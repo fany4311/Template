@@ -1,0 +1,6 @@
+# pnpm 12 设置入口（package.json 的 pnpm 字段已不再读取）
+# 本项目为单包，无需 packages 字段。
+strictDepBuilds: false
+# 允许执行构建脚本的依赖（vite 依赖 esbuild 二进制）
+allowBuilds:
+  esbuild: true

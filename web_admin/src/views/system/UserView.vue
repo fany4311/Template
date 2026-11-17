@@ -9,28 +9,43 @@ import {
 import { computed, onMounted, reactive, ref } from 'vue';
 import { deptApi } from '../../api/dept';
 import { roleApi } from '../../api/role';
-import {
-  userApi,
-  type UserCreateBody,
-  type UserQuery,
-} from '../../api/user';
+import { userApi, type UserCreateBody } from '../../api/user';
 import type { DeptTreeNode, RoleItem, UserItem, UserRoleGrant } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 import ImportDialog from '../../components/ImportDialog.vue';
+import { useCrud } from '../../composables/useCrud';
 
 // ---------------------------------------------------------------------------
 // 列表
 // ---------------------------------------------------------------------------
-const loading = ref(false);
-const list = ref<UserItem[]>([]);
-const total = ref(0);
+/** UserQuery 的分页字段在 OpenAPI 里是可选的，useCrud 要求必填，这里收窄 */
+type UserListQuery = {
+  pageNum: number;
+  pageSize: number;
+  keyword: string;
+  status?: number;
+  deptId?: number;
+};
 
-const query = reactive<UserQuery>({
-  pageNum: 1,
-  pageSize: 10,
-  keyword: '',
-  status: undefined,
-  deptId: undefined,
+const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
+  UserItem,
+  UserListQuery
+>({
+  api: { page: (q) => userApi.page(q), remove: userApi.remove },
+  query: { pageNum: 1, pageSize: 10, keyword: '', status: undefined, deptId: undefined },
+  removeText: (row) => '确认删除用户「' + row.username + '」？',
 });
+
+const columns: TableColumn[] = [
+  { prop: 'id', label: 'ID', width: 70 },
+  { prop: 'username', label: '用户名', minWidth: 120 },
+  { prop: 'nickname', label: '昵称', minWidth: 120 },
+  { label: '部门', minWidth: 140, slot: 'dept' },
+  { prop: 'post', label: '岗位', minWidth: 110 },
+  { prop: 'phone', label: '手机号', minWidth: 120 },
+  { label: '状态', width: 90, slot: 'status' },
+  { label: '创建时间', width: 170, slot: 'createTime' },
+];
 
 const deptTree = ref<DeptTreeNode[]>([]);
 const roleOptions = ref<RoleItem[]>([]);
@@ -56,19 +71,6 @@ const roleMap = computed(() => new Map(roleOptions.value.map((r) => [r.id, r])))
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await userApi.page({ ...query });
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 错误提示由 http 拦截器统一处理
-  } finally {
-    loading.value = false;
-  }
-}
-
 async function loadDeptTree(): Promise<void> {
   try {
     deptTree.value = await deptApi.tree();
@@ -86,18 +88,6 @@ async function loadRoles(): Promise<void> {
   }
 }
 
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
-
-function handleReset(): void {
-  query.keyword = '';
-  query.status = undefined;
-  query.deptId = undefined;
-  query.pageNum = 1;
-  void fetchList();
-}
 
 // ---------------------------------------------------------------------------
 // 新建 / 编辑
@@ -189,28 +179,11 @@ async function submitForm(): Promise<void> {
       ElMessage.success('更新成功');
     }
     dialogVisible.value = false;
-    await fetchList();
+    await reload();
   } catch {
     // 已提示
   } finally {
     submitting.value = false;
-  }
-}
-
-async function handleDelete(row: UserItem): Promise<void> {
-  try {
-    await ElMessageBox.confirm(`确认删除用户「${row.username}」？`, '提示', {
-      type: 'warning',
-    });
-  } catch {
-    return;
-  }
-  try {
-    await userApi.remove(row.id);
-    ElMessage.success('删除成功');
-    await fetchList();
-  } catch {
-    // 已提示
   }
 }
 
@@ -368,9 +341,10 @@ async function handleExport(): Promise<void> {
   }
 }
 
-onMounted(async () => {
-  await Promise.all([loadDeptTree(), loadRoles()]);
-  await fetchList();
+/** 列表由 useCrud 自动加载；这里只补下拉数据源 */
+onMounted(() => {
+  void loadDeptTree();
+  void loadRoles();
 });
 </script>
 
@@ -384,7 +358,7 @@ onMounted(async () => {
           placeholder="用户名 / 昵称"
           clearable
           style="width: 200px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-tree-select
           v-model="query.deptId"
@@ -405,10 +379,8 @@ onMounted(async () => {
           <el-option label="正常" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="handleSearch">
-          查询
-        </el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
 
         <div class="page-toolbar-right">
           <el-button
@@ -438,25 +410,25 @@ onMounted(async () => {
       </div>
 
       <!-- 列表 -->
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="username" label="用户名" min-width="120" />
-        <el-table-column prop="nickname" label="昵称" min-width="120" />
-        <el-table-column label="部门" min-width="140">
-          <template #default="{ row }">{{ deptLabel(row.deptId) }}</template>
-        </el-table-column>
-        <el-table-column prop="post" label="岗位" min-width="110" />
-        <el-table-column prop="phone" label="手机号" min-width="120" />
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
-        </el-table-column>
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #dept="{ row }">{{ deptLabel(row.deptId) }}</template>
+
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '正常' : '禁用' }}
+          </el-tag>
+        </template>
+
+        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>
+
         <el-table-column label="操作" width="300" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -487,25 +459,13 @@ onMounted(async () => {
               v-perm="'system:user:remove'"
               link
               type="danger"
-              @click="handleDelete(row as UserItem)"
+              @click="remove(row as UserItem)"
             >
               删除
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
 
     <!-- 新建 / 编辑 -->
@@ -674,7 +634,7 @@ onMounted(async () => {
       title="导入用户"
       hint="表头：账号、昵称、部门、手机号、岗位、初始密码（仅 .csv；部门按名称匹配）"
       :upload="userApi.importCsv"
-      @done="fetchList"
+      @done="reload"
     />
   </div>
 </template>

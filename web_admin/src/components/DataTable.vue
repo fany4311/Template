@@ -36,17 +36,24 @@ const props = withDefaults(
     rowKey?: string;
     emptyText?: string;
     pageSizes?: number[];
+    /** 树表等不分页场景关掉分页条 */
+    pagination?: boolean;
+    /** 树表默认全展开 */
+    defaultExpandAll?: boolean;
   }>(),
   {
     loading: false,
     rowKey: 'id',
     emptyText: '暂无数据',
     pageSizes: () => [10, 20, 50, 100],
+    pagination: true,
+    defaultExpandAll: false,
   },
 );
 
-const page = defineModel<number>('page', { required: true });
-const pageSize = defineModel<number>('pageSize', { required: true });
+// 树表等不分页场景不传，给个默认值即可（分页条本身由 pagination 控制显隐）
+const page = defineModel<number>('page', { default: 1 });
+const pageSize = defineModel<number>('pageSize', { default: 10 });
 
 const emit = defineEmits<{ change: [] }>();
 
@@ -82,6 +89,7 @@ function onSize(value: number): void {
       :data="tableRows"
       :row-key="rowKey"
       :empty-text="emptyText"
+      :default-expand-all="defaultExpandAll"
       border
       stripe
     >
@@ -104,7 +112,7 @@ function onSize(value: number): void {
       <slot />
     </el-table>
 
-    <div class="pagination">
+    <div v-if="pagination" class="pagination">
       <el-pagination
         :current-page="page"
         :page-size="pageSize"

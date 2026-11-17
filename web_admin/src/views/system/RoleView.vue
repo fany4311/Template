@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { Plus, Refresh, Search } from '@element-plus/icons-vue';
-import {
-  ElMessage,
-  ElMessageBox,
-  ElTree,
-  type FormInstance,
-  type FormRules,
-} from 'element-plus';
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { ElMessage, ElTree, type FormInstance, type FormRules } from 'element-plus';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { permissionApi } from '../../api/permission';
-import { roleApi, type RoleCreateBody, type RoleQuery } from '../../api/role';
+import { roleApi, type RoleCreateBody } from '../../api/role';
 import type { DataScope, PermissionGroup, RoleItem } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
+import { useCrud } from '../../composables/useCrud';
 
 /**
  * 内置超管的编号（`sys_role.level`）。
@@ -37,7 +33,7 @@ const DATA_SCOPE_OPTIONS: { value: DataScope; label: string }[] = [
   { value: 'CUSTOM', label: '自定义（暂未启用）' },
 ];
 
-const dataScopeLabel = (value: DataScope): string =>
+const dataScopeLabel = (value: string): string =>
   DATA_SCOPE_OPTIONS.find((o) => o.value === value)?.label ?? value;
 
 const fmtTime = (value?: string | null): string =>
@@ -46,41 +42,32 @@ const fmtTime = (value?: string | null): string =>
 // ---------------------------------------------------------------------------
 // 列表
 // ---------------------------------------------------------------------------
-const loading = ref(false);
-const list = ref<RoleItem[]>([]);
-const total = ref(0);
+/** RoleQuery 的 OpenAPI 版本把分页字段都标成可选，useCrud 要求分页必填，这里收窄一次 */
+type RoleListQuery = {
+  pageNum: number;
+  pageSize: number;
+  keyword: string;
+  status?: number;
+};
 
-const query = reactive<RoleQuery>({
-  pageNum: 1,
-  pageSize: 10,
-  keyword: '',
-  status: undefined,
+const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
+  RoleItem,
+  RoleListQuery
+>({
+  api: { page: (q) => roleApi.page(q), remove: roleApi.remove },
+  query: { pageNum: 1, pageSize: 10, keyword: '', status: undefined },
+  removeText: (row) => '确认删除角色「' + row.roleName + '」？',
 });
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await roleApi.page({ ...query });
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 已提示
-  } finally {
-    loading.value = false;
-  }
-}
-
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
-
-function handleReset(): void {
-  query.keyword = '';
-  query.status = undefined;
-  query.pageNum = 1;
-  void fetchList();
-}
+const columns: TableColumn[] = [
+  { prop: 'id', label: 'ID', width: 70 },
+  { label: '编号', width: 90, slot: 'level' },
+  { label: '角色名称', minWidth: 150, slot: 'roleName' },
+  { label: '数据范围', width: 140, slot: 'dataScope' },
+  { label: '权限码', minWidth: 260, slot: 'permissions' },
+  { label: '状态', width: 90, slot: 'status' },
+  { label: '创建时间', width: 170, slot: 'createTime' },
+];
 
 // ---------------------------------------------------------------------------
 // 新建 / 编辑
@@ -104,6 +91,23 @@ const form = reactive<RoleCreateBody>({
   dataScope: 'SELF',
   status: 1,
 });
+
+/**
+ * 角色身上是否有**平台级授权**（通配 `*` 或否定 `!`，如校级管理员的 `*:*:*,!system:*`）。
+ *
+ * 这类码不是普通权限码：接口（`permissionCodeSchema`）一律拒收，
+ * 只能由迁移/seed 写入。所以界面必须把权限区锁住、保存时不回传 permissions ——
+ * 否则编辑内置角色时前端会先报「权限码格式非法」，放行也会被后端拒。
+ * 判据用码本身而不是 `isBuiltin`：manager/operator/auditor 也是内置角色，但权限为空、本就该允许配。
+ */
+const PLATFORM_PERMISSION_REGEX = /[*!]/;
+
+const hasPlatformPermissions = computed(() =>
+  (form.permissions ?? []).some((code) => PLATFORM_PERMISSION_REGEX.test(code)),
+);
+
+/** 权限区是否只读：超管锁 或 含平台级授权 */
+const permLocked = computed(() => superadminLock.value || hasPlatformPermissions.value);
 
 // ---------------------------------------------------------------------------
 // 权限清单树
@@ -147,14 +151,14 @@ const permTreeData = computed<PermTreeNode[]>(() => {
         id: perm.code,
         label: perm.name || perm.code,
         code: perm.code,
-        disabled: superadminLock.value,
+        disabled: permLocked.value,
       });
     }
     if (!children.length) continue;
     groups.push({
       id: `g:${group.module}:${group.moduleLabel}`,
       label: group.moduleLabel || group.module,
-      disabled: superadminLock.value,
+      disabled: permLocked.value,
       children,
     });
   }
@@ -169,14 +173,14 @@ const permTreeData = computed<PermTreeNode[]>(() => {
       label: info ? `${info.name}（代码中已不存在）` : code,
       code,
       stale: true,
-      disabled: superadminLock.value,
+      disabled: permLocked.value,
     });
   }
   if (orphans.length) {
     groups.push({
       id: 'g:__stale__',
       label: `已失效 / 未收录（${orphans.length}）`,
-      disabled: superadminLock.value,
+      disabled: permLocked.value,
       children: orphans,
     });
   }
@@ -219,10 +223,11 @@ const rules = computed<FormRules>(() => ({
   roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
   permissions: [
     {
-      // 兜底校验：码现在只能从清单树勾选，理论上必然合法
+      // 兜底校验：码现在只能从清单树勾选，理论上必然合法；
+      // 平台级授权（含 * / !）不经此处校验 —— 它们本就不是普通码，也不由界面写入
       validator: (_rule, value, cb) => {
         const bad = ((value as string[] | undefined) ?? []).filter(
-          (p) => !PERMISSION_CODE_REGEX.test(p),
+          (p) => !PLATFORM_PERMISSION_REGEX.test(p) && !PERMISSION_CODE_REGEX.test(p),
         );
         if (bad.length) {
           cb(
@@ -272,8 +277,9 @@ function openEdit(row: RoleItem): void {
 }
 
 async function submitForm(): Promise<void> {
-  // 从树上收权限码：`leafOnly=true` 保证拿到的是码，不是分组节点 id
-  if (!superadminLock.value) {
+  // 从树上收权限码：`leafOnly=true` 保证拿到的是码，不是分组节点 id。
+  // 权限区锁住时不收也不发 —— 含平台级授权的角色，permissions 只能由迁移维护。
+  if (!permLocked.value) {
     form.permissions =
       (permTreeRef.value?.getCheckedKeys(true) as string[] | undefined) ?? [];
   }
@@ -287,6 +293,10 @@ async function submitForm(): Promise<void> {
     const payload: RoleCreateBody = superadminLock.value
       ? { roleName: form.roleName }
       : { ...form };
+    // 含平台级授权时不能回传 permissions（后端 DTO 拒收 * / !），其它字段照常可改
+    if (hasPlatformPermissions.value) {
+      delete (payload as { permissions?: string[] }).permissions;
+    }
     if (dialogMode.value === 'create') {
       await roleApi.create(payload);
       ElMessage.success('创建成功');
@@ -295,32 +305,13 @@ async function submitForm(): Promise<void> {
       ElMessage.success('更新成功');
     }
     dialogVisible.value = false;
-    await fetchList();
+    await reload();
   } catch {
     // 已提示
   } finally {
     submitting.value = false;
   }
 }
-
-async function handleDelete(row: RoleItem): Promise<void> {
-  try {
-    await ElMessageBox.confirm(`确认删除角色「${row.roleName}」？`, '提示', {
-      type: 'warning',
-    });
-  } catch {
-    return;
-  }
-  try {
-    await roleApi.remove(row.id);
-    ElMessage.success('删除成功');
-    await fetchList();
-  } catch {
-    // 已提示
-  }
-}
-
-onMounted(fetchList);
 </script>
 
 <template>
@@ -332,7 +323,7 @@ onMounted(fetchList);
           placeholder="角色名称"
           clearable
           style="width: 200px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-select
           v-model="query.status"
@@ -343,8 +334,8 @@ onMounted(fetchList);
           <el-option label="正常" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="handleSearch">查询</el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
 
         <div class="page-toolbar-right">
           <el-button
@@ -358,67 +349,57 @@ onMounted(fetchList);
         </div>
       </div>
 
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column label="编号" width="90">
-          <template #default="{ row }">
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #level="{ row }">
+          <el-tag :type="row.level <= 4 ? 'warning' : 'info'" size="small" effect="plain">
+            {{ row.level }}
+          </el-tag>
+        </template>
+
+        <template #roleName="{ row }">
+          {{ row.roleName }}
+          <el-tag v-if="row.isBuiltin === 1" size="small" type="warning" effect="plain">
+            内置
+          </el-tag>
+        </template>
+
+        <template #dataScope="{ row }">
+          <el-tag size="small" type="info">{{ dataScopeLabel(row.dataScope) }}</el-tag>
+        </template>
+
+        <template #permissions="{ row }">
+          <template v-if="row.permissions?.length">
             <el-tag
-              :type="row.level <= 4 ? 'warning' : 'info'"
+              v-for="perm in row.permissions.slice(0, 3)"
+              :key="perm"
               size="small"
-              effect="plain"
+              class="perm-tag"
             >
-              {{ row.level }}
+              {{ perm }}
+            </el-tag>
+            <el-tag v-if="row.permissions.length > 3" size="small" type="info">
+              +{{ row.permissions.length - 3 }}
             </el-tag>
           </template>
-        </el-table-column>
-        <el-table-column label="角色名称" min-width="150">
-          <template #default="{ row }">
-            {{ row.roleName }}
-            <el-tag
-              v-if="row.isBuiltin === 1"
-              size="small"
-              type="warning"
-              effect="plain"
-            >
-              内置
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="数据范围" width="140">
-          <template #default="{ row }">
-            <el-tag size="small" type="info">
-              {{ dataScopeLabel(row.dataScope) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="权限码" min-width="260">
-          <template #default="{ row }">
-            <template v-if="row.permissions?.length">
-              <el-tag
-                v-for="perm in row.permissions.slice(0, 3)"
-                :key="perm"
-                size="small"
-                class="perm-tag"
-              >
-                {{ perm }}
-              </el-tag>
-              <el-tag v-if="row.permissions.length > 3" size="small" type="info">
-                +{{ row.permissions.length - 3 }}
-              </el-tag>
-            </template>
-            <span v-else class="form-tip">未配置</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
-        </el-table-column>
+          <span v-else class="form-tip">未配置</span>
+        </template>
+
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '正常' : '禁用' }}
+          </el-tag>
+        </template>
+
+        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>
+
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -443,25 +424,13 @@ onMounted(fetchList);
               v-perm="'system:role:remove'"
               link
               type="danger"
-              @click="handleDelete(row as RoleItem)"
+              @click="remove(row as RoleItem)"
             >
               删除
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
 
     <el-dialog
@@ -477,6 +446,14 @@ onMounted(fetchList);
         show-icon
         class="dialog-alert"
         title="内置超级管理员角色是系统管理域的唯一入口，权限 / 数据范围 / 状态已锁定，仅可修改名称"
+      />
+      <el-alert
+        v-else-if="hasPlatformPermissions"
+        type="info"
+        :closable="false"
+        show-icon
+        class="dialog-alert"
+        title="该角色含平台级通配授权（*:*:*、!system:*），权限由数据库维护、界面不可修改；名称 / 数据范围 / 状态仍可调整"
       />
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="角色名称" prop="roleName">
@@ -509,7 +486,7 @@ onMounted(fetchList);
               v-model="permKeyword"
               size="small"
               clearable
-              :disabled="superadminLock"
+              :disabled="permLocked"
               placeholder="搜索权限码或名称"
               class="perm-search"
             />
@@ -545,6 +522,9 @@ onMounted(fetchList);
             按模块勾选。清单由 <code>pnpm authz:sync</code> 从接口装饰器反射生成，
             此处只能选、不能编 —— 要新增权限码，去写
             <code>@RequiresPermissions</code> 再同步一次。
+            <template v-if="hasPlatformPermissions">
+              含通配 / 否定的平台级授权不经接口下发，勾选已锁定，保存时保持原值。
+            </template>
           </div>
         </el-form-item>
         <el-form-item label="状态" prop="status">

@@ -1,46 +1,29 @@
 <script setup lang="ts">
+import { Delete, Download, Refresh, Search, Upload, View } from '@element-plus/icons-vue';
+import { ref } from 'vue';
+import { fileApi } from '../../api/file';
+import type { FileDetail, FileItem } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
+import UploadFile from '../../components/UploadFile.vue';
+import { useCrud } from '../../composables/useCrud';
+import { downloadFile } from '../../utils/download';
+
 /**
  * 文件管理（系统管理域）。
  *
  * 注意权限归属：`system:file:*` 属于系统域，内置 `admin` 角色被 `!system:*` 排除，
  * 只有 `superadmin` 能进 —— 这是刻意的：业务管理员不应通过文件总览
  * 窥探其它部门的附件，他们通过业务页面（走 FileBizRegistry 判定）看自己的。
+ *
+ * 上传与详情是文件域特有的，useCrud 只接管列表这一半。
  */
-import { Delete, Download, Refresh, Search, Upload, View } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { onMounted, reactive, ref } from 'vue';
-import UploadFile from '../../components/UploadFile.vue';
-import { fileApi, type FileQuery } from '../../api/file';
-import type { FileDetail, FileItem } from '../../api/types';
-import { downloadFile } from '../../utils/download';
-
-const loading = ref(false);
-const list = ref<FileItem[]>([]);
-const total = ref(0);
-
-const query = reactive<{
+type FileQueryState = {
   pageNum: number;
   pageSize: number;
   keyword: string;
   ext: string;
   status?: 'TEMP' | 'ACTIVE';
-}>({
-  pageNum: 1,
-  pageSize: 10,
-  keyword: '',
-  ext: '',
-  status: undefined,
-});
-
-const detailVisible = ref(false);
-const detail = ref<FileDetail | null>(null);
-
-const uploadVisible = ref(false);
-
-/** 上传成功：新文件是 TEMP 状态，出现在列表里，绑定动作由业务页面完成 */
-function handleUploaded(): void {
-  void fetchList();
-}
+};
 
 const fmtTime = (v?: string | null): string =>
   v ? new Date(v).toLocaleString('zh-CN', { hour12: false }) : '-';
@@ -51,37 +34,41 @@ const fmtSize = (bytes: number): string => {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 };
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const params: FileQuery = {
-      pageNum: query.pageNum,
-      pageSize: query.pageSize,
-      keyword: query.keyword || undefined,
-      ext: query.ext || undefined,
-      status: query.status,
-    };
-    const res = await fileApi.page(params);
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 已提示
-  } finally {
-    loading.value = false;
-  }
-}
+const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
+  FileItem,
+  FileQueryState
+>({
+  api: {
+    page: (q) =>
+      fileApi.page({
+        pageNum: q.pageNum,
+        pageSize: q.pageSize,
+        keyword: q.keyword || undefined,
+        ext: q.ext || undefined,
+        status: q.status,
+      }),
+    remove: fileApi.remove,
+  },
+  query: { pageNum: 1, pageSize: 10, keyword: '', ext: '', status: undefined },
+  removeText: (row) =>
+    `确认删除「${row.originalName}」？已绑定业务的文件请在业务页面解绑后再删除。`,
+});
 
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
+const columns: TableColumn[] = [
+  { prop: 'id', label: 'ID', width: 80 },
+  { prop: 'originalName', label: '文件名', minWidth: 220, showOverflowTooltip: true },
+  { prop: 'ext', label: '类型', width: 90 },
+  { label: '大小', width: 100, slot: 'size' },
+  { label: '状态', width: 100, slot: 'status' },
+  { prop: 'refCount', label: '引用', width: 80 },
+  { prop: 'uploaderName', label: '上传人', width: 120 },
+  { label: '上传时间', width: 170, slot: 'createTime' },
+  { label: '过期时间', width: 170, slot: 'expireAt' },
+];
 
-function handleReset(): void {
-  query.keyword = '';
-  query.ext = '';
-  query.status = undefined;
-  handleSearch();
-}
+const detailVisible = ref(false);
+const detail = ref<FileDetail | null>(null);
+const uploadVisible = ref(false);
 
 async function handleDetail(row: FileItem): Promise<void> {
   try {
@@ -96,26 +83,10 @@ async function handleDownload(row: FileItem): Promise<void> {
   await downloadFile(row.downloadUrl, row.originalName);
 }
 
-async function handleRemove(row: FileItem): Promise<void> {
-  try {
-    await ElMessageBox.confirm(
-      `确认删除「${row.originalName}」？已绑定业务的文件请在业务页面解绑后再删除。`,
-      '提示',
-      { type: 'warning' },
-    );
-  } catch {
-    return;
-  }
-  try {
-    await fileApi.remove(row.id);
-    ElMessage.success('删除成功');
-    await fetchList();
-  } catch {
-    // 已提示
-  }
+/** 上传成功：新文件是 TEMP 状态，出现在列表里，绑定动作由业务页面完成 */
+function handleUploaded(): void {
+  void reload();
 }
-
-onMounted(fetchList);
 </script>
 
 <template>
@@ -127,46 +98,49 @@ onMounted(fetchList);
           placeholder="文件名"
           clearable
           style="width: 200px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-input
           v-model="query.ext"
           placeholder="扩展名（如 pdf）"
           clearable
           style="width: 150px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-select v-model="query.status" placeholder="状态" clearable style="width: 130px">
           <el-option label="已绑定" value="ACTIVE" />
           <el-option label="临时" value="TEMP" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="handleSearch">查询</el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
-        <el-button :icon="Upload" type="success" @click="uploadVisible = true">上传文件</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
+        <div class="page-toolbar-right">
+          <el-button :icon="Upload" type="success" @click="uploadVisible = true">
+            上传文件
+          </el-button>
+        </div>
       </div>
 
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="originalName" label="文件名" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="ext" label="类型" width="90" />
-        <el-table-column label="大小" width="100">
-          <template #default="{ row }">{{ fmtSize(row.size) }}</template>
-        </el-table-column>
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'" size="small">
-              {{ row.status === 'ACTIVE' ? '已绑定' : '临时' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="refCount" label="引用" width="80" />
-        <el-table-column prop="uploaderName" label="上传人" width="120" />
-        <el-table-column label="上传时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
-        </el-table-column>
-        <el-table-column label="过期时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.expireAt) }}</template>
-        </el-table-column>
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #size="{ row }">{{ fmtSize(row.size) }}</template>
+
+        <template #status="{ row }">
+          <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'" size="small">
+            {{ row.status === 'ACTIVE' ? '已绑定' : '临时' }}
+          </el-tag>
+        </template>
+
+        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>
+
+        <template #expireAt="{ row }">{{ fmtTime(row.expireAt) }}</template>
+
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button :icon="View" link type="primary" @click="handleDetail(row as FileItem)">
@@ -180,25 +154,13 @@ onMounted(fetchList);
               :icon="Delete"
               link
               type="danger"
-              @click="handleRemove(row as FileItem)"
+              @click="remove(row as FileItem)"
             >
               删除
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
 
     <el-dialog v-model="uploadVisible" title="上传文件（先暂存，绑定在业务页面完成）" width="560px">
@@ -212,10 +174,14 @@ onMounted(fetchList);
       <template v-if="detail">
         <el-descriptions :column="1" border>
           <el-descriptions-item label="文件名">{{ detail.file.originalName }}</el-descriptions-item>
-          <el-descriptions-item label="类型">{{ detail.file.mime }}（.{{ detail.file.ext }}）</el-descriptions-item>
+          <el-descriptions-item label="类型">
+            {{ detail.file.mime }}（.{{ detail.file.ext }}）
+          </el-descriptions-item>
           <el-descriptions-item label="大小">{{ fmtSize(detail.file.size) }}</el-descriptions-item>
           <el-descriptions-item label="上传人">{{ detail.file.uploaderName }}</el-descriptions-item>
-          <el-descriptions-item label="上传时间">{{ fmtTime(detail.file.createTime) }}</el-descriptions-item>
+          <el-descriptions-item label="上传时间">
+            {{ fmtTime(detail.file.createTime) }}
+          </el-descriptions-item>
           <el-descriptions-item label="状态">
             {{ detail.file.status === 'ACTIVE' ? '已绑定' : '临时' }}
             （引用 {{ detail.file.refCount }} 次）

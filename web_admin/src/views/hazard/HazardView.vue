@@ -13,7 +13,6 @@ import {
   HAZARD_ACTION_PERMISSIONS,
   hazardApi,
   type HazardAcceptBody,
-  type HazardQuery,
   type HazardReportBody,
 } from '../../api/hazard';
 import type {
@@ -22,6 +21,8 @@ import type {
   HazardDetail,
   HazardItem,
 } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
+import { useCrud } from '../../composables/useCrud';
 import { useAuthStore } from '../../stores/auth';
 
 /**
@@ -34,22 +35,53 @@ import { useAuthStore } from '../../stores/auth';
  */
 const auth = useAuthStore();
 
-const loading = ref(false);
-const list = ref<HazardItem[]>([]);
-const total = ref(0);
 /** 查询表单：onlyMine 在 UI 上是开关（boolean），出网时转成字符串（后端 stringbool） */
-type HazardQueryForm = Omit<HazardQuery, 'onlyMine'> & { onlyMine: boolean };
+type HazardListQuery = {
+  pageNum: number;
+  pageSize: number;
+  keyword: string;
+  status?: string;
+  level?: string;
+  scope?: string;
+  category?: string;
+  onlyMine: boolean;
+};
 
-const query = reactive<HazardQueryForm>({
-  pageNum: 1,
-  pageSize: 10,
-  keyword: '',
-  status: undefined,
-  level: undefined,
-  scope: undefined,
-  category: undefined,
-  onlyMine: false,
+const { query, rows, total, loading, reload, search, reset } = useCrud<
+  HazardItem,
+  HazardListQuery
+>({
+  api: {
+    page: (q) =>
+      hazardApi.page({
+        ...q,
+        onlyMine: q.onlyMine ? 'true' : undefined,
+      } as Record<string, unknown>),
+  },
+  query: {
+    pageNum: 1,
+    pageSize: 10,
+    keyword: '',
+    status: undefined,
+    level: undefined,
+    scope: undefined,
+    category: undefined,
+    onlyMine: false,
+  },
 });
+
+const columns: TableColumn[] = [
+  { prop: 'hazardNo', label: '编号', width: 170 },
+  { prop: 'title', label: '标题', minWidth: 200, showOverflowTooltip: true },
+  { label: '类别', width: 110, slot: 'category' },
+  { label: '等级', width: 110, slot: 'level' },
+  { label: '范围', width: 120, slot: 'scope' },
+  { label: '状态', width: 100, slot: 'status' },
+  { prop: 'assigneeDeptName', label: '主责部门', width: 120 },
+  { label: '协办部门', minWidth: 140, slot: 'cooperate' },
+  { prop: 'reporterName', label: '上报人', width: 110 },
+  { label: '整改期限', width: 150, slot: 'deadline' },
+];
 
 const categories = ref<DictOption[]>([]);
 const levels = ref<DictOption[]>([]);
@@ -99,39 +131,6 @@ const SCOPE_TAG: Record<string, TagType> = {
 // 列表
 // ---------------------------------------------------------------------------
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await hazardApi.page({
-      ...query,
-      onlyMine: query.onlyMine ? 'true' : undefined,
-    } as Record<string, unknown>);
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 已提示
-  } finally {
-    loading.value = false;
-  }
-}
-
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
-
-function handleReset(): void {
-  Object.assign(query, {
-    keyword: '',
-    status: undefined,
-    level: undefined,
-    scope: undefined,
-    category: undefined,
-    onlyMine: false,
-    pageNum: 1,
-  });
-  void fetchList();
-}
 
 // ---------------------------------------------------------------------------
 // 上报
@@ -190,7 +189,7 @@ async function submitReport(): Promise<void> {
     });
     ElMessage.success('上报成功');
     reportVisible.value = false;
-    await fetchList();
+    await reload();
   } catch {
     // 已提示
   } finally {
@@ -236,7 +235,7 @@ async function openDetail(id: number): Promise<void> {
 async function reloadDetail(): Promise<void> {
   if (!detail.value) return;
   detail.value = await hazardApi.detail(detail.value.id);
-  await fetchList();
+  await reload();
 }
 
 /** 状态机允许 && 我有权限码 */
@@ -330,14 +329,14 @@ async function handleDelete(): Promise<void> {
     await hazardApi.remove(detail.value.id);
     ElMessage.success('删除成功');
     detailVisible.value = false;
-    await fetchList();
+    await reload();
   } catch {
     // 已提示
   }
 }
 
+/** 列表由 useCrud 自动加载；这里只补字典与部门树 */
 onMounted(async () => {
-  await fetchList();
   const [cat, lv, tree] = await Promise.allSettled([
     dictApi.options('hazard_category'),
     dictApi.options('hazard_level'),
@@ -358,7 +357,7 @@ onMounted(async () => {
           placeholder="编号 / 标题 / 地点"
           clearable
           style="width: 200px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-select v-model="query.status" placeholder="状态" clearable style="width: 130px">
           <el-option label="待受理" value="REPORTED" />
@@ -385,8 +384,8 @@ onMounted(async () => {
           />
         </el-select>
         <el-checkbox v-model="query.onlyMine">只看我部门</el-checkbox>
-        <el-button :icon="Search" type="primary" @click="handleSearch">查询</el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button
             v-perm="'hazard:report:add'"
@@ -399,87 +398,64 @@ onMounted(async () => {
         </div>
       </div>
 
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="hazardNo" label="编号" width="170" />
-        <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column label="类别" width="110">
-          <template #default="{ row }">
-            <el-tag :type="catTag(row.category)" size="small">
-              {{ catLabel(row.category) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="等级" width="110">
-          <template #default="{ row }">
-            <el-tag :type="levelTag(row.level)" size="small">
-              {{ levelLabel(row.level) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="范围" width="120">
-          <template #default="{ row }">
-            <el-tag :type="SCOPE_TAG[row.scope] ?? 'info'" size="small" effect="plain">
-              {{ SCOPE_LABEL[row.scope] ?? row.scope }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="STATUS_TAG[row.status] ?? 'info'" size="small">
-              {{ row.statusLabel }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="assigneeDeptName" label="主责部门" width="120" />
-        <el-table-column label="协办部门" min-width="140">
-          <template #default="{ row }">
-            <span v-if="!row.cooperateDeptNames.length" class="muted">-</span>
-            <el-tag
-              v-for="name in row.cooperateDeptNames"
-              :key="name"
-              size="small"
-              type="info"
-              effect="plain"
-              style="margin-right: 4px"
-            >
-              {{ name }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="reporterName" label="上报人" width="110" />
-        <el-table-column label="整改期限" width="150">
-          <template #default="{ row }">
-            <span :class="{ 'text-danger': row.overdue }">
-              {{ fmtTime(row.rectifyDeadline) }}
-              <el-tag v-if="row.overdue" type="danger" size="small">逾期</el-tag>
-            </span>
-          </template>
-        </el-table-column>
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #category="{ row }">
+          <el-tag :type="catTag(row.category)" size="small">{{ catLabel(row.category) }}</el-tag>
+        </template>
+
+        <template #level="{ row }">
+          <el-tag :type="levelTag(row.level)" size="small">{{ levelLabel(row.level) }}</el-tag>
+        </template>
+
+        <template #scope="{ row }">
+          <el-tag :type="SCOPE_TAG[row.scope] ?? 'info'" size="small" effect="plain">
+            {{ SCOPE_LABEL[row.scope] ?? row.scope }}
+          </el-tag>
+        </template>
+
+        <template #status="{ row }">
+          <el-tag :type="STATUS_TAG[row.status] ?? 'info'" size="small">
+            {{ row.statusLabel }}
+          </el-tag>
+        </template>
+
+        <template #cooperate="{ row }">
+          <span v-if="!row.cooperateDeptNames.length" class="muted">-</span>
+          <el-tag
+            v-for="name in row.cooperateDeptNames"
+            :key="name"
+            size="small"
+            type="info"
+            effect="plain"
+            style="margin-right: 4px"
+          >
+            {{ name }}
+          </el-tag>
+        </template>
+
+        <template #deadline="{ row }">
+          <span :class="{ 'text-danger': row.overdue }">
+            {{ fmtTime(row.rectifyDeadline) }}
+            <el-tag v-if="row.overdue" type="danger" size="small">逾期</el-tag>
+          </span>
+        </template>
+
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button
-              :icon="View"
-              link
-              type="primary"
-              @click="openDetail(row.id as number)"
-            >
+            <el-button :icon="View" link type="primary" @click="openDetail(row.id)">
               详情
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
 
     <!-- 上报 -->

@@ -9,6 +9,7 @@ import {
 import { computed, onMounted, reactive, ref } from 'vue';
 import { menuApi, type MenuCreateBody } from '../../api/menu';
 import type { MenuItem, MenuType } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 
 const TYPE_LABEL: Record<MenuType, string> = { M: '目录', C: '菜单', F: '按钮' };
 const TYPE_TAG: Record<MenuType, 'primary' | 'success' | 'info'> = {
@@ -17,12 +18,24 @@ const TYPE_TAG: Record<MenuType, 'primary' | 'success' | 'info'> = {
   F: 'info',
 };
 
+/** 菜单树：整棵返回、无分页，与部门树同理不走 useCrud；表单含类型联动，仍手写 */
 const loading = ref(false);
 const tree = ref<MenuItem[]>([]);
 const query = reactive<{ keyword: string; status?: number }>({
   keyword: '',
   status: undefined,
 });
+
+const columns: TableColumn[] = [
+  { prop: 'name', label: '名称', minWidth: 200 },
+  { label: '类型', width: 90, slot: 'type' },
+  { prop: 'path', label: '路由地址', minWidth: 150 },
+  { prop: 'component', label: '组件路径', minWidth: 160, showOverflowTooltip: true },
+  { prop: 'perms', label: '权限码', minWidth: 170, showOverflowTooltip: true },
+  { prop: 'sort', label: '排序', width: 70 },
+  { label: '可见', width: 80, slot: 'visible' },
+  { label: '状态', width: 80, slot: 'status' },
+];
 
 async function fetchTree(): Promise<void> {
   loading.value = true;
@@ -188,38 +201,28 @@ onMounted(fetchTree);
         </div>
       </div>
 
-      <el-table
-        v-loading="loading"
-        :data="tree"
-        row-key="id"
-        border
+      <DataTable
+        :columns="columns"
+        :rows="tree"
+        :loading="loading"
+        :total="0"
+        :pagination="false"
         default-expand-all
-        :tree-props="{ children: 'children' }"
       >
-        <el-table-column prop="name" label="名称" min-width="200" />
-        <el-table-column label="类型" width="90">
-          <template #default="{ row }">
-            <el-tag :type="TYPE_TAG[row.type as MenuType]" size="small">
-              {{ TYPE_LABEL[row.type as MenuType] }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="path" label="路由地址" min-width="150" />
-        <el-table-column prop="component" label="组件路径" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="perms" label="权限码" min-width="170" show-overflow-tooltip />
-        <el-table-column prop="sort" label="排序" width="70" />
-        <el-table-column label="可见" width="80">
-          <template #default="{ row }">
-            {{ row.visible === 1 ? '显示' : '隐藏' }}
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '正常' : '停用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
+        <template #type="{ row }">
+          <el-tag :type="TYPE_TAG[row.type as MenuType]" size="small">
+            {{ TYPE_LABEL[row.type as MenuType] }}
+          </el-tag>
+        </template>
+
+        <template #visible="{ row }">{{ row.visible === 1 ? '显示' : '隐藏' }}</template>
+
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '正常' : '停用' }}
+          </el-tag>
+        </template>
+
         <el-table-column label="操作" width="210" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -248,7 +251,7 @@ onMounted(fetchTree);
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </DataTable>
     </el-card>
 
     <el-dialog

@@ -9,9 +9,22 @@ import {
 import { computed, onMounted, reactive, ref } from 'vue';
 import { deptApi, type DeptCreateBody } from '../../api/dept';
 import type { DeptTreeNode } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 
+/**
+ * 部门树：接口返回整棵树、无分页，所以不走 useCrud（它的分页/退页语义在这里没意义），
+ * 只用 DataTable 统一表格与 loading。树形展开由 el-table 的 row-key + children 驱动。
+ */
 const loading = ref(false);
 const tree = ref<DeptTreeNode[]>([]);
+
+const columns: TableColumn[] = [
+  { prop: 'name', label: '部门名称', minWidth: 220 },
+  { prop: 'ancestors', label: '祖先路径', minWidth: 140 },
+  { prop: 'sort', label: '排序', width: 80 },
+  { label: '状态', width: 90, slot: 'status' },
+  { label: '创建时间', width: 170, slot: 'createTime' },
+];
 
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
@@ -147,27 +160,22 @@ onMounted(fetchTree);
         </div>
       </div>
 
-      <el-table
-        v-loading="loading"
-        :data="tree"
-        row-key="id"
-        border
+      <DataTable
+        :columns="columns"
+        :rows="tree"
+        :loading="loading"
+        :total="0"
+        :pagination="false"
         default-expand-all
-        :tree-props="{ children: 'children' }"
       >
-        <el-table-column prop="name" label="部门名称" min-width="220" />
-        <el-table-column prop="ancestors" label="祖先路径" min-width="140" />
-        <el-table-column prop="sort" label="排序" width="80" />
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-              {{ row.status === 1 ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
-        </el-table-column>
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '正常' : '禁用' }}
+          </el-tag>
+        </template>
+
+        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>
+
         <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -196,7 +204,7 @@ onMounted(fetchTree);
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </DataTable>
     </el-card>
 
     <el-dialog

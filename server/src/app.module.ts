@@ -28,6 +28,7 @@ import { PermissionModule } from './modules/permission/permission.module.js';
 import { RoleModule } from './modules/role/role.module.js';
 import { UserModule } from './modules/user/user.module.js';
 import { ShareModule } from './share/share.module.js';
+// <gen:import>（gen:module 在此插入新模块的 import，勿删）
 
 /**
  * 根模块：业务模块必须手动注册进 imports，否则不加载。
@@ -77,6 +78,7 @@ import { ShareModule } from './share/share.module.js';
     RoleModule,
     PermissionModule,
     UserModule,
+    // <gen:module>（gen:module 在此插入新模块，勿删）
   ],
   controllers: [AppController],
   providers: [

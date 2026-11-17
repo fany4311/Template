@@ -2660,6 +2660,73 @@
         ]
       }
     },
+    "/api/v1/config/export": {
+      "get": {
+        "operationId": "ConfigController_exportCsv_v1",
+        "parameters": [
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "导出参数配置（CSV，最多 5000 行）",
+        "tags": [
+          "参数配置"
+        ]
+      }
+    },
+    "/api/v1/config/import": {
+      "post": {
+        "operationId": "ConfigController_importCsv_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "导入结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigImportResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "导入参数配置（CSV，最多 5000 行，逐行返回失败原因）",
+        "tags": [
+          "参数配置"
+        ]
+      }
+    },
     "/api/v1/config/{id}": {
       "get": {
         "operationId": "ConfigController_detail_v1",
@@ -5399,6 +5466,65 @@
             "required": [
               "configKey",
               "configValue"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "msg"
+        ]
+      },
+      "ConfigImportResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200,
+            "description": "业务码，200 表示成功"
+          },
+          "msg": {
+            "type": "string",
+            "example": "操作成功",
+            "description": "提示信息"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "ok": {
+                "type": "number"
+              },
+              "failed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "row": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "row",
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "failedTruncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "total",
+              "ok",
+              "failed",
+              "failedTruncated"
             ],
             "additionalProperties": false
           }

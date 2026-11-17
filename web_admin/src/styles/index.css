@@ -1,3 +1,9 @@
+/**
+ * 全局样式：只放「结构性」样式与自有类。
+ *
+ * 颜色/字号一律走 theme.css 里的变量 —— 这一层不许出现写死的 #hex 或 14px，
+ * 否则右上角「外观」切主题时，这些地方会掉队（之前导航色差就是这么来的）。
+ */
 * {
   box-sizing: border-box;
 }
@@ -13,27 +19,29 @@ body {
   font-family:
     'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', Arial, sans-serif;
-  color: #303133;
-  background: #f5f7fa;
+  font-size: var(--app-font-size);
+  color: var(--app-text);
+  background: var(--app-bg);
 }
 
-/* 布局 */
+/* ───────────────────────── 布局 ───────────────────────── */
 .layout {
   height: 100%;
 }
 
 .layout-aside {
-  background: #001529;
+  background: var(--app-nav-bg);
   display: flex;
   flex-direction: column;
+  transition: background-color 0.2s;
 }
 
 .layout-logo {
   height: 56px;
   line-height: 56px;
   padding: 0 16px;
-  color: #fff;
-  font-size: 15px;
+  color: var(--app-nav-active-text);
+  font-size: calc(var(--app-font-size) + 1px);
   font-weight: 600;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -43,18 +51,69 @@ body {
 
 .layout-menu {
   border-right: none;
-  background: #001529;
+  background: var(--app-nav-bg);
   flex: 1;
+  overflow-y: auto;
 }
 
-.layout-menu .el-menu-item {
-  color: #c9d1d9;
+/* 菜单文字：主项、子菜单标题、嵌套子菜单统一取导航文字色 */
+.layout-menu .el-menu-item,
+.layout-menu .el-sub-menu__title {
+  color: var(--app-nav-text);
+  font-size: var(--app-font-size);
 }
 
-.layout-menu .el-menu-item.is-active,
-.layout-menu .el-menu-item:hover {
-  color: #fff;
-  background: #1677ff;
+/* 嵌套的 ul.el-menu 会自己带背景，这里统一压成导航底色，避免出现「色块断层」 */
+.layout-menu .el-menu {
+  background: var(--app-nav-bg);
+}
+
+/* 悬停：半透明主色 —— 与「选中」的实色明确区分（原来两者同色，看不出当前在哪） */
+.layout-menu .el-menu-item:hover,
+.layout-menu .el-sub-menu__title:hover {
+  background: var(--app-nav-hover-bg);
+  color: #ffffff;
+}
+
+/* 选中：实色主色 + 白字 */
+.layout-menu .el-menu-item.is-active {
+  background: var(--app-nav-active-bg);
+  color: var(--app-nav-active-text);
+  font-weight: 600;
+}
+
+/* 有子项被选中时，父级标题也高亮（否则只亮子项，看不出在哪个分组里） */
+.layout-menu .el-sub-menu.is-active > .el-sub-menu__title {
+  color: var(--app-nav-active-text);
+  font-weight: 600;
+}
+
+.layout-menu .el-sub-menu__icon-arrow {
+  color: inherit;
+}
+
+/**
+ * 折叠/悬浮弹出的子菜单被 teleport 到 body，
+ * 上面那些 .layout-menu 后代选择器够不到 —— 必须单独给弹层上色。
+ * 变量已经在 :root 上，颜色保持一致，只是要补 hover/active 背景。
+ */
+.el-menu--popup {
+  background: var(--app-nav-bg);
+}
+
+.el-menu--popup .el-menu-item {
+  color: var(--app-nav-text);
+  font-size: var(--app-font-size);
+}
+
+.el-menu--popup .el-menu-item:hover {
+  background: var(--app-nav-hover-bg);
+  color: #ffffff;
+}
+
+.el-menu--popup .el-menu-item.is-active {
+  background: var(--app-nav-active-bg);
+  color: var(--app-nav-active-text);
 }
 
 .layout-header {
@@ -62,13 +121,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-bottom: 1px solid #ebeef5;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text);
 }
 
 .layout-title {
-  font-size: 16px;
+  font-size: calc(var(--app-font-size) + 2px);
   font-weight: 600;
+}
+
+.layout-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .layout-user {
@@ -81,31 +147,33 @@ body {
 
 .layout-main {
   padding: 16px;
+  background: var(--app-bg);
 }
 
-/* 登录页 */
+/* ───────────────────────── 登录页 ───────────────────────── */
 .login-page {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0b1f3a 0%, #123a6b 100%);
+  background: linear-gradient(135deg, var(--app-login-from) 0%, var(--app-login-to) 100%);
 }
 
 .login-card {
   width: 380px;
+  border-radius: var(--app-radius);
 }
 
 .login-title {
   margin: 0 0 4px;
-  font-size: 20px;
+  font-size: calc(var(--app-font-size) + 6px);
   text-align: center;
 }
 
 .login-subtitle {
   margin: 0 0 20px;
-  font-size: 13px;
-  color: #909399;
+  font-size: calc(var(--app-font-size) - 1px);
+  color: var(--app-text-muted);
   text-align: center;
 }
 
@@ -120,15 +188,15 @@ body {
   height: 40px;
   width: 110px;
   cursor: pointer;
-  border-radius: 4px;
-  background: #fff;
+  border-radius: var(--app-radius);
+  background: var(--app-surface);
 }
 
 .login-submit {
   width: 100%;
 }
 
-/* 通用页面 */
+/* ───────────────────────── 通用页面 ───────────────────────── */
 .page-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -143,8 +211,8 @@ body {
 }
 
 .page-card {
-  background: #fff;
-  border-radius: 4px;
+  background: var(--app-surface);
+  border-radius: var(--app-radius);
 }
 
 .pagination {
@@ -154,8 +222,8 @@ body {
 }
 
 .form-tip {
-  font-size: 12px;
-  color: #909399;
+  font-size: calc(var(--app-font-size) - 2px);
+  color: var(--app-text-muted);
   line-height: 1.5;
 }
 
@@ -171,5 +239,50 @@ body {
 .not-found h1 {
   margin: 0;
   font-size: 64px;
-  color: #c0c4cc;
+  color: var(--app-text-muted);
+}
+
+/* ───────────────────────── 外观设置抽屉 ───────────────────────── */
+.theme-section {
+  margin-bottom: 22px;
+}
+
+.theme-section__label {
+  margin-bottom: 8px;
+  font-size: calc(var(--app-font-size) - 1px);
+  color: var(--app-text-muted);
+}
+
+.theme-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.theme-swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+.theme-swatch.is-active {
+  border-color: var(--app-text);
+  box-shadow: 0 0 0 2px var(--app-surface) inset;
+}
+
+.theme-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.theme-row__text {
+  font-size: var(--app-font-size);
 }

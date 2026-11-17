@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { SwitchButton } from '@element-plus/icons-vue';
+import { Setting, SwitchButton } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { authApi } from '../api/auth';
 import SideMenu from '../components/SideMenu.vue';
+import ThemeDrawer from '../components/ThemeDrawer.vue';
 import { resetMenuRoutes } from '../router';
 import { useAuthStore } from '../stores/auth';
 import { useMenuStore } from '../stores/menu';
+import { useThemeStore } from '../stores/theme';
 
 /** 与后端 PASSWORD_MIN_LENGTH 对齐（见 server auth/dto/password.dto.ts） */
 const PASSWORD_MIN_LENGTH = 8;
@@ -16,6 +18,15 @@ const auth = useAuthStore();
 const menu = useMenuStore();
 const route = useRoute();
 const router = useRouter();
+
+const theme = useThemeStore();
+const themeVisible = ref(false);
+
+// 全局默认外观存在 sys_config 的 ui.theme，登录后才可读；
+// 读不到（未配置/无权限）就沿用本地偏好与内置默认，不阻断任何操作。
+onMounted(() => {
+  void theme.loadRemote();
+});
 
 const menus = computed(() => menu.tree);
 const currentTitle = computed(() => (route.meta.title as string | undefined) ?? '');
@@ -111,23 +122,28 @@ async function submitPwd(): Promise<void> {
     <el-container>
       <el-header class="layout-header">
         <div class="layout-title">{{ currentTitle }}</div>
-        <el-dropdown trigger="click">
-          <span class="layout-user">
-            {{ auth.displayName || '未命名用户' }}
-            <!-- 展示用角色名（auth.roles 是编号 level，同序）：名称可改，只作展示 -->
-            <el-tag v-if="auth.roleNames.length" size="small" type="info">
-              {{ auth.roleNames.join(' / ') }}
-            </el-tag>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="openPwdDialog">修改密码</el-dropdown-item>
-              <el-dropdown-item :icon="SwitchButton" @click="handleLogout">
-                退出登录
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        <div class="layout-actions">
+          <el-tooltip content="外观（主色 / 字号 / 暗色）" placement="bottom">
+            <el-button text :icon="Setting" @click="themeVisible = true" />
+          </el-tooltip>
+          <el-dropdown trigger="click">
+            <span class="layout-user">
+              {{ auth.displayName || '未命名用户' }}
+              <!-- 展示用角色名（auth.roles 是编号 level，同序）：名称可改，只作展示 -->
+              <el-tag v-if="auth.roleNames.length" size="small" type="info">
+                {{ auth.roleNames.join(' / ') }}
+              </el-tag>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="openPwdDialog">修改密码</el-dropdown-item>
+                <el-dropdown-item :icon="SwitchButton" @click="handleLogout">
+                  退出登录
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
 
       <el-main class="layout-main">
@@ -163,5 +179,7 @@ async function submitPwd(): Promise<void> {
         </el-button>
       </template>
     </el-dialog>
+
+    <ThemeDrawer v-model="themeVisible" />
   </el-container>
 </template>

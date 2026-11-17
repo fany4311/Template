@@ -21,6 +21,39 @@ export async function downloadFile(url: string, filename = 'download'): Promise<
   }
 }
 
+/**
+ * 下载带查询条件的导出（CSV）。
+ *
+ * 与 downloadFile 的区别：
+ * 1. 要带筛选参数（keyword/status），文件名由前端拼（后端没有暴露响应头）；
+ * 2. 后端业务异常仍是 HTTP 200 + JSON，responseType 为 blob 时拿到的是
+ *    「装着 JSON 的 Blob」—— 不判一下，用户会下载到一个内容是报错信息的 .csv。
+ */
+export async function downloadCsv(
+  url: string,
+  params: Record<string, unknown>,
+  filename: string,
+): Promise<void> {
+  let blob: Blob;
+  try {
+    blob = (await http.get(url, {
+      params,
+      responseType: 'blob',
+      timeout: 60_000,
+    })) as unknown as Blob;
+  } catch {
+    ElMessage.error('导出失败，请稍后重试');
+    return;
+  }
+
+  if (blob.type.includes('json')) {
+    const body = JSON.parse(await blob.text()) as { msg?: string };
+    ElMessage.error(body.msg || '导出失败');
+    return;
+  }
+  saveBlob(blob, filename);
+}
+
 /** 触发浏览器另存为 */
 export function saveBlob(blob: Blob, filename: string): void {
   const objectUrl = URL.createObjectURL(blob);

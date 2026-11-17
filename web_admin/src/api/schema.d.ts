@@ -560,6 +560,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/config/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 导出参数配置（CSV，最多 5000 行） */
+        get: operations["ConfigController_exportCsv_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/config/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 导入参数配置（CSV，最多 5000 行，逐行返回失败原因） */
+        post: operations["ConfigController_importCsv_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/config/{id}": {
         parameters: {
             query?: never;
@@ -1267,6 +1301,27 @@ export interface components {
             data?: {
                 configKey: string;
                 configValue: string;
+            };
+        };
+        ConfigImportResult: {
+            /**
+             * @description 业务码，200 表示成功
+             * @example 200
+             */
+            code: number;
+            /**
+             * @description 提示信息
+             * @example 操作成功
+             */
+            msg: string;
+            data?: {
+                total: number;
+                ok: number;
+                failed: {
+                    row: number;
+                    message: string;
+                }[];
+                failedTruncated: boolean;
             };
         };
         SysConfig: {
@@ -3343,6 +3398,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SysConfigValue"];
+                };
+            };
+        };
+    };
+    ConfigController_exportCsv_v1: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                status?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ConfigController_importCsv_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 导入结果 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigImportResult"];
                 };
             };
         };

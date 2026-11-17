@@ -9,6 +9,14 @@ import {
 } from '../../common/dto/pagination.dto.js';
 import { ApiException } from '../../common/exceptions/api.exception.js';
 import {
+  CSV_MAX_FAILED,
+  CSV_MAX_ROWS,
+  type ImportFailure,
+  type ImportResult,
+} from '../../common/import-export/csv.js';
+import { configImportRowSchema } from './config.csv.js';
+import {
+  type ConfigExportQuery,
   type ConfigValueResult,
   type CreateConfigInput,
   type QueryConfigInput,
@@ -97,5 +105,70 @@ export class ConfigService {
       await repo.softDelete(id);
       return true;
     });
+  }
+
+  /**
+   * 导出：与列表同样的筛选条件，顺序稳定（id 升序）。
+   * 超上限直接拒绝而不是静默截断 —— 截断的文件看不出少了数据，比报错危险。
+   */
+  async exportRows(query: ConfigExportQuery): Promise<Config[]> {
+    const qb = this.configRepo.createQueryBuilder('c');
+    if (query.keyword) {
+      qb.andWhere('(c.configName LIKE :kw OR c.configKey LIKE :kw)', {
+        kw: '%' + query.keyword + '%',
+      });
+    }
+    if (query.status !== undefined) {
+      qb.andWhere('c.status = :status', { status: query.status });
+    }
+    const rows = await qb.orderBy('c.id', 'ASC').limit(CSV_MAX_ROWS + 1).getMany();
+    if (rows.length > CSV_MAX_ROWS) {
+      throw new ApiException(
+        '单次最多导出 ' + CSV_MAX_ROWS + ' 行，请先按关键字或状态缩小范围',
+      );
+    }
+    return rows;
+  }
+
+  /**
+   * 逐行导入：部分成功。
+   *
+   * 为什么不做整单事务：5000 行里错 3 行就全部回滚，用户必须改到全对才能用，
+   * 体验极差。这里逐行独立写入并回报失败行号，改完重试即可；
+   * 已存在的参数键按失败返回，不会覆盖线上值。
+   */
+  async importRows(records: Record<string, string>[]): Promise<ImportResult> {
+    const failed: ImportFailure[] = [];
+    let ok = 0;
+    let failedTruncated = false;
+
+    const pushFailure = (row: number, message: string): void => {
+      if (failed.length < CSV_MAX_FAILED) failed.push({ row, message });
+      else failedTruncated = true;
+    };
+
+    for (let index = 0; index < records.length; index += 1) {
+      const rowNo = index + 2; // 表头占 1 行，数据从第 2 行起，与 Excel 行号对齐
+      const parsed = configImportRowSchema.safeParse(records[index]);
+      if (!parsed.success) {
+        pushFailure(rowNo, parsed.error.issues[0]?.message ?? '格式不正确');
+        continue;
+      }
+
+      const row = parsed.data;
+      try {
+        const exists = await this.configRepo.findOneBy({ configKey: row.configKey });
+        if (exists) {
+          pushFailure(rowNo, '参数键已存在：' + row.configKey);
+          continue;
+        }
+        await this.configRepo.insert({ ...row });
+        ok += 1;
+      } catch {
+        pushFailure(rowNo, '写入失败，请检查参数值长度');
+      }
+    }
+
+    return { total: records.length, ok, failed, failedTruncated };
   }
 }

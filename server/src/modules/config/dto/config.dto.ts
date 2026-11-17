@@ -41,6 +41,13 @@ export const queryConfigSchema = paginationSchema.extend({
 });
 export type QueryConfigInput = z.infer<typeof queryConfigSchema>;
 
+/** 导出条件：与列表相同的筛选，但不分页（上限由 CSV_MAX_ROWS 控制） */
+export const exportConfigSchema = z.object({
+  keyword: filterString(100),
+  status: filterStatus(),
+});
+export type ConfigExportQuery = z.infer<typeof exportConfigSchema>;
+
 /** 按参数键查询的返回值 */
 export interface ConfigValueResult {
   configKey: string;

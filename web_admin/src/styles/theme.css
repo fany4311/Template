@@ -1,0 +1,82 @@
+/**
+ * 主题变量：本项目**唯一**的色彩/字号来源。
+ *
+ * 两层：
+ * - --app-*  ：本项目语义（导航底色、正文色、圆角、字号…）
+ * - --el-*   ：Element Plus 变量（主色与 7 个色阶、菜单变量、字号、圆角）
+ *
+ * 运行时由 stores/theme.ts 写到 <html> 上（以用户/全局配置为准）；
+ * 这里只是**首屏兜底**，保证 JS 还没跑起来时不闪白、不闪紫。
+ *
+ * 新增样式时禁止再写死颜色/字号：颜色用 var(--app-*) 或 var(--el-color-*)，
+ * 字号用 calc(var(--app-font-size) + Npx)，否则换肤时这一处会掉队。
+ */
+:root {
+  /* —— 品牌 —— */
+  --app-primary: #1677ff;
+
+  /* —— 表面与文字 —— */
+  --app-bg: #f5f7fa;
+  --app-surface: #ffffff;
+  --app-border: #ebeef5;
+  --app-text: #303133;
+  --app-text-muted: #909399;
+
+  /* —— 导航（侧边栏） —— */
+  --app-nav-bg: #001529;
+  --app-nav-text: #c9d1d9;
+  --app-nav-active-bg: #1677ff;
+  --app-nav-active-text: #ffffff;
+  --app-nav-hover-bg: rgba(22, 119, 255, 0.18);
+
+  /* —— 登录页 —— */
+  --app-login-from: #001529;
+  --app-login-to: #123a6b;
+
+  /* —— 尺寸 —— */
+  --app-radius: 4px;
+  --app-font-size: 14px;
+
+  /* —— Element Plus：主色与色阶（JS 会按主色重算） —— */
+  --el-color-primary: #1677ff;
+  --el-color-primary-light-3: #5a9bff;
+  --el-color-primary-light-5: #8bbbff;
+  --el-color-primary-light-7: #bcd8ff;
+  --el-color-primary-light-8: #d3e5ff;
+  --el-color-primary-light-9: #e8f2ff;
+  --el-color-primary-dark-2: #125fcc;
+
+  /* —— Element Plus：字号与圆角 —— */
+  --el-font-size-base: 14px;
+  --el-font-size-small: 12px;
+  --el-font-size-extra-small: 11px;
+  --el-font-size-medium: 16px;
+  --el-font-size-large: 18px;
+  --el-border-radius-base: 4px;
+
+  /* —— Element Plus：菜单（含被 teleport 到 body 的弹层，所以必须在根上设） —— */
+  --el-menu-bg-color: var(--app-nav-bg);
+  --el-menu-text-color: var(--app-nav-text);
+  --el-menu-active-color: var(--app-nav-active-text);
+  --el-menu-hover-bg-color: var(--app-nav-hover-bg);
+  --el-menu-hover-text-color: #ffffff;
+  --el-menu-item-height: 48px;
+  --el-menu-sub-item-height: 42px;
+}
+
+/**
+ * 暗色：只改「表面/文字」这类会被 EP 暗色变量覆盖不到的自有类；
+ * 组件自身的暗色由 element-plus/theme-chalk/dark/css-vars.css 负责（main.ts 引入）。
+ */
+html.dark {
+  --app-bg: #0b0f14;
+  --app-surface: #141a22;
+  --app-border: #232c38;
+  --app-text: #e5eaf3;
+  --app-text-muted: #8d96a3;
+
+  --app-nav-bg: #0b1220;
+  --app-nav-text: #9aa7b8;
+
+  color-scheme: dark;
+}

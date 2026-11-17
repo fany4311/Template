@@ -26,7 +26,8 @@
     "migration:revert": "pnpm build && typeorm -d dist/core/database/data-source.js migration:revert",
     "migration:show": "pnpm build && typeorm -d dist/core/database/data-source.js migration:show",
     "openapi:dump": "pnpm build && cross-env NODE_ENV=dev node dist/scripts/dump-openapi.js",
-    "authz:sync": "pnpm build && cross-env NODE_ENV=dev node dist/scripts/authz-sync.js"
+    "authz:sync": "pnpm build && cross-env NODE_ENV=dev node dist/scripts/authz-sync.js",
+    "gen:module": "pnpm build && node dist/scripts/gen-module.js"
   },
   "dependencies": {
     "@casl/ability": "^6.8.1",

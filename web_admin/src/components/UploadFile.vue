@@ -19,7 +19,12 @@ const props = withDefaults(
   defineProps<{
     /** 业务类型（可选）：给了就按该业务更严的收件策略校验 */
     bizType?: string;
-    /** 业务对象 id（可选）：与 bizType 同时给时，上传后立即绑定 */
+    /**
+     * 业务对象 id（可选）：会随上传一起发给服务端。
+     *
+     * 注意：上传接口只落 TEMP 元数据，**不自动绑定**；绑定是单独的 `POST /file/bind`。
+     * 需要「上传即关联」时用 `components/BizFiles.vue`（它把两步合起来）。
+     */
     bizId?: string | number;
     /** 附件用途（可选） */
     bizField?: string;

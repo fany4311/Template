@@ -1,59 +1,65 @@
 <script setup lang="ts">
 import { Refresh, Search } from '@element-plus/icons-vue';
-import { onMounted, reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { auditLogApi } from '../../api/log';
 import type { AuditLogItem } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
+import { useCrud } from '../../composables/useCrud';
 
-const loading = ref(false);
-const list = ref<AuditLogItem[]>([]);
-const total = ref(0);
-
-const query = reactive({
-  pageNum: 1,
-  pageSize: 10,
-  actorName: '',
-  action: '',
-  result: undefined as 'success' | 'fail' | undefined,
-  range: null as [string, string] | null,
-});
+/**
+ * 操作日志（只读列表 + 详情抽屉）。
+ *
+ * 查询条件里时间用 range 数组（日期选择器需要），接口要 startTime/endTime，
+ * 所以在 api 适配层做一次映射 —— 这正是 useCrud 留 api 注入而非写死 request 的原因。
+ */
+type Query = {
+  pageNum: number;
+  pageSize: number;
+  actorName: string;
+  action: string;
+  result?: 'success' | 'fail';
+  range: [string, string] | null;
+};
 
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await auditLogApi.page({
-      pageNum: query.pageNum,
-      pageSize: query.pageSize,
-      actorName: query.actorName || undefined,
-      action: query.action || undefined,
-      result: query.result,
-      startTime: query.range?.[0] ?? undefined,
-      endTime: query.range?.[1] ?? undefined,
-    });
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 已提示
-  } finally {
-    loading.value = false;
-  }
-}
+const { query, rows, total, loading, reload, search, reset } = useCrud<AuditLogItem, Query>({
+  api: {
+    page: (q) =>
+      auditLogApi.page({
+        pageNum: q.pageNum,
+        pageSize: q.pageSize,
+        actorName: q.actorName || undefined,
+        action: q.action || undefined,
+        result: q.result,
+        startTime: q.range?.[0] ?? undefined,
+        endTime: q.range?.[1] ?? undefined,
+      }),
+  },
+  query: {
+    pageNum: 1,
+    pageSize: 10,
+    actorName: '',
+    action: '',
+    result: undefined,
+    range: null,
+  },
+});
 
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
-
-function handleReset(): void {
-  query.actorName = '';
-  query.action = '';
-  query.result = undefined;
-  query.range = null;
-  query.pageNum = 1;
-  void fetchList();
-}
+const columns: TableColumn[] = [
+  { prop: 'id', label: 'ID', width: 90 },
+  { prop: 'actorName', label: '操作人', width: 110 },
+  { prop: 'action', label: '动作', minWidth: 180, showOverflowTooltip: true },
+  { prop: 'resourceType', label: '资源类型', width: 110 },
+  { prop: 'resourceId', label: '资源ID', width: 90 },
+  { label: '结果', width: 80, slot: 'result' },
+  { prop: 'method', label: '方法', width: 80 },
+  { prop: 'path', label: '路径', minWidth: 200, showOverflowTooltip: true },
+  { prop: 'ip', label: 'IP', width: 130 },
+  { label: '耗时', width: 90, slot: 'duration' },
+  { label: '时间', width: 170, slot: 'createTime' },
+];
 
 const detailVisible = ref(false);
 const detailLoading = ref(false);
@@ -72,7 +78,10 @@ async function openDetail(row: AuditLogItem): Promise<void> {
   }
 }
 
-onMounted(fetchList);
+const prettyDetail = (): string => {
+  const value = (detail.value as { detail?: unknown } | null)?.detail;
+  return value ? JSON.stringify(value, null, 2) : '-';
+};
 </script>
 
 <template>
@@ -84,14 +93,14 @@ onMounted(fetchList);
           placeholder="操作人"
           clearable
           style="width: 140px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-input
           v-model="query.action"
           placeholder="动作（如 system:user:add）"
           clearable
           style="width: 220px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-select v-model="query.result" placeholder="结果" clearable style="width: 110px">
           <el-option label="成功" value="success" />
@@ -105,32 +114,29 @@ onMounted(fetchList);
           end-placeholder="结束时间"
           style="width: 360px"
         />
-        <el-button :icon="Search" type="primary" @click="handleSearch">查询</el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
       </div>
 
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="actorName" label="操作人" width="110" />
-        <el-table-column prop="action" label="动作" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="resourceType" label="资源类型" width="110" />
-        <el-table-column prop="resourceId" label="资源ID" width="90" />
-        <el-table-column label="结果" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.result === 'success' ? 'success' : 'danger'" size="small">
-              {{ row.result === 'success' ? '成功' : '失败' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="method" label="方法" width="80" />
-        <el-table-column prop="path" label="路径" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="ip" label="IP" width="130" />
-        <el-table-column label="耗时" width="90">
-          <template #default="{ row }">{{ row.durationMs ?? '-' }} ms</template>
-        </el-table-column>
-        <el-table-column label="时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
-        </el-table-column>
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #result="{ row }">
+          <el-tag :type="row.result === 'success' ? 'success' : 'danger'" size="small">
+            {{ row.result === 'success' ? '成功' : '失败' }}
+          </el-tag>
+        </template>
+
+        <template #duration="{ row }">{{ row.durationMs ?? '-' }} ms</template>
+
+        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>
+
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row as AuditLogItem)">
@@ -138,19 +144,7 @@ onMounted(fetchList);
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
 
     <el-drawer v-model="detailVisible" title="操作日志详情" size="560px">
@@ -179,7 +173,7 @@ onMounted(fetchList);
         <el-descriptions-item label="耗时">{{ detail.durationMs ?? '-' }} ms</el-descriptions-item>
         <el-descriptions-item label="时间">{{ fmtTime(detail.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="详情">
-          <pre class="detail-json">{{ JSON.stringify(detail.detail ?? {}, null, 2) }}</pre>
+          <pre class="detail-json">{{ prettyDetail() }}</pre>
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
@@ -191,7 +185,8 @@ onMounted(fetchList);
   margin: 0;
   max-height: 320px;
   overflow: auto;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: calc(var(--app-font-size) - 2px);
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 </style>

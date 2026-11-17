@@ -27,6 +27,7 @@ import { OutboxModule } from './modules/outbox/outbox.module.js';
 import { PermissionModule } from './modules/permission/permission.module.js';
 import { RoleModule } from './modules/role/role.module.js';
 import { UserModule } from './modules/user/user.module.js';
+import { OpsModule } from './modules/ops/ops.module.js';
 import { ShareModule } from './share/share.module.js';
 // <gen:import>（gen:module 在此插入新模块的 import，勿删）
 
@@ -78,6 +79,7 @@ import { ShareModule } from './share/share.module.js';
     RoleModule,
     PermissionModule,
     UserModule,
+    OpsModule,
     // <gen:module>（gen:module 在此插入新模块，勿删）
   ],
   controllers: [AppController],

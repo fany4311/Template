@@ -6,6 +6,8 @@ import { PoliciesGuard } from './guards/policies.guard.js';
 import { RbacGuard } from './guards/rbac.guard.js';
 import { AbilityFactory } from './authz/ability.factory.js';
 import { AuditInterceptor } from './interceptors/audit.interceptor.js';
+import { MetricsInterceptor } from './metrics/metrics.interceptor.js';
+import { MetricsService } from './metrics/metrics.service.js';
 import { IdempotencyInterceptor } from './interceptors/idempotency.interceptor.js';
 import { TraceIdInterceptor } from './interceptors/trace-id.interceptor.js';
 import { TransformInterceptor } from './interceptors/transform.interceptor.js';
@@ -20,6 +22,9 @@ import { TransformInterceptor } from './interceptors/transform.interceptor.js';
 @Module({
   providers: [
     AbilityFactory,
+    MetricsService,
+    // 指标最先注册：包住后续所有拦截器，异常路径也能计数
+    { provide: APP_INTERCEPTOR, useClass: MetricsInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RbacGuard },
@@ -29,5 +34,6 @@ import { TransformInterceptor } from './interceptors/transform.interceptor.js';
     { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
+  exports: [MetricsService],
 })
 export class CommonModule {}

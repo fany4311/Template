@@ -17,6 +17,9 @@ FILE="${BACKUP_DIR}/${DB_NAME}-${STAMP}.sql.gz"
 
 mkdir -p "$BACKUP_DIR"
 
+# 失败时删掉半截文件：一个"看起来存在"的坏备份比没有备份更危险
+trap 'rm -f "$FILE" "$FILE.sha256"' ERR
+
 echo "[backup] dump ${DB_NAME} -> ${FILE}"
 mysqldump \
   --host="$DB_HOST" --port="$DB_PORT" \
@@ -25,9 +28,15 @@ mysqldump \
   --default-character-set=utf8mb4 \
   "$DB_NAME" | gzip -9 > "$FILE"
 
+# 校验：gzip 能完整解压 + 记 sha256（restore.sh 会先比对，防拷坏）
+gzip -t "$FILE"
+SHA="$(sha256sum "$FILE" | cut -d' ' -f1)"
+printf '%s  %s\n' "$SHA" "$(basename "$FILE")" > "$FILE.sha256"
+echo "[backup] verified gzip, sha256=${SHA:0:12}"
+
 echo "[backup] 清理 ${KEEP_DAYS} 天前备份"
 find "$BACKUP_DIR" -name "${DB_NAME}-*.sql.gz" -mtime "+${KEEP_DAYS}" -delete
 
 echo "[backup] done: $(du -h "$FILE" | cut -f1)"
-# TODO: 异地备份（restic backup / rclone copy）
-# TODO: 恢复演练脚本（定期从备份恢复并校验）
+# 恢复：bash deploy/restore.sh <备份文件>（默认恢复到 <库>_restore_<时间戳>，不覆盖生产）
+# 异地备份（restic/rclone）由部署端按环境决定，脚本不内置。

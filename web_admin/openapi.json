@@ -4342,6 +4342,133 @@
           "权限清单"
         ]
       }
+    },
+    "/api/v1/ops/overview": {
+      "get": {
+        "operationId": "OpsController_overview_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "运行概览（HTTP / 数据库 / Outbox / 审计）",
+        "tags": [
+          "系统监控"
+        ]
+      }
+    },
+    "/api/v1/ops/metrics": {
+      "get": {
+        "operationId": "OpsController_prometheus_v1",
+        "parameters": [
+          {
+            "name": "x-metrics-token",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Prometheus 指标（默认仅本机；配置 METRICS_TOKEN 后需带请求头）",
+        "tags": [
+          "系统监控"
+        ]
+      }
+    },
+    "/api/v1/ops/audit-retention": {
+      "put": {
+        "operationId": "OpsController_saveRetention_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "retentionDays": {
+                    "type": "integer",
+                    "minimum": 7,
+                    "maximum": 3650
+                  }
+                },
+                "required": [
+                  "retentionDays"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "保存审计留存天数（写 sys_config.audit.retentionDays）",
+        "tags": [
+          "系统监控"
+        ]
+      }
+    },
+    "/api/v1/ops/audit-cleanup": {
+      "post": {
+        "operationId": "OpsController_cleanup_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "retentionDays": {
+                    "type": "integer",
+                    "minimum": 7,
+                    "maximum": 3650
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "立即清理过期审计（分批，最多 20 万条/次）",
+        "tags": [
+          "系统监控"
+        ]
+      }
     }
   },
   "info": {

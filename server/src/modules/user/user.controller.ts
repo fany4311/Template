@@ -9,9 +9,19 @@ import {
   Post,
   Put,
   Query,
+  Res,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
 import { z } from 'zod';
+import { Keep } from '../../common/decorators/keep.decorator.js';
+import { ApiException } from '../../common/exceptions/api.exception.js';
+import { exportRows as rowsToCsv, readRows } from '../../common/import-export/csv.js';
+import { USER_EXPORT_COLUMNS, USER_IMPORT_COLUMNS } from './user.csv.js';
 import { ApiOkZod, pageOf } from '../../common/swagger/api-ok.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
 import { Idempotent } from '../../common/decorators/idempotent.decorator.js';
@@ -24,10 +34,12 @@ import {
 } from '../auth/dto/password.dto.js';
 import {
   createUserSchema,
+  exportUserSchema,
   grantRolesSchema,
   queryUserSchema,
   updateUserSchema,
   type CreateUserInput,
+  type ExportUserQuery,
   type GrantRolesInput,
   type QueryUserInput,
   type UpdateUserInput,
@@ -40,6 +52,13 @@ import { UserService } from './user.service.js';
 
 /** 路径参数 id schema（Standard Schema，统一走全局校验管道） */
 const idParamSchema = z.coerce.number().int().positive();
+
+const importResultSchema = z.object({
+  total: z.number(),
+  ok: z.number(),
+  failed: z.array(z.object({ row: z.number(), message: z.string() })),
+  failedTruncated: z.boolean(),
+});
 
 /**
  * 用户管理接口。
@@ -60,6 +79,40 @@ export class UserController {
     @CurrentUser() user: JwtUser,
   ) {
     return this.userService.page(query, user);
+  }
+
+  @Get('export')
+  @RequiresPermissions('system:user:export')
+  @Auditable({ action: 'system:user:export', resourceType: 'user' })
+  @ApiOperation({ summary: '导出用户（CSV，最多 5000 条，按数据范围）' })
+  @ApiProduces('text/csv')
+  @Keep()
+  async exportCsv(
+    @Query({ schema: exportUserSchema }) query: ExportUserQuery,
+    @CurrentUser() user: JwtUser,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const rows = await this.userService.exportRows(query, user);
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="users-' + date + '.csv"');
+    return new StreamableFile(Buffer.from(rowsToCsv(rows, USER_EXPORT_COLUMNS), 'utf8'));
+  }
+
+  @Post('import')
+  @HttpCode(HttpStatus.OK)
+  @RequiresPermissions('system:user:import')
+  @Auditable({ action: 'system:user:import', resourceType: 'user' })
+  @UseInterceptors(FileInterceptor('file', { limits: { files: 1, fileSize: 2 * 1024 * 1024 } }))
+  @ApiOperation({ summary: '导入用户（CSV，逐行返回失败原因）' })
+  @ApiOkZod('UserImportResult', importResultSchema, '导入结果')
+  importCsv(@UploadedFile() file?: Express.Multer.File) {
+    if (!file) throw new ApiException('请选择要导入的 CSV 文件', 400);
+    if (!file.originalname.toLowerCase().endsWith('.csv')) {
+      throw new ApiException('只支持 .csv 文件（Excel 请另存为 CSV UTF-8）', 400);
+    }
+    const records = readRows(file.buffer.toString('utf8'), USER_IMPORT_COLUMNS);
+    return this.userService.importRows(records);
   }
 
   @Post()

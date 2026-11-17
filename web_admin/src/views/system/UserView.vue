@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Refresh, Search } from '@element-plus/icons-vue';
+import { Download, Plus, Refresh, Search, Upload } from '@element-plus/icons-vue';
 import {
   ElMessage,
   ElMessageBox,
@@ -15,6 +15,7 @@ import {
   type UserQuery,
 } from '../../api/user';
 import type { DeptTreeNode, RoleItem, UserItem, UserRoleGrant } from '../../api/types';
+import ImportDialog from '../../components/ImportDialog.vue';
 
 // ---------------------------------------------------------------------------
 // 列表
@@ -345,6 +346,28 @@ async function revokeGrant(grant: UserRoleGrant): Promise<void> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// 导入 / 导出
+// 导出走后端同样的数据范围过滤；导入按「部门名称」解析，初始密码缺省取参数
+// ---------------------------------------------------------------------------
+const importVisible = ref(false);
+const exporting = ref(false);
+
+async function handleExport(): Promise<void> {
+  exporting.value = true;
+  try {
+    await userApi.exportCsv({
+      keyword: query.keyword || undefined,
+      deptId: query.deptId,
+      status: query.status,
+    });
+  } catch {
+    // 错误提示由 http / downloadCsv 统一弹出
+  } finally {
+    exporting.value = false;
+  }
+}
+
 onMounted(async () => {
   await Promise.all([loadDeptTree(), loadRoles()]);
   await fetchList();
@@ -388,6 +411,21 @@ onMounted(async () => {
         <el-button :icon="Refresh" @click="handleReset">重置</el-button>
 
         <div class="page-toolbar-right">
+          <el-button
+            v-perm="'system:user:export'"
+            :icon="Download"
+            :loading="exporting"
+            @click="handleExport"
+          >
+            导出
+          </el-button>
+          <el-button
+            v-perm="'system:user:import'"
+            :icon="Upload"
+            @click="importVisible = true"
+          >
+            导入
+          </el-button>
           <el-button
             v-perm="'system:user:add'"
             :icon="Plus"
@@ -630,5 +668,13 @@ onMounted(async () => {
         </el-button>
       </template>
     </el-dialog>
+
+    <ImportDialog
+      v-model="importVisible"
+      title="导入用户"
+      hint="表头：账号、昵称、部门、手机号、岗位、初始密码（仅 .csv；部门按名称匹配）"
+      :upload="userApi.importCsv"
+      @done="fetchList"
+    />
   </div>
 </template>

@@ -33,6 +33,14 @@ export const updateUserSchema = updateSchemaOf(createUserSchema.omit({ password:
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
+/** 导出条件：与列表相同的筛选，不分页 */
+export const exportUserSchema = z.object({
+  keyword: filterString(50),
+  deptId: z.coerce.number().int().positive().optional(),
+  status: filterStatus(),
+});
+export type ExportUserQuery = z.infer<typeof exportUserSchema>;
+
 /** 查询用户（分页 + 关键字 + 部门） */
 export const queryUserSchema = paginationSchema.extend({
   keyword: filterString(50),

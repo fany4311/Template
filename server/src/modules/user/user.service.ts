@@ -1,14 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterTypeOrm } from '@nestjs-cls/transactional-adapter-typeorm';
 import { hash as argonHash, verify as argonVerify } from '@node-rs/argon2';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import {
   buildPageResult,
   type PageResult,
 } from '../../common/dto/pagination.dto.js';
 import { ApiException } from '../../common/exceptions/api.exception.js';
+import {
+  CSV_MAX_FAILED,
+  CSV_MAX_ROWS,
+  type ImportFailure,
+  type ImportResult,
+} from '../../common/import-export/csv.js';
 import { SessionService } from '../../core/session/session.service.js';
 import { OutboxService } from '../outbox/outbox.service.js';
 import type { JwtUser } from '../auth/auth.interface.js';
@@ -16,9 +22,11 @@ import { DataScopeService } from '../dept/data-scope.service.js';
 import type { Role } from '../role/entities/role.entity.js';
 import type {
   CreateUserInput,
+  ExportUserQuery,
   QueryUserInput,
   UpdateUserInput,
 } from './dto/user.dto.js';
+import { userImportRowSchema } from './user.csv.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { User } from './entities/user.entity.js';
 
@@ -39,7 +47,138 @@ export class UserService {
     private readonly outbox: OutboxService,
     private readonly session: SessionService,
     private readonly dataScope: DataScopeService,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
+
+  // ---------------- 导入 / 导出 ----------------
+
+  /**
+   * 导出：与列表同样的筛选 + **同样的数据范围**。
+   * 导出必须走 dataScope，否则「列表看不到的用户」能从 CSV 里捞出来。
+   */
+  async exportRows(query: ExportUserQuery, user: JwtUser): Promise<User[]> {
+    const qb = this.userRepo.createQueryBuilder('u');
+    const { clause, params } = await this.dataScope.resolve(
+      { userId: user.userId, deptId: user.deptId },
+      user.dataScopes ?? [],
+      { deptColumn: 'u.deptId', ownerColumn: 'u.id' },
+    );
+    qb.andWhere(clause, params);
+
+    if (query.keyword) {
+      qb.andWhere('(u.username LIKE :kw OR u.nickname LIKE :kw)', {
+        kw: '%' + query.keyword + '%',
+      });
+    }
+    if (query.status !== undefined) {
+      qb.andWhere('u.status = :status', { status: query.status });
+    }
+    if (query.deptId !== undefined) {
+      qb.andWhere('u.deptId = :deptId', { deptId: query.deptId });
+    }
+
+    const rows = await qb.orderBy('u.id', 'ASC').limit(CSV_MAX_ROWS + 1).getMany();
+    if (rows.length > CSV_MAX_ROWS) {
+      throw new ApiException('单次最多导出 ' + CSV_MAX_ROWS + ' 条，请先按关键字或部门缩小范围');
+    }
+    return rows;
+  }
+
+  /**
+   * 逐行导入用户：部分成功。
+   * 初始密码：行内给了就用行内（≥8 位）；否则读参数 sys.user.initPassword。
+   * 不做默认口令兜底 —— 硬编码默认密码等于给每个部署留一个后门。
+   */
+  async importRows(records: Record<string, string>[]): Promise<ImportResult> {
+    const failed: ImportFailure[] = [];
+    let ok = 0;
+    let failedTruncated = false;
+    const pushFailure = (row: number, message: string): void => {
+      if (failed.length < CSV_MAX_FAILED) failed.push({ row, message });
+      else failedTruncated = true;
+    };
+
+    const fallbackPassword = await this.defaultInitPassword();
+    // 同一批通常共用一个初始密码：hash 一次即可（argon2 单次约几十毫秒）
+    const hashCache = new Map<string, string>();
+
+    for (let index = 0; index < records.length; index += 1) {
+      const rowNo = index + 2;
+      const parsed = userImportRowSchema.safeParse(records[index]);
+      if (!parsed.success) {
+        pushFailure(rowNo, parsed.error.issues[0]?.message ?? '格式不正确');
+        continue;
+      }
+
+      const row = parsed.data;
+
+      try {
+        // 先判重：账号已存在时，提示"密码不够"会把人带偏
+        const exists = await this.userRepo.findOneBy({ username: row.username });
+        if (exists) {
+          pushFailure(rowNo, '账号已存在：' + row.username);
+          continue;
+        }
+
+        const plain = row.initialPassword || fallbackPassword;
+        if (!plain || plain.length < 8) {
+          pushFailure(rowNo, '缺少初始密码（至少 8 位），且参数 sys.user.initPassword 未配置');
+          continue;
+        }
+
+        let deptId: number | null = null;
+        if (row.deptName) {
+          const depts: Array<{ id: number }> = await this.dataSource.query(
+            'SELECT id FROM sys_dept WHERE name = ? AND delete_time IS NULL LIMIT 2',
+            [row.deptName],
+          );
+          if (depts.length === 0) {
+            pushFailure(rowNo, '部门不存在：' + row.deptName);
+            continue;
+          }
+          if (depts.length > 1) {
+            pushFailure(rowNo, '部门重名，无法唯一确定：' + row.deptName);
+            continue;
+          }
+          deptId = depts[0]!.id;
+        }
+
+        let hash = hashCache.get(plain);
+        if (!hash) {
+          hash = await argonHash(plain);
+          hashCache.set(plain, hash);
+        }
+
+        await this.userRepo.insert({
+          username: row.username,
+          password: hash,
+          nickname: row.nickname,
+          email: '',
+          phone: row.phone,
+          post: row.post,
+          status: 1,
+          deptId,
+        } as never);
+        ok += 1;
+      } catch {
+        pushFailure(rowNo, '写入失败，请检查字段长度');
+      }
+    }
+
+    return { total: records.length, ok, failed, failedTruncated };
+  }
+
+  private async defaultInitPassword(): Promise<string> {
+    try {
+      const rows: Array<{ config_value: string }> = await this.dataSource.query(
+        "SELECT config_value FROM sys_config WHERE config_key = 'sys.user.initPassword' AND status = 1 LIMIT 1",
+      );
+      const value = rows[0]?.config_value ?? '';
+      return value.length >= 8 ? value : '';
+    } catch {
+      return '';
+    }
+  }
 
   /** 登录查询：按用户名取用户（带出密码） */
   async findByUsername(username: string): Promise<User | null> {

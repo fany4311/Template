@@ -48,6 +48,20 @@ export class DictService {
     private readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
   ) {}
 
+  /**
+   * 前端下拉的进程内缓存。
+   *
+   * 字典是「读极多、写极少」，而每个带字典的表单都会拉一次；
+   * 不缓存时一次页面切换能打出十几条同 SQL。
+   * 多实例下靠 5 分钟 TTL 收敛，同一实例内靠写操作主动失效（见各写方法）。
+   */
+  private readonly optionCache = new Map<string, { expires: number; value: DictOption[] }>();
+  private static readonly OPTION_TTL_MS = 5 * 60 * 1000;
+
+  private invalidateOptions(): void {
+    this.optionCache.clear();
+  }
+
   // ---------------- 字典类型 ----------------
 
   async pageType(query: QueryDictTypeInput): Promise<PageResult<DictType>> {
@@ -72,7 +86,9 @@ export class DictService {
       const repo = this.txHost.tx.getRepository(DictType);
       const exists = await repo.findOneBy({ dictType: dto.dictType });
       if (exists) throw new ApiException(MSG_TYPE_EXISTS);
-      return repo.save(repo.create(dto));
+      const saved = await repo.save(repo.create(dto));
+      this.invalidateOptions();
+      return saved;
     });
   }
 
@@ -99,6 +115,7 @@ export class DictService {
           { dictType: dto.dictType },
         );
       }
+      this.invalidateOptions();
       return saved;
     });
   }
@@ -114,6 +131,7 @@ export class DictService {
       await dataRepo.softDelete({ dictType: type.dictType });
 
       await repo.softDelete(id);
+      this.invalidateOptions();
       return true;
     });
   }
@@ -148,7 +166,9 @@ export class DictService {
       if (!type) throw new ApiException(MSG_TYPE_NOT_FOUND);
 
       const repo = this.txHost.tx.getRepository(DictData);
-      return repo.save(repo.create(dto));
+      const saved = await repo.save(repo.create(dto));
+      this.invalidateOptions();
+      return saved;
     });
   }
 
@@ -165,7 +185,9 @@ export class DictService {
       }
 
       Object.assign(data, dto);
-      return repo.save(data);
+      const saved = await repo.save(data);
+      this.invalidateOptions();
+      return saved;
     });
   }
 
@@ -175,6 +197,7 @@ export class DictService {
       const data = await repo.findOneBy({ id });
       if (!data) throw new NotFoundException(MSG_DATA_NOT_FOUND);
       await repo.softDelete(id);
+      this.invalidateOptions();
       return true;
     });
   }
@@ -183,14 +206,23 @@ export class DictService {
 
   /** 查询某类型下的可用选项（仅 status=1），按 dictSort、id 升序 */
   async options(dictType: string): Promise<DictOption[]> {
+    const now = Date.now();
+    const hit = this.optionCache.get(dictType);
+    if (hit && hit.expires > now) return hit.value;
+
     const list = await this.dataRepo.find({
       where: { dictType, status: 1 },
       order: { dictSort: 'ASC', id: 'ASC' },
     });
-    return list.map((item) => ({
+    const value = list.map((item) => ({
       label: item.dictLabel,
       value: item.dictValue,
       tagType: item.tagType,
     }));
+    this.optionCache.set(dictType, {
+      expires: now + DictService.OPTION_TTL_MS,
+      value,
+    });
+    return value;
   }
 }

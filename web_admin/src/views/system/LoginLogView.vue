@@ -1,87 +1,61 @@
 <script setup lang="ts">
 import { Delete, Refresh, Search } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { onMounted, reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { loginLogApi } from '../../api/log';
 import type { LoginLogItem } from '../../api/types';
+import DataTable, { type TableColumn } from '../../components/DataTable.vue';
+import { useCrud } from '../../composables/useCrud';
 
-const loading = ref(false);
-const list = ref<LoginLogItem[]>([]);
-const total = ref(0);
-
-const query = reactive<{
-  pageNum: number;
-  pageSize: number;
-  username: string;
-  status?: number;
-}>({
-  pageNum: 1,
-  pageSize: 10,
-  username: '',
-  status: undefined,
-});
+/**
+ * 登录日志（只读列表 + 单条删除 + 清空）。
+ *
+ * 用 useCrud + DataTable：日志页没有表单，正好是「列表抽象」最省事的落地场景。
+ * 清空是模块特有动作，留在页面里，不硬塞进 useCrud。
+ */
+type Query = { pageNum: number; pageSize: number; username: string; status?: number };
 
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
 
-async function fetchList(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await loginLogApi.page({ ...query });
-    list.value = res.list;
-    total.value = res.total;
-  } catch {
-    // 已提示
-  } finally {
-    loading.value = false;
-  }
-}
+const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
+  LoginLogItem,
+  Query
+>({
+  api: loginLogApi,
+  query: { pageNum: 1, pageSize: 10, username: '', status: undefined },
+  removeText: () => '确认删除该条登录日志？',
+});
 
-function handleSearch(): void {
-  query.pageNum = 1;
-  void fetchList();
-}
+const columns: TableColumn[] = [
+  { prop: 'id', label: 'ID', width: 90 },
+  { prop: 'username', label: '用户名', minWidth: 130 },
+  { label: '结果', width: 90, slot: 'status' },
+  { prop: 'msg', label: '说明', minWidth: 160, showOverflowTooltip: true },
+  { prop: 'ip', label: 'IP', width: 140 },
+  { prop: 'userAgent', label: 'User-Agent', minWidth: 220, showOverflowTooltip: true },
+  { label: '登录时间', width: 170, slot: 'loginTime' },
+];
 
-function handleReset(): void {
-  query.username = '';
-  query.status = undefined;
-  query.pageNum = 1;
-  void fetchList();
-}
-
-async function handleRemove(row: LoginLogItem): Promise<void> {
-  try {
-    await ElMessageBox.confirm('确认删除该条登录日志？', '提示', { type: 'warning' });
-  } catch {
-    return;
-  }
-  try {
-    await loginLogApi.remove(row.id);
-    ElMessage.success('删除成功');
-    await fetchList();
-  } catch {
-    // 已提示
-  }
-}
+const clearing = ref(false);
 
 async function handleClear(): Promise<void> {
   try {
-    await ElMessageBox.confirm('确认清空全部登录日志？不可恢复。', '警告', {
-      type: 'warning',
-    });
+    await ElMessageBox.confirm('确认清空全部登录日志？不可恢复。', '警告', { type: 'warning' });
   } catch {
     return;
   }
+  clearing.value = true;
   try {
     await loginLogApi.clear();
     ElMessage.success('已清空');
-    await fetchList();
+    await reload();
   } catch {
     // 已提示
+  } finally {
+    clearing.value = false;
   }
 }
-
-onMounted(fetchList);
 </script>
 
 <template>
@@ -93,20 +67,21 @@ onMounted(fetchList);
           placeholder="用户名"
           clearable
           style="width: 160px"
-          @keyup.enter="handleSearch"
+          @keyup.enter="search"
         />
         <el-select v-model="query.status" placeholder="结果" clearable style="width: 120px">
           <el-option label="成功" :value="1" />
           <el-option label="失败" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="handleSearch">查询</el-button>
-        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Refresh" @click="reset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button
             v-perm="'system:loginlog:remove'"
             :icon="Delete"
             type="danger"
             plain
+            :loading="clearing"
             @click="handleClear"
           >
             清空
@@ -114,47 +89,36 @@ onMounted(fetchList);
         </div>
       </div>
 
-      <el-table v-loading="loading" :data="list" border stripe>
-        <el-table-column prop="id" label="ID" width="90" />
-        <el-table-column prop="username" label="用户名" min-width="130" />
-        <el-table-column label="结果" width="90">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? '成功' : '失败' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="msg" label="说明" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="ip" label="IP" width="140" />
-        <el-table-column prop="userAgent" label="User-Agent" min-width="220" show-overflow-tooltip />
-        <el-table-column label="登录时间" width="170">
-          <template #default="{ row }">{{ fmtTime(row.loginTime) }}</template>
-        </el-table-column>
+      <DataTable
+        v-model:page="query.pageNum"
+        v-model:page-size="query.pageSize"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
+        :total="total"
+        @change="reload"
+      >
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
+            {{ row.status === 1 ? '成功' : '失败' }}
+          </el-tag>
+        </template>
+
+        <template #loginTime="{ row }">{{ fmtTime(row.loginTime) }}</template>
+
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
             <el-button
               v-perm="'system:loginlog:remove'"
               link
               type="danger"
-              @click="handleRemove(row as LoginLogItem)"
+              @click="remove(row as LoginLogItem)"
             >
               删除
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="query.pageNum"
-          v-model:page-size="query.pageSize"
-          :total="total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next"
-          @current-change="fetchList"
-          @size-change="handleSearch"
-        />
-      </div>
+      </DataTable>
     </el-card>
   </div>
 </template>

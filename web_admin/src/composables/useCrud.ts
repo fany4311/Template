@@ -25,12 +25,15 @@ export interface PageLike<T> {
   total: number;
 }
 
-export interface CrudApi<T, Q> {
+/** 主键可能是 number，也可能是序列化成字符串的 bigint（如日志类表） */
+export type RowId = number | string;
+
+export interface CrudApi<T extends { id: RowId }, Q> {
   page: (query: Q) => Promise<PageLike<T>>;
-  remove?: (id: number) => Promise<unknown>;
+  remove?: (id: T['id']) => Promise<unknown>;
 }
 
-export interface UseCrudOptions<T extends { id: number }, Q extends PagedQuery> {
+export interface UseCrudOptions<T extends { id: RowId }, Q extends PagedQuery> {
   api: CrudApi<T, Q>;
   /** 初始查询条件（必须含 pageNum/pageSize）；reset() 会回到这份快照 */
   query: Q;
@@ -40,7 +43,7 @@ export interface UseCrudOptions<T extends { id: number }, Q extends PagedQuery> 
   autoLoad?: boolean;
 }
 
-export interface UseCrudResult<T extends { id: number }, Q extends PagedQuery> {
+export interface UseCrudResult<T extends { id: RowId }, Q extends PagedQuery> {
   query: Q;
   rows: Ref<T[]>;
   total: Ref<number>;
@@ -51,7 +54,7 @@ export interface UseCrudResult<T extends { id: number }, Q extends PagedQuery> {
   remove: (row: T) => Promise<void>;
 }
 
-export function useCrud<T extends { id: number }, Q extends PagedQuery>(
+export function useCrud<T extends { id: RowId }, Q extends PagedQuery>(
   options: UseCrudOptions<T, Q>,
 ): UseCrudResult<T, Q> {
   const initial = { ...options.query };

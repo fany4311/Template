@@ -110,7 +110,13 @@ router.beforeEach(async (to) => {
 
   // 未登录：public 页面放行，其余带去登录页
   if (!auth.token) {
-    if (to.meta.public) return true;
+    /**
+     * catch-all（`not-found`）也标了 public —— 那是给**已登录**用户刷新深链用的：
+     * 动态路由注册前，`/system/user` 只能匹配到 catch-all。
+     * 但未登录时放行它，用户看到的是「页面不存在」，而不是登录页。
+     * 深链本就是"登录后要去的地址"，所以这里带 redirect 去登录更合理。
+     */
+    if (to.meta.public && to.name !== 'not-found') return true;
     return { path: '/login', query: { redirect: to.fullPath } };
   }
 

@@ -20,18 +20,23 @@ step "后端类型检查"
 step "后端 lint"
 (cd server && pnpm lint)
 
-step "权限一致性（代码 ⇄ sys_permission ⇄ sys_menu）"
-(cd server && pnpm authz:check)
+step "权限一致性（代码 ⇄ sys_permission ⇄ sys_menu，env=${NODE_ENV:-dev}）"
+(cd server && NODE_ENV="${NODE_ENV:-dev}" pnpm authz:check)
 
 # 迁移一致性：代码里有、库里没跑 → 派生/上线最经典的 500 制造机。
 # TypeORM 的 `migration:show` 用 `[X]` 标记已执行、`[ ]` 标记未执行。
 # 用 if 而不是 `cmd && die`：grep 没匹配到时是非零，直接跟 && 会被 set -e 判成失败。
-step "迁移一致性（代码 ⇄ 库）"
-if (cd server && NODE_ENV=dev pnpm migration:show 2>/dev/null) | grep -q '^\[ \]'; then
-  echo "✗ 有迁移未在 dev 库执行，先跑：cd server && NODE_ENV=dev pnpm migration:run" >&2
+# 环境可继承：本地默认 dev；要在部署端校验 prod 就 `NODE_ENV=prod bash scripts/verify.sh`。
+# ⚠ 别写死 dev —— 部署端可能根本没建 dev 库，那会误报成"脚本坏了"。
+# （prod 侧其实不需要这道门禁：`template.sh prod start` 第 2 步就是 migration:run，
+#   漏跑迁移 prod 起不来。这里挡的是"改了代码忘了跑迁移"的人为疏漏。）
+CHECK_ENV="${NODE_ENV:-dev}"
+step "迁移一致性（代码 ⇄ 库，env=$CHECK_ENV）"
+if (cd server && NODE_ENV="$CHECK_ENV" pnpm migration:show 2>/dev/null) | grep -q '^\[ \]'; then
+  echo "✗ 有迁移未在 $CHECK_ENV 库执行，先跑：cd server && NODE_ENV=$CHECK_ENV pnpm migration:run" >&2
   exit 1
 fi
-echo "    dev 库已与代码迁移对齐"
+echo "    $CHECK_ENV 库已与代码迁移对齐"
 
 step "前端 lint（web_admin / web）"
 (cd web_admin && pnpm lint)

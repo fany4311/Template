@@ -263,28 +263,33 @@ done
 
 if [ "$DO_ENV" -eq 1 ]; then
   update_env() {
-    local f="$1" db="$2"
+    local f="$1" db="$2" user="$3"
     [ -f "$f" ] || { warn "不存在，跳过：$f"; return 0; }
     cp -p "$f" "$f.bak"
     sed -i \
       -e "s#^APP_NAME=.*#APP_NAME=${SLUG}#" \
-      -e "s#^DB_USERNAME=.*#DB_USERNAME=${SLUG}#" \
+      -e "s#^DB_USERNAME=.*#DB_USERNAME=${user}#" \
       -e "s#^DB_DATABASE=.*#DB_DATABASE=${db}#" \
       -e "s#^STORAGE_S3_BUCKET=.*#STORAGE_S3_BUCKET=${SLUG}#" "$f"
     if [ -n "$PORTS" ] && [ "$f" = "server/.env.dev" ]; then
       sed -i -e "s#^PORT=.*#PORT=${DEV_API}#" "$f"
     fi
-    log "env 已更新：$f（备份 $f.bak）"
+    log "env 已更新：$f（DB=${db}，账号=${user}，备份 $f.bak）"
   }
+  # 一库一账号（见 server/sql/databases.sql / docs/库台账.md）：账号随库角色走，
+  # 不再复用项目名当账号 —— 否则派生后 dev 与 prod 又落回同一个账号。
   if [ "$CONFIRM" -eq 1 ]; then
-    update_env server/.env.dev  "$SLUG"
-    update_env server/.env.test "${SLUG}_test"
-    update_env server/.env.prod "${SLUG}_prod"
+    update_env server/.env.dev  "$SLUG"         "${SLUG}_dev"
+    update_env server/.env.test "${SLUG}_tmp"   "${SLUG}_tmp"
+    update_env server/.env.prod "${SLUG}_prod"  "${SLUG}_prod"
   else
     echo "   env 将更新：server/.env.dev|.env.test|.env.prod 的 APP_NAME/DB_USERNAME/DB_DATABASE/STORAGE_S3_BUCKET"
+    echo "   库与账号：$SLUG（账号 ${SLUG}_dev） / ${SLUG}_tmp（同账号） / ${SLUG}_prod（同账号）"
   fi
 else
-  echo "   env 未改（加 --env 才会动真实 .env.*；改库名后必须人工建库+授权）"
+  echo "   env 未改（加 --env 才会动真实 .env.*）"
+  echo "   改库名后**必须**在 server/sql/databases.sql 追加该项目段落，并到 MySQL 上跑一次；"
+  echo "   否则一库一账号无法生效（见 docs/库台账.md §4 变更流程）"
 fi
 
 if [ "$CONFIRM" -eq 0 ]; then

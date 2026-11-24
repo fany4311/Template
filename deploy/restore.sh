@@ -37,7 +37,11 @@ if [ -z "${DB_NAME:-}" ] && [ -f server/.env.prod ]; then
 fi
 : "${DB_HOST:=127.0.0.1}"
 : "${DB_PORT:=3306}"
-: "${DB_USER:=template}"
+# 账号：一库一账号（见 server/sql/databases.sql）。
+# 既要认 DB_USER（命令行/环境变量），也要认 .env.prod 里的 DB_USERNAME ——
+# 上面 source 进来的是 DB_USERNAME，只写 DB_USER 默认值会静默退回旧共享账号。
+DB_USER="${DB_USER:-${DB_USERNAME:-}}"
+: "${DB_USER:?缺 DB_USER / DB_USERNAME（环境变量或 server/.env.prod）}"
 : "${DB_NAME:?缺 DB_NAME（环境变量或 server/.env.prod）}"
 : "${DB_PASSWORD:?缺 DB_PASSWORD}"
 
@@ -71,8 +75,26 @@ fi
 
 MYSQL=(mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASSWORD")
 
+# 建库/授权需要管理员连接：一库一账号后，业务账号（如 template_prod）只有
+# `<本库>.*` 权限，**建不了新库**，演练目标库必须用管理员建。
+# 与 scripts/db-reset.sh 同一套接口：MYSQL_ADMIN / MYSQL_ROOT_PASSWORD。
+if [ -n "${MYSQL_ADMIN:-}" ]; then
+  # shellcheck disable=SC2206
+  ADMIN=( $MYSQL_ADMIN )
+elif [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then
+  ADMIN=( mysql -h"$DB_HOST" -P"$DB_PORT" -uroot "-p${MYSQL_ROOT_PASSWORD}" --default-character-set=utf8mb4 )
+else
+  # 退回到业务账号：只在旧的「一账号多库」授权下能跑通，新模型下会 Permission denied
+  ADMIN=( "${MYSQL[@]}" )
+  echo "⚠ 未设 MYSQL_ADMIN / MYSQL_ROOT_PASSWORD，试用业务账号建库（一库一账号下会失败）"
+fi
+
 echo "==> 建库（若不存在）"
-"${MYSQL[@]}" -e "CREATE DATABASE IF NOT EXISTS $TARGET CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+"${ADMIN[@]}" -e "CREATE DATABASE IF NOT EXISTS $TARGET CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" || {
+  echo "✗ 建库失败。演练目标库需管理员建：" >&2
+  echo "    MYSQL_ROOT_PASSWORD=<root密码> bash deploy/restore.sh $FILE --db <目标库>" >&2
+  exit 1
+}
 
 echo "==> 导入"
 gunzip -c "$FILE" | "${MYSQL[@]}" "$TARGET"

@@ -6,9 +6,14 @@ set -euo pipefail
 
 : "${DB_HOST:=127.0.0.1}"
 : "${DB_PORT:=3306}"
-: "${DB_USER:=template}"
+# 一库一账号（见 server/sql/databases.sql）：只认 DB_USER / DB_USERNAME 显式传入，
+# 不再默默退回旧的共享账号 'template' —— 那个默认值在 cron 里会被漏掉。
+DB_USER="${DB_USER:-${DB_USERNAME:-}}"
+: "${DB_USER:?必须显式指定 DB_USER（如 template_prod），不提供默认值}"
 : "${DB_PASSWORD:?DB_PASSWORD 未设置}"
-: "${DB_NAME:=template}"
+# 以前这里是 `${DB_NAME:=template}`，默认备份 **dev 库**。
+# cron 里忘传 DB_NAME，就会得到一份"看上去正常"的备份，而生产库根本没备。
+: "${DB_NAME:?必须显式指定 DB_NAME（生产用 <项目>_prod，不要依赖默认值）}"
 
 BACKUP_DIR="${BACKUP_DIR:-/data/backups/template}"
 KEEP_DAYS="${KEEP_DAYS:-14}"

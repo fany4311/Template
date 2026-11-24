@@ -14,7 +14,7 @@ export default defineConfig({
     /**
      * e2e **必须串行**。
      *
-     * e2e 跑在独立的 `template_test` 库（见 `.env.test`），与 dev 库物理隔离，
+     * e2e 跑在独立的 `template_tmp` 库（见 `.env.test`），与 dev 库物理隔离，
      * 所以在 dev server 运行中也可以直接跑，不会互相污染。
      *
      * 但仍然要串行：所有 spec 共享同一个 test 库、同一个 Redis DB 和同一条 Outbox 队列。
@@ -26,9 +26,9 @@ export default defineConfig({
      *
      * 串行后 10 个文件 80 个用例全绿，耗时约 25s，代价可以接受。
      *
-     * 新环境准备测试库：
-     *   CREATE DATABASE template_test ...（utf8mb4_unicode_ci）
-     *   NODE_ENV=test pnpm migration:run    # 含 CreateCoreSchema 基线建表
+     * 新环境准备测试库（tmp 类库，随时可重建）：
+     *   bash scripts/db-reset.sh          # 建库 + 授权 + 跑迁移，一条命令
+     *   库/账号定义见 server/sql/databases.sql，台账见 docs/库台账.md
      */
     fileParallelism: false,
   },

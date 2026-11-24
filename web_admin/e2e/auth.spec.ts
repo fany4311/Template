@@ -56,12 +56,12 @@ test.describe('认证', () => {
     );
 
     await login(page, ADMIN_USER, ADMIN_PASS);
-    await expect(page.locator('.el-menu')).toBeVisible();
+    await expect(page.getByRole('menubar')).toBeVisible();
 
     // 会话在 Redis 里，刷新后 token 仍有效
     await page.reload();
     await expect(page).not.toHaveURL(/\/login/);
-    await expect(page.locator('.el-menu')).toBeVisible();
+    await expect(page.getByRole('menubar')).toBeVisible();
   });
 
   test('超管登出后访问受保护页会被拦', async ({ page }) => {

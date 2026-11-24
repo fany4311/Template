@@ -12,8 +12,10 @@
 - **工具链已铺平**（2026-11-24）：`oxlint` + `oxfmt` 覆盖三个子项目，**prettier 已移除**；
   全仓按 oxfmt 重排（server 77 文件 / web_admin 41 / web 7，纯换行与引号，无逻辑改动）；
   `verify.sh` 增加「前端 lint」与「格式检查」两步。
-- **E2E 骨架已就位**：`web_admin/e2e/`（认证 4 条）+ `playwright.config.ts`；
-  **浏览器未安装**（本机到 `cdn.playwright.dev` 不通），所以**尚未真正跑过**。
+- **E2E 已跑通**（2026-11-24）：`web_admin/e2e/` 认证链路 **3 通过 / 2 跳过**
+  （跳过的两条要超管密码，走 `E2E_ADMIN_USER` / `E2E_ADMIN_PASS`）。
+  跑通过程中修掉一个真 bug：未登录访问深链时先命中 public 的 catch-all →
+  渲染 404 而不是登录页（守卫已加 `to.name !== 'not-found'`）。
 - **数据变更按标签失效**：`composables/useRefetch.ts`（等价 TanStack `queryKey` 的 1%），
   `useCrud` 支持 `tags`；已接线 用户 / 角色 / 部门 三处。
 - 库与账号三角色化已收口（详见 `log/20261124_库与账号三角色化.md`）。
@@ -43,6 +45,9 @@
 
 ## 验证台账
 
+- 2026-11-24 E2E 首次跑绿：`npx playwright test` → 3 passed / 2 skipped（18s→2.6s）。
+  同时验证 WSL2 无 IPv6 出口导致浏览器下载卡住，`--dns-result-order=ipv4first` 可解。
+- 2026-11-24 守卫修复后 `scripts/verify.sh` 全绿。
 - 2026-11-24 工具链改造后 `scripts/verify.sh` 全绿（新增前端 lint / 格式检查两步）：
   后端 tsc + oxlint + 权限一致性（48 码）+ 单测 16 文件 113 用例；前端 lint ×2 +
   `oxfmt --check` ×3 + `vue-tsc` + `vite build` ×2。

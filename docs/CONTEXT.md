@@ -12,6 +12,11 @@
 - **工具链已铺平**（2026-11-24）：`oxlint` + `oxfmt` 覆盖三个子项目，**prettier 已移除**；
   全仓按 oxfmt 重排（server 77 文件 / web_admin 41 / web 7，纯换行与引号，无逻辑改动）；
   `verify.sh` 增加「前端 lint」与「格式检查」两步。
+- **`dataScope=CUSTOM` 已完成**（2026-11-24）：`sys_role_dept` 表 + 迁移、会话带
+  `dataScopeDepts`、`DataScopeService` 的 CUSTOM 分支、角色编辑页部门树多选（空选拦提交）。
+  端到端实测：CUSTOM=部门1 → 0 条、部门2 → 2 条、admin(ALL) → 2 条。
+  同时修掉一个真缺口：`hazard` / `user` 三处调用点手搓 `{userId, deptId}`，把
+  `dataScopeDepts` 丢了（CUSTOM 静默空集）。
 - **E2E 已跑通**（2026-11-24）：`web_admin/e2e/` 认证链路 **3 通过 / 2 跳过**
   （跳过的两条要超管密码，走 `E2E_ADMIN_USER` / `E2E_ADMIN_PASS`）。
   跑通过程中修掉一个真 bug：未登录访问深链时先命中 public 的 catch-all →
@@ -24,9 +29,6 @@
 
 > 选型复核结论见 `整体方案与选型.md` §4.1：运行时不换，只补工具链。
 
-- [ ] **P1 权限缺口**：`dataScope=CUSTOM` 界面禁用、后端「暂按无权限处理」，
-      被传进来就是静默查不到数据（不报错）。补 `sys_role_dept` + `DataScopeService` 分支 +
-      角色编辑页部门树多选。**CASL `rules` 编辑 UI 不做**（用户决定）。
 - [ ] **P1 E2E 跑通并补链路**：先在有网的机器 `npx playwright install chromium`，
       把认证 4 条跑绿；再补「建角色→建用户并授权」「隐患流转到销号」「附件上传-下载-回收」。
 - [ ] **P2 迁移一致性门禁**：`verify.sh` 现在只查权限码，不查"代码里的迁移是否都跑过"。
@@ -45,6 +47,9 @@
 
 ## 验证台账
 
+- 2026-11-24 `dataScope=CUSTOM` 端到端：建角色（部门1,2）→ 详情回读 [1,2] → 改 [2] → 空数组；
+  临时用户持该角色登录，隐患列表 CUSTOM=1 → 0 条 / =2 → 2 条 / admin(ALL) → 2 条；
+  测试数据（用户/角色/关联）已清理。E2E 6/6 通过。
 - 2026-11-24 E2E 首次跑绿：`npx playwright test` → 3 passed / 2 skipped（18s→2.6s）。
   同时验证 WSL2 无 IPv6 出口导致浏览器下载卡住，`--dns-result-order=ipv4first` 可解。
 - 2026-11-24 守卫修复后 `scripts/verify.sh` 全绿。

@@ -189,6 +189,10 @@ pnpm authz:sync          # 改了装饰器后跑一次
 
 ## 12. 待做
 
-- 角色规则（CASL rules）编辑 UI + 数据范围 `CUSTOM`（自定义部门集合）。
+- ~~数据范围 `CUSTOM`（自定义部门集合）~~ —— **已完成**（2026-11-24）：
+  `sys_role_dept` + `DataScopeService` 的 CUSTOM 分支 + 角色编辑页部门树多选。
+  CUSTOM 的部门集合在**登录时算并集写进会话**（`dataScopeDepts`），查询层不再回库查。
+- 角色规则（CASL rules）编辑 UI —— **明确不做**（用户决定：规则属于平台设计，
+  由迁移/seed 维护，界面放开等于给了提权入口）。
 - 外部授权服务（OpenFGA）适配器（按需）。
 - 业务资源的 `@CheckPolicies` 资源级判定。

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterTypeOrm } from '@nestjs-cls/transactional-adapter-typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   buildPageResult,
   type PageResult,
@@ -15,6 +15,7 @@ import {
   type QueryRoleInput,
   type UpdateRoleInput,
 } from './dto/role.dto.js';
+import { RoleDept } from './entities/role-dept.entity.js';
 import { Role } from './entities/role.entity.js';
 
 const MSG_ROLE_NOT_FOUND = '角色不存在';
@@ -72,12 +73,72 @@ export class RoleService {
     @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
     @InjectRepository(UserRole)
     private readonly userRoleRepo: Repository<UserRole>,
+    @InjectRepository(RoleDept)
+    private readonly roleDeptRepo: Repository<RoleDept>,
     private readonly session: SessionService,
     private readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
   ) {}
 
   async findById(id: number): Promise<Role | null> {
-    return this.roleRepo.findOneBy({ id });
+    const role = await this.roleRepo.findOneBy({ id });
+    if (!role) return null;
+    const [withDepts] = await this.attachDeptIds([role]);
+    return withDepts ?? role;
+  }
+
+  /**
+   * 给角色对象挂上 `deptIds`（自定义数据范围的部门集合）。
+   *
+   * 为什么不放进实体列：`deptIds` 是派生数据（来自 sys_role_dept），
+   * 放进 @Column 会让 save() 试图写一个不存在的列。
+   */
+  private async attachDeptIds<T extends Role>(roles: T[]): Promise<T[]> {
+    if (!roles.length) return roles;
+    const ids = roles.map((r) => r.id);
+    const rows = await this.roleDeptRepo.find({
+      where: { roleId: In(ids) },
+      select: ['roleId', 'deptId'],
+    });
+    const byRole = new Map<number, number[]>();
+    for (const row of rows) {
+      const list = byRole.get(row.roleId) ?? [];
+      list.push(row.deptId);
+      byRole.set(row.roleId, list);
+    }
+    return roles.map((r) =>
+      Object.assign(r, { deptIds: byRole.get(r.id) ?? [] }),
+    );
+  }
+
+  /** 覆盖角色的自定义部门集合（事务内先删后插，避免残留已取消的部门） */
+  private async replaceDeptIds(
+    repo: Repository<RoleDept>,
+    roleId: number,
+    deptIds: number[],
+  ): Promise<void> {
+    // 硬删：关联表没有业务含义，留软删行会撞唯一键（同一个部门再次选中时插不进去）
+    await repo.delete({ roleId });
+    const unique = [...new Set(deptIds)];
+    if (!unique.length) return;
+    await repo.insert(unique.map((deptId) => ({ roleId, deptId })));
+  }
+
+  /**
+   * 取一组角色在 `CUSTOM` 范围内的部门并集（登录时写进会话用）。
+   * 非 CUSTOM 的角色不贡献部门 —— 它们的范围由 DEPT / DEPT_AND_CHILD / SELF 表达。
+   */
+  async getCustomDeptIds(
+    roles: Pick<Role, 'id' | 'dataScope'>[],
+  ): Promise<number[]> {
+    const roleIds = roles
+      .filter((r) => r.dataScope === 'CUSTOM')
+      .map((r) => r.id);
+    if (!roleIds.length) return [];
+    const rows = await this.roleDeptRepo.find({
+      where: { roleId: In(roleIds) },
+      select: ['deptId'],
+    });
+    return [...new Set(rows.map((r) => r.deptId))];
   }
 
   async page(query: QueryRoleInput): Promise<PageResult<Role>> {
@@ -95,14 +156,23 @@ export class RoleService {
       .skip((query.pageNum - 1) * query.pageSize)
       .take(query.pageSize);
     const [list, total] = await qb.getManyAndCount();
-    return buildPageResult(list, total);
+    return buildPageResult(await this.attachDeptIds(list), total);
   }
 
   async create(dto: CreateRoleInput): Promise<Role> {
+    const { deptIds, ...roleFields } = dto;
     return this.txHost.withTransaction(async () => {
       const repo = this.txHost.tx.getRepository(Role);
       const level = await this.allocateLevel(repo);
-      return repo.save(repo.create({ ...dto, level }));
+      const saved = await repo.save(repo.create({ ...roleFields, level }));
+      if (deptIds?.length) {
+        await this.replaceDeptIds(
+          this.txHost.tx.getRepository(RoleDept),
+          saved.id,
+          deptIds,
+        );
+      }
+      return saved;
     });
   }
 
@@ -145,14 +215,35 @@ export class RoleService {
 
       this.assertSuperAdminWritable(role, dto);
 
+      // deptIds 不是角色表的列，先摘出来单独处理
+      const { deptIds, ...fields } = dto;
       // 只覆盖**显式传入**的字段：DTO 里被省略的键不能把库里的值改成 undefined
       const patch = Object.fromEntries(
-        Object.entries(dto).filter(([, v]) => v !== undefined),
+        Object.entries(fields).filter(([, v]) => v !== undefined),
       );
       const before = authzFingerprint(role);
       Object.assign(role, patch);
       const saved = await repo.save(role);
-      return { saved, authzChanged: before !== authzFingerprint(saved) };
+
+      // 部门集合变了也算授权变更：会话里缓存着 dataScopeDepts，
+      // 不失效就是"改了数据范围、本人却还按旧范围看"。
+      let deptChanged = false;
+      if (deptIds !== undefined) {
+        const deptRepo = this.txHost.tx.getRepository(RoleDept);
+        const prev = await deptRepo.find({
+          where: { roleId: id },
+          select: ['deptId'],
+        });
+        const prevSet = new Set(prev.map((r) => r.deptId));
+        const nextSet = new Set(deptIds);
+        deptChanged =
+          prevSet.size !== nextSet.size ||
+          [...nextSet].some((d) => !prevSet.has(d));
+        if (deptChanged) await this.replaceDeptIds(deptRepo, id, deptIds);
+      }
+
+      const authzChanged = before !== authzFingerprint(saved) || deptChanged;
+      return { saved, authzChanged };
     });
 
     // 会话失效放在**事务提交之后**：Redis 不受事务保护，
@@ -204,6 +295,9 @@ export class RoleService {
       }
 
       await repo.softDelete(id);
+      // 关联表跟着清：角色是软删，但 sys_role_dept 没有业务含义，
+      // 留着就是孤儿行（以后按部门反查"哪些角色能看它"会查到已删角色）。
+      await this.txHost.tx.getRepository(RoleDept).delete({ roleId: id });
       return true;
     });
   }

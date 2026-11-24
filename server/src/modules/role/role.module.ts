@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRole } from '../user/entities/user-role.entity.js';
+import { RoleDept } from './entities/role-dept.entity.js';
 import { Role } from './entities/role.entity.js';
 import { RoleController } from './role.controller.js';
 import { RoleService } from './role.service.js';
@@ -13,7 +14,7 @@ import { RoleService } from './role.service.js';
  * `SessionService` 来自全局 SessionModule（@Global），无需在此 import。
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Role, UserRole])],
+  imports: [TypeOrmModule.forFeature([Role, UserRole, RoleDept])],
   controllers: [RoleController],
   providers: [RoleService],
   exports: [RoleService],

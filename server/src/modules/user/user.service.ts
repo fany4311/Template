@@ -59,7 +59,7 @@ export class UserService {
   async exportRows(query: ExportUserQuery, user: JwtUser): Promise<User[]> {
     const qb = this.userRepo.createQueryBuilder('u');
     const { clause, params } = await this.dataScope.resolve(
-      { userId: user.userId, deptId: user.deptId },
+      user,
       user.dataScopes ?? [],
       { deptColumn: 'u.deptId', ownerColumn: 'u.id' },
     );
@@ -256,7 +256,7 @@ export class UserService {
     const qb = this.userRepo.createQueryBuilder('u');
     if (user) {
       const { clause, params } = await this.dataScope.resolve(
-        { userId: user.userId, deptId: user.deptId },
+        user,
         user.dataScopes ?? [],
         { deptColumn: 'u.deptId', ownerColumn: 'u.id' },
       );

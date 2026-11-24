@@ -8,6 +8,7 @@ import type { AbilityRule } from '../../common/authz/ability.types.js';
 import { ApiException } from '../../common/exceptions/api.exception.js';
 import { RedisService } from '../../core/redis/redis.service.js';
 import { LoginLogService } from '../loginlog/loginlog.service.js';
+import { RoleService } from '../role/role.service.js';
 import { UserService } from '../user/user.service.js';
 import type { JwtUser, LoginMeta, Payload } from './auth.interface.js';
 import { SessionService } from '../../core/session/session.service.js';
@@ -33,6 +34,7 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly session: SessionService,
     private readonly loginLog: LoginLogService,
+    private readonly roleService: RoleService,
   ) {}
 
   /** 生成数学图形验证码（svg），答案存 Redis 5 分钟 */
@@ -86,6 +88,8 @@ export class AuthService {
       ];
       const rules: AbilityRule[] = roles.flatMap((r) => r.rules ?? []);
       const dataScopes = [...new Set(roles.map((r) => r.dataScope))];
+      // CUSTOM 的部门集合只在登录时算一次，之后从会话读（不在每次请求回库查）
+      const dataScopeDepts = await this.roleService.getCustomDeptIds(roles);
 
       const payload: Payload = { userId: user.id, username: user.username };
       const token = this.jwtService.sign(payload);
@@ -98,6 +102,7 @@ export class AuthService {
         deptId: user.deptId,
         post: user.post,
         dataScopes,
+        dataScopeDepts,
       });
 
       this.recordLogin(user.username, meta, 1, '登录成功');

@@ -98,11 +98,10 @@ export class HazardService {
   private async visibility(
     user: JwtUser,
   ): Promise<{ clause: string; params: Record<string, unknown> }> {
-    const base = await this.dataScope.resolve(
-      { userId: user.userId, deptId: user.deptId },
-      user.dataScopes ?? [],
-      { deptColumn: 'h.assignee_dept_id', ownerColumn: 'h.reporter_id' },
-    );
+    const base = await this.dataScope.resolve(user, user.dataScopes ?? [], {
+      deptColumn: 'h.assignee_dept_id',
+      ownerColumn: 'h.reporter_id',
+    });
 
     const ors = [`(${base.clause})`];
     const params: Record<string, unknown> = { ...base.params };

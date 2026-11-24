@@ -14,5 +14,7 @@ export const roleResponseSchema = z.object({
   permissions: z.array(z.string()),
   rules: z.array(abilityRuleResponseSchema).nullable().optional(),
   dataScope: z.string(),
+  /** 自定义数据范围的部门 id 集合（仅 CUSTOM 时有意义） */
+  deptIds: z.array(z.number()).optional(),
   status: z.number(),
 });

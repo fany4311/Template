@@ -71,6 +71,14 @@ export const createRoleSchema = z.object({
   permissions: permissionListSchema,
   rules: z.array(abilityRuleSchema).optional(),
   dataScope: dataScopeSchema.default('SELF'),
+  /**
+   * 自定义数据范围的部门集合（`dataScope = CUSTOM` 时生效）。
+   *
+   * 允许省略、也允许空数组：空数组的语义是**看不到任何数据**（fail-closed），
+   * 界面会拦住空提交，但接口不强制 —— 否则"先把范围改成 CUSTOM、再选部门"
+   * 这种两段式操作就做不了。
+   */
+  deptIds: z.array(z.number().int().positive()).max(200).optional(),
   status: statusSchema.default(1),
 });
 export type CreateRoleInput = z.infer<typeof createRoleSchema>;

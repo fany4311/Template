@@ -31,4 +31,6 @@ export interface JwtUser {
   post?: string;
   /** 角色的数据范围并集（查询层过滤依据） */
   dataScopes: DataScope[];
+  /** `dataScope = CUSTOM` 的部门集合（多角色并集） */
+  dataScopeDepts?: number[];
 }

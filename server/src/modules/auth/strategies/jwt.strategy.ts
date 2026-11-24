@@ -46,6 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       deptId: ctx.deptId,
       post: ctx.post,
       dataScopes: ctx.dataScopes,
+      dataScopeDepts: ctx.dataScopeDepts,
     };
   }
 }

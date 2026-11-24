@@ -23,6 +23,8 @@ export interface SessionData {
   post?: string;
   /** 角色的数据范围并集（查询层过滤依据） */
   dataScopes: DataScope[];
+  /** `dataScope = CUSTOM` 的部门集合（多角色并集）；其它范围不读 */
+  dataScopeDepts?: number[];
 }
 
 /** 会话读取上下文 */
@@ -34,6 +36,8 @@ export interface SessionContext {
   deptId?: number;
   post?: string;
   dataScopes: DataScope[];
+  /** `dataScope = CUSTOM` 的部门集合（多角色并集）；其它范围不读 */
+  dataScopeDepts?: number[];
 }
 
 /**
@@ -75,6 +79,7 @@ export class SessionService {
           deptId: data.deptId,
           post: data.post,
           dataScopes: data.dataScopes,
+          dataScopeDepts: data.dataScopeDepts ?? [],
         }),
         ttl,
       ),
@@ -101,6 +106,7 @@ export class SessionService {
           deptId?: number;
           post?: string;
           dataScopes?: DataScope[];
+          dataScopeDepts?: number[];
         })
       : {};
     return {
@@ -110,6 +116,7 @@ export class SessionService {
       deptId: p.deptId,
       post: p.post,
       dataScopes: p.dataScopes ?? [],
+      dataScopeDepts: p.dataScopeDepts ?? [],
     };
   }
 

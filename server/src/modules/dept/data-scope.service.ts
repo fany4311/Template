@@ -6,6 +6,13 @@ import { DeptService } from './dept.service.js';
 export interface DataScopeUser {
   userId: number;
   deptId?: number;
+  /**
+   * `dataScope = CUSTOM` 时能看的部门集合（登录时写进会话）。
+   *
+   * ⚠️ 调用方**直接把 JwtUser 传进来**（`resolve(user, user.dataScopes, opts)`），
+   * 不要手搓 `{ userId, deptId }` —— 那会把本字段丢掉，CUSTOM 静默变成"看不到任何数据"。
+   */
+  dataScopeDepts?: number[];
 }
 
 /** 数据范围列名配置（不同实体列名不同） */
@@ -31,12 +38,13 @@ export interface DataScopeResult {
  * - DEPT            → 本部门
  * - DEPT_AND_CHILD  → 本部门及以下（按 sys_dept.ancestors 求子树）
  * - SELF            → 归属人 = 当前用户
- * - CUSTOM          → 预留（自定义部门集合，暂按无权限处理）
+ * - CUSTOM          → 会话里预先算好的部门集合（`dataScopeDepts`）
  *
  * 用法：
  *   const { clause, params } = await dataScope.resolve(user, user.dataScopes, {
  *     deptColumn: 'u.deptId', ownerColumn: 'u.id',
  *   });
+ *   // CUSTOM 需要 user.dataScopeDepts（会话里带的部门集合）
  *   qb.andWhere(clause, params);
  */
 @Injectable()
@@ -66,6 +74,17 @@ export class DataScopeService {
       } else {
         params[key] = user.deptId;
         ors.push(`${options.deptColumn} = :${key}`);
+      }
+    }
+
+    // 自定义部门集合：会话里算好并集，这里只拼条件。
+    // 空集合 = 看不到任何数据（fail-closed）——**不要**退化成"不过滤"。
+    if (scopes.includes('CUSTOM') && options.deptColumn) {
+      const depts = user.dataScopeDepts ?? [];
+      if (depts.length) {
+        const key = `ds_custom_${idx++}`;
+        params[key] = depts;
+        ors.push(`${options.deptColumn} IN (:...${key})`);
       }
     }
 

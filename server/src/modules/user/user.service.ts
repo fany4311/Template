@@ -29,6 +29,7 @@ import type {
 import { userImportRowSchema } from './user.csv.js';
 import { UserRole } from './entities/user-role.entity.js';
 import { User } from './entities/user.entity.js';
+import { SUPERADMIN_LEVEL } from '../role/role.service.js';
 
 const MSG_USER_EXISTS = '用户名已存在';
 const MSG_USER_NOT_FOUND = '用户不存在';
@@ -344,7 +345,24 @@ export class UserService {
   }
 
   /** 删除用户（软删除）+ 解绑所有角色 */
-  async remove(id: number): Promise<boolean> {
+  async remove(id: number, operatorId: number): Promise<boolean> {
+    // 两道保护：删掉超管账号 = 系统再也没人能进管理域（只能改库）；删掉自己同样如此。
+    // 与 RoleService 的「内置角色不可删」对称：那边护的是角色，这边护的是持有者。
+    if (id === operatorId) {
+      throw new ApiException('不能删除当前登录账号');
+    }
+    const isSuperHolder = await this.userRoleRepo
+      .createQueryBuilder('ur')
+      .leftJoin('ur.role', 'role')
+      .where('ur.userId = :id', { id })
+      .andWhere('role.level = :level', { level: SUPERADMIN_LEVEL })
+      .getCount();
+    if (isSuperHolder > 0) {
+      throw new ApiException(
+        '超级管理员账号不可删除（如需停用请将状态改为禁用）',
+      );
+    }
+
     await this.txHost.withTransaction(async () => {
       const userRepo = this.txHost.tx.getRepository(User);
       const user = await userRepo.findOneBy({ id });

@@ -9,34 +9,46 @@
 
 ## 现在做什么
 
-- **工具链已铺平**（2026-11-24）：`oxlint` + `oxfmt` 覆盖三个子项目，**prettier 已移除**；
-  全仓按 oxfmt 重排（server 77 文件 / web_admin 41 / web 7，纯换行与引号，无逻辑改动）；
-  `verify.sh` 增加「前端 lint」与「格式检查」两步。
-- **`dataScope=CUSTOM` 已完成**（2026-11-24）：`sys_role_dept` 表 + 迁移、会话带
-  `dataScopeDepts`、`DataScopeService` 的 CUSTOM 分支、角色编辑页部门树多选（空选拦提交）。
-  端到端实测：CUSTOM=部门1 → 0 条、部门2 → 2 条、admin(ALL) → 2 条。
-  同时修掉一个真缺口：`hazard` / `user` 三处调用点手搓 `{userId, deptId}`，把
-  `dataScopeDepts` 丢了（CUSTOM 静默空集）。
-- **E2E 已跑通**（2026-11-24）：`web_admin/e2e/` 认证链路 **3 通过 / 2 跳过**
-  （跳过的两条要超管密码，走 `E2E_ADMIN_USER` / `E2E_ADMIN_PASS`）。
-  跑通过程中修掉一个真 bug：未登录访问深链时先命中 public 的 catch-all →
-  渲染 404 而不是登录页（守卫已加 `to.name !== 'not-found'`）。
-- **数据变更按标签失效**：`composables/useRefetch.ts`（等价 TanStack `queryKey` 的 1%），
-  `useCrud` 支持 `tags`；已接线 用户 / 角色 / 部门 三处。
-- 库与账号三角色化已收口（详见 `log/20261124_库与账号三角色化.md`）。
+- **全量质量评审已出结论**（2026-11-24）：总分 **8.1/10**；明细与证据见
+  `log/20261124_质量评审与P1修复.md`。评审方法全部可复现（verify / e2e / cov / audit /
+  openapi 比对 / 库表实查 / 探针实测）。
+- **本轮修掉的**（均已 `verify.sh` + `pnpm test:e2e` 复验）：
+  - P1 软删 + 单列唯一互撞 → 迁移 `1767000024000` 把 3 张表的唯一键扩为 `(列, delete_time)`，
+    实体同步；实测「软删后重建同名」三例全部通过。
+  - P1 Swagger 生产公开 → `SWAGGER_ENABLED`，prod 默认关。
+  - P2 删除保护 → 用户：拒删自己 / 拒删持有超管角色的账号；部门：有挂人拒删。
+  - P2 审计 `detail` → `@Auditable({ capture })` 默认记入参，拦截器统一脱敏 + 截断。
+  - P2 登录日志留存 → 每小时分批清理（默认 90 天，可配）。
+  - P2 覆盖率口径 → `coverage.include: src/**`；**真实基线 18.93%**（旧 77% 是假象）。
+  - P3 索引 → `idx_user_dept` / `idx_dept_parent`。
+  - P1 账号侧能力 → 不预置，改为部署文档必查项（`docs/部署端环境.md`「账号与登录安全」）。
+  - P1 multer high → `pnpm-workspace.yaml` 的 `overrides: multer >=2.5.0`
+    （实际 2.5.0），audit 降为 0 high。
+  - P2 `scope=SCHOOL` 落地：可见性 SQL 加 `OR h.scope='SCHOOL'`，前端上报加
+    「全校通报」单选 + 提示、列表补可见范围筛选，e2e 新增一条。
+  - P3 外键：**有意不加**，理由与补偿写进 `坑与约束.md`（含孤儿巡检 SQL）。
+- 库与账号三角色化、`dataScope=CUSTOM`、E2E 认证链路均已收口（见 `docs/log/`）。
 
 ## 下一步
 
 > 选型复核结论见 `整体方案与选型.md` §4.1：运行时不换，只补工具链。
 
-- [ ] **P1 E2E 跑通并补链路**：先在有网的机器 `npx playwright install chromium`，
-      把认证 4 条跑绿；再补「建角色→建用户并授权」「隐患流转到销号」「附件上传-下载-回收」。
+**排期中（已列入但未动）**
+
 - [ ] **P2 `@nestjs/storage@0.0.4`**：0.0.x 随时可改 API。当前用法极浅（
       `storage.disk()` / `defaultDisk` / `put` / `get` / `delete` 五个），
       替换成本约半天（S3 兼容用一个适配器即可）。**现在只 pin 版本，等文件模块要加密/多桶时一起换。**
 - [ ] **P2 部署端巡检**：`deploy/check.sh`（连通性、磁盘、备份时效 + sha256 复校）。
       注：本机无 `mysqldump`/`mysql` 客户端，`backup.sh` 只能在部署端跑（`restore.sh` 已有容器回退）。
+- [ ] **E2E 补链路**：现只有认证 3 条 + CUSTOM 1 条（超管相关需 `E2E_ADMIN_*`）。
+      待补「建角色→建用户并授权」「隐患流转到销号」「附件上传-下载-回收」「删除保护」。
 - [ ] 派生新项目时按 `docs/init.md` 替换身份与环境；本副本不再改身份。
+
+**暂缓（有意不做）**
+
+- CI / git hooks：小项目通用模板，暂不引入（`verify.sh` 手动跑）。
+- 前端主包 1.12 MB：已确认可接受。
+- 文档整体重写（SVN→git 叙述、8081→8084 漂移、README 过短）：不急，另行安排。
 
 ## 阻塞
 
@@ -44,28 +56,25 @@
 
 ## 验证台账
 
-- 2026-11-24 `verify.sh` 增加迁移一致性门禁（`migration:show` 出现 `[ ]` 即失败）。
-  用探针迁移实测：插入未执行迁移 → verify exit=1；删掉 → 全绿。探针的 dist 残留已清。
-- 2026-11-24 `dataScope=CUSTOM` 端到端：建角色（部门1,2）→ 详情回读 [1,2] → 改 [2] → 空数组；
-  临时用户持该角色登录，隐患列表 CUSTOM=1 → 0 条 / =2 → 2 条 / admin(ALL) → 2 条；
-  测试数据（用户/角色/关联）已清理。E2E 6/6 通过。
-- 2026-11-24 E2E 首次跑绿：`npx playwright test` → 3 passed / 2 skipped（18s→2.6s）。
-  同时验证 WSL2 无 IPv6 出口导致浏览器下载卡住，`--dns-result-order=ipv4first` 可解。
-- 2026-11-24 守卫修复后 `scripts/verify.sh` 全绿。
-- 2026-11-24 工具链改造后 `scripts/verify.sh` 全绿（新增前端 lint / 格式检查两步）：
-  后端 tsc + oxlint + 权限一致性（48 码）+ 单测 16 文件 113 用例；前端 lint ×2 +
-  `oxfmt --check` ×3 + `vue-tsc` + `vite build` ×2。
-- **E2E 未执行**：用例与配置已提交，浏览器装不上（CDN 不可达）。不许写成"已验证"。
-- 2026-11-24 恢复演练脚本改造后实测：dump(16K) → `template_tmp_restore` 19 表 / 5 用户 / 5 角色，
-  源库 `template` 19 表 5 用户未受影响，演练库已删；`--db template_prod` 被拒（exit 1）。
-  同时修掉一个真 bug：`--databases` 型 dump 含 `USE`，原样灌会写回源库（目标库 0 表）。
-- 2026-11-24 库与账号改造执行完毕：`db-apply.sh` 建库建号（三段密码互不相同、每账号只授本库）、
-  `db-reset.sh --yes` 重建 `template_tmp` 并跑完迁移、`scripts/verify.sh` **全绿**、
-  dev 三进程 online、`/health/ready` 数据库 up、admin 200 / web 200。
-  当日库里另有派生项目 `csmu*` / `safe_campus*` / `nest_template` / `tsg` —— 不属本项目身份，未动。
-- 2026-11-17 全量 `scripts/verify.sh`：后端 tsc / oxlint / authz-check（48 码）/ 单测 16 文件 113 用例、
-  前端 `vue-tsc -b` / `vite build` —— 全绿。
-- 生成器增强另用临时库 `template_gen_test` 走了一遍建库 → 迁移 → 校验 → 回滚 → 删库：
-  菜单 parent/ancestors 正确、UNIQUE 键生效、down 干净；生成物在时前后端均可构建。
-- 前端产物 index 1.12 MB（gzip 373 KB）；HazardView 19.5 KB、UserView 14.1 KB、RoleView 10.8 KB。
-- 手工验证：角色（超管锁、通配授权锁）、用户（授权 / 重置密码）、隐患全流程流转 —— 用户已确认。
+- 2026-11-24 本轮修复后 `scripts/verify.sh` **exit 0**（真实退出码，未用管道遮蔽）：
+  后端 tsc + oxlint + 权限一致性（48 码）+ 迁移门禁 + 前端 lint×2 + 单测 17 文件 124 用例 +
+  oxfmt ×3 + `vue-tsc` + `vite build` ×2。
+- 2026-11-24 `pnpm test:e2e`（`template_tmp`，已跑新迁移）→ **13 文件 / 110 用例全绿**（28s）。
+  删除保护、审计 detail、迁移均未破坏既有行为。
+- 2026-11-24 软删唯一索引探针：`sys_user` / `sys_config` / `sys_dict_type` 各自
+  「插入 → 软删 → 重插同名」全部成功（各 2 行：1 墓碑 + 1 活行）；探针数据已物理清理。
+- 2026-11-24 新覆盖率口径：**18.93%** stmts / 19.21% branch / 16.23% func / 18.96% lines
+  （464/2451 可覆盖行）。单测只盖关键纯函数，业务行为由 e2e 负责。
+- 2026-11-24 `scope=SCHOOL` 落地后：`hazard.e2e-spec.ts` **17/17**（含新增的
+  「SCHOOL 单对信息中心可见、详情 200；对照 DEPT 单仍 404」）；
+  全量 e2e **13 文件 / 111 用例全绿**；`verify.sh` **exit 0**。
+- 2026-11-24 `pnpm audit --prod`：**0 high + 2 moderate**（multer 已由 override 钉到 2.5.0；
+  剩下 `typeorm→glob/minimatch` 不在请求路径）。web_admin 0。
+- 2026-11-24 multer 2.4.0 → 2.5.0 后 `test/file.e2e-spec.ts` **20 条全过**（上传路径无回归）。
+- 2026-11-24 `openapi:dump` 与仓库产物比对零漂移（修改 dept/user 的 summary 后已重跑）。
+- 2026-11-24 全量实测复现的问题：`scope=SCHOOL` 单对信息中心不可见（0 条）；Swagger
+  在 dev 匿名 200（prod 修后为 404）。
+- 2026-11-24 库与账号三角色化执行完毕：`db-apply.sh` 建库建号（三段密码互不相同）、
+  `db-reset.sh --yes` 重建 `template_tmp`、dev 三进程 online、`/health/ready` 数据库 up。
+- 2026-11-24 恢复演练脚本实测：dump(16K) → `template_tmp_restore` 19 表 / 5 用户 / 5 角色，
+  源库未受影响；`--db template_prod` 被拒（exit 1）。

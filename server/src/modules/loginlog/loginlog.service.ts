@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterTypeOrm } from '@nestjs-cls/transactional-adapter-typeorm';
@@ -11,6 +12,14 @@ import type { QueryLoginLogInput } from './dto/login-log.dto.js';
 import { LoginLog } from './entities/login-log.entity.js';
 
 const MSG_LOG_NOT_FOUND = '登录日志不存在';
+
+/** 登录日志留存天数：`sys_config` 的 `loginlog.retentionDays` > 环境变量 > 默认 90 */
+const RETENTION_CONFIG_KEY = 'loginlog.retentionDays';
+const DEFAULT_RETENTION_DAYS = 90;
+/** 单批删除行数（有长事务会锁住整表，分批 + 每小时继续） */
+const PURGE_BATCH_SIZE = 2000;
+/** 一轮最多删多少批（2000 × 100 = 20 万/轮，没删完下一小时接着） */
+const PURGE_MAX_ROUNDS = 100;
 
 /** 登录日志写入载荷（调用方无需关心 id / 登录时间） */
 export interface LoginLogEntry {
@@ -30,6 +39,8 @@ export interface LoginLogEntry {
  */
 @Injectable()
 export class LoginLogService {
+  private readonly logger = new Logger(LoginLogService.name);
+
   constructor(
     @InjectRepository(LoginLog) private readonly repo: Repository<LoginLog>,
     private readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
@@ -87,5 +98,74 @@ export class LoginLogService {
       await repo.createQueryBuilder().delete().execute();
       return true;
     });
+  }
+
+  // -------------------------------------------------------------------------
+  // 留存
+  // -------------------------------------------------------------------------
+
+  /**
+   * 登录日志留存天数。
+   *
+   * 为什么需要：审计有 `OpsService` 的每小时清理，登录日志却一直只有
+   * 「手动清空全部」一条路 —— 校园系统一天几千次登录，一年就是几十万行，
+   * 既拖慢查询也让 `sys_login_log` 无限膨胀。留存天数做成可配置，
+   * 派生项目按本单位合规要求改。
+   */
+  async retentionDays(): Promise<number> {
+    try {
+      const rows: Array<{ config_value: string }> =
+        await this.repo.manager.query(
+          'SELECT config_value FROM sys_config WHERE config_key = ? AND status = 1 LIMIT 1',
+          [RETENTION_CONFIG_KEY],
+        );
+      const parsed = Number(rows[0]?.config_value);
+      if (Number.isFinite(parsed) && parsed > 0) return Math.floor(parsed);
+    } catch {
+      // 未配置是常态；库不可用时也别把定时任务带崩
+    }
+    const env = Number(process.env.LOGINLOG_RETENTION_DAYS);
+    return Number.isFinite(env) && env > 0
+      ? Math.floor(env)
+      : DEFAULT_RETENTION_DAYS;
+  }
+
+  /** 分批删除超期登录日志（按 login_time 走索引） */
+  async cleanup(
+    days?: number,
+  ): Promise<{ deleted: number; retentionDays: number }> {
+    const retention = days ?? (await this.retentionDays());
+    const cutoff = new Date(Date.now() - retention * 24 * 60 * 60 * 1000);
+    let deleted = 0;
+
+    for (let round = 0; round < PURGE_MAX_ROUNDS; round += 1) {
+      const result: { affectedRows?: number } = await this.repo.manager.query(
+        'DELETE FROM sys_login_log WHERE login_time < ? ORDER BY id LIMIT ?',
+        [cutoff, PURGE_BATCH_SIZE],
+      );
+      const affected = Number(result.affectedRows ?? 0);
+      deleted += affected;
+      if (affected < PURGE_BATCH_SIZE) break;
+    }
+
+    return { deleted, retentionDays: retention };
+  }
+
+  /** 每小时清理一次（与 outbox / 幂等 / 文件 / 审计同节奏） */
+  @Cron(CronExpression.EVERY_HOUR, { name: 'loginlog-cleanup' })
+  async cleanupTask(): Promise<void> {
+    // e2e 并行跑时不要插入额外写入，避免污染用例断言
+    if (process.env.NODE_ENV === 'test') return;
+    try {
+      const { deleted, retentionDays } = await this.cleanup();
+      if (deleted > 0) {
+        this.logger.log(
+          `登录日志清理：删除 ${deleted} 条（留存 ${retentionDays} 天）`,
+        );
+      }
+    } catch (err) {
+      // 定时任务不能把进程带崩：记录后等下个周期重试
+      this.logger.error(`登录日志清理失败：${(err as Error).message}`);
+    }
   }
 }

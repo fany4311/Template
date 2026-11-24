@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity.js';
 
 /**
@@ -6,6 +6,7 @@ import { BaseEntity } from '../../../common/entities/base.entity.js';
  * ancestors 存祖先路径（如 "0,1,5"），便于"本部门及以下"快速查询。
  */
 @Entity('sys_dept')
+@Index('idx_dept_parent', ['parentId'])
 export class Dept extends BaseEntity {
   @Column({ name: 'parent_id', type: 'int', nullable: true })
   parentId?: number | null;

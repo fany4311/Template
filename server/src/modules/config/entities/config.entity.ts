@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity.js';
 
 /**
@@ -10,6 +10,8 @@ import { BaseEntity } from '../../../common/entities/base.entity.js';
  * - 值为文本存储，业务侧自行按需解析（JSON/数字/布尔等）
  */
 @Entity('sys_config')
+// 唯一键含 delete_time：软删的参数键可以被重新创建（否则删过一次就永远建不回来）
+@Index('uk_config_key', ['configKey', 'deleteTime'], { unique: true })
 export class Config extends BaseEntity {
   @Column({ name: 'config_name', length: 100, comment: '参数名称' })
   configName: string;
@@ -17,7 +19,6 @@ export class Config extends BaseEntity {
   @Column({
     name: 'config_key',
     length: 100,
-    unique: true,
     comment: '参数键，如 sys.user.initPassword',
   })
   configKey: string;

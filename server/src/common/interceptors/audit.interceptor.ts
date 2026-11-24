@@ -86,6 +86,9 @@ export class AuditInterceptor implements NestInterceptor {
       path: req.originalUrl ?? req.url,
       ip: req.ip,
       userAgent: (req.headers['user-agent'] ?? '').slice(0, 255),
+      // 入参摘要（脱敏）：回答“把哪条数据的什么改成了什么”。
+      // 默认记；接口可用 @Auditable({ capture: false }) 关掉。
+      detail: meta.capture === false ? undefined : buildDetail(req.body),
       durationMs: Date.now() - start,
     };
     const pending = this.audit.record(entry);
@@ -107,4 +110,56 @@ function extractErrorCode(err: unknown): string | undefined {
     return undefined;
   }
   return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// 入参摘要（detail）
+// ---------------------------------------------------------------------------
+
+/** 单条审计 detail 的字符上限（json 列不限长，防一个巨大 body 把审计表撞胖） */
+const MAX_DETAIL_CHARS = 2000;
+
+/**
+ * 敏感字段名（**命中即值置 `***`**）。
+ * 用整名匹配而不是子串匹配：`author` / `tokenType` 这类正常字段不该被误伤，
+ * 而 `password` / `newPassword` / `captchaCode` / `token` 这类必须脱敏。
+ */
+const SENSITIVE_KEY =
+  /^(password|passwd|pwd|oldPassword|newPassword|confirmPassword|secret|token|accessToken|refreshToken|captchaCode|authorization)$/i;
+
+/** 递归清理：敏感字段脱敏、二进制转占位、限深/限长 */
+function sanitizeValue(value: unknown, depth = 0): unknown {
+  if (value === null || typeof value !== 'object') return value;
+  if (depth >= 3) return '[depth]';
+  if (value instanceof Date) return value.toISOString();
+  // 文件上传的 Buffer 千万不能序列化（一个 10MB 附件会变成千万级数组）
+  if (Buffer.isBuffer(value) || value instanceof Uint8Array) return '[binary]';
+  if (Array.isArray(value)) {
+    return value.slice(0, 20).map((v) => sanitizeValue(v, depth + 1));
+  }
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    out[k] = SENSITIVE_KEY.test(k) ? '***' : sanitizeValue(v, depth + 1);
+  }
+  return out;
+}
+
+/**
+ * 把请求体转成审计 detail。
+ * 非对象（如 multipart 的 Buffer、undefined）返回 undefined；
+ * 超长时保留截断标记与前缀，不把 2KB 以上的 JSON 写进审计表。
+ */
+function buildDetail(body: unknown): Record<string, unknown> | undefined {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return undefined;
+  }
+  const sanitized = sanitizeValue(body) as Record<string, unknown>;
+  if (!Object.keys(sanitized).length) return undefined;
+  const json = JSON.stringify(sanitized);
+  if (json.length <= MAX_DETAIL_CHARS) return sanitized;
+  return {
+    _truncated: true,
+    _length: json.length,
+    _preview: json.slice(0, MAX_DETAIL_CHARS),
+  };
 }

@@ -117,6 +117,17 @@ export class HazardService {
       params.vis_dept = String(user.deptId);
     }
 
+    // 全校通报：`scope = 'SCHOOL'` 的单对所有**过得了权限码**的人可见。
+    //
+    // 两层职责要分清楚：`@RequiresPermissions(hazard:report:list)` 决定
+    // 「能不能调列表接口」（RbacGuard），这里只决定「看得到哪些单」。
+    // 所以这条不会让没权限的人看到隐患，只是让全校有权限的人在列表里看到通报单。
+    //
+    // 必须在 SQL 里加（而不是拿到结果集后再过滤）——否则分页 `total` 不对。
+    // 可见性同时被 `findVisibleOrFail`（详情）与 `canAccess`（附件鉴权）复用，
+    // 所以 SCHOOL 单的详情与其附件同样是全校可见，语义一致。
+    ors.push("h.scope = 'SCHOOL'");
+
     return { clause: `(${ors.join(' OR ')})`, params };
   }
 

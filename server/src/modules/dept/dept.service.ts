@@ -4,6 +4,7 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterTypeOrm } from '@nestjs-cls/transactional-adapter-typeorm';
 import { Repository } from 'typeorm';
 import { ApiException } from '../../common/exceptions/api.exception.js';
+import { User } from '../user/entities/user.entity.js';
 import type {
   CreateDeptInput,
   QueryDeptInput,
@@ -40,6 +41,7 @@ export function buildDeptTree(list: Dept[]): DeptTreeNode[] {
 export class DeptService {
   constructor(
     @InjectRepository(Dept) private readonly deptRepo: Repository<Dept>,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
     private readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
   ) {}
 
@@ -150,7 +152,13 @@ export class DeptService {
     });
   }
 
-  /** 删除部门（软删除）；存在下级则拒绝 */
+  /**
+   * 删除部门（软删除）；存在下级或**仍有用户挂靠**则拒绝。
+   *
+   * 为什要看用户：`sys_user.dept_id` 没有外键，删掉部门后那些用户的 deptId 成了
+   * 悬空值 —— 界面看不出异常，但 dataScope 的「本部门」按 deptId 过滤 → **静默失权**。
+   * 角色侧同类保护见 `RoleService.remove`（有持有人拒删）。
+   */
   async remove(id: number): Promise<boolean> {
     return this.txHost.withTransaction(async () => {
       const repo = this.txHost.tx.getRepository(Dept);
@@ -158,6 +166,12 @@ export class DeptService {
       if (!dept) throw new NotFoundException(MSG_DEPT_NOT_FOUND);
       const children = await repo.countBy({ parentId: id });
       if (children > 0) throw new ApiException('存在下级部门，不能删除');
+      const holders = await this.userRepo.countBy({ deptId: id });
+      if (holders > 0) {
+        throw new ApiException(
+          `该部门下还有 ${holders} 个用户，请先调岗后再删除`,
+        );
+      }
       await repo.softDelete(id);
       return true;
     });

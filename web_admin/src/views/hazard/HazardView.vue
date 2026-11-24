@@ -411,6 +411,16 @@ onMounted(async () => {
             :value="item.value"
           />
         </el-select>
+        <el-select
+          v-model="query.scope"
+          placeholder="可见范围"
+          clearable
+          style="width: 130px"
+        >
+          <el-option label="本部门" value="DEPT" />
+          <el-option label="多部门协同" value="OPEN" />
+          <el-option label="全校通报" value="SCHOOL" />
+        </el-select>
         <el-checkbox v-model="query.onlyMine">只看我部门</el-checkbox>
         <el-button :icon="Search" type="primary" @click="search"
           >查询</el-button
@@ -550,7 +560,13 @@ onMounted(async () => {
           <el-radio-group v-model="reportForm.scope">
             <el-radio value="DEPT">本部门闭环</el-radio>
             <el-radio value="OPEN">多部门协同</el-radio>
+            <el-radio value="SCHOOL">全校通报</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="reportForm.scope === 'SCHOOL'">
+          <span class="scope-hint">
+            全校通报：所有能进后台的人都会在列表里看到这条隐患（包括标题、地点与附件），请确认内容可公开。
+          </span>
         </el-form-item>
         <el-form-item v-if="reportForm.scope === 'OPEN'" label="协办部门">
           <el-tree-select
@@ -873,6 +889,12 @@ onMounted(async () => {
 .muted {
   color: var(--el-text-color-secondary);
   font-size: 12px;
+}
+/* 全校通报提示：发出去就对所有人可见，提交前必须能看见这句话 */
+.scope-hint {
+  color: var(--el-color-warning);
+  font-size: 12px;
+  line-height: 1.5;
 }
 .flow-actions {
   margin: 16px 0 8px;

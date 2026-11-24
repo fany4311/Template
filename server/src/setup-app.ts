@@ -59,7 +59,11 @@ export function setupApp(app: INestApplication) {
   );
 
   // Swagger 文档：/api/docs
-  setupSwagger(app);
+  // 生产默认**关闭**（匿名可读全量接口契约 = 免费的攻击地图）。
+  // 需要时显式 SWAGGER_ENABLED=true；dev/test 默认开启。
+  if (config.get<boolean>('app.swaggerEnabled')) {
+    setupSwagger(app);
+  }
 
   return app;
 }

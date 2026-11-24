@@ -61,6 +61,12 @@ export default () => ({
     outboxEnabled: process.env.OUTBOX_ENABLED !== 'false',
     // 全局限流开关（默认开）。e2e 建议关：同一 IP 高频登录会触发 429，测试时好时坏
     throttleEnabled: process.env.THROTTLE_ENABLED !== 'false',
+    // Swagger 文档开关：dev/test 默认开，prod 默认关（显式 SWAGGER_ENABLED=true 才开）。
+    // 匿名列出全量接口契约，等于把攻击面写清楚，生产不需要。
+    swaggerEnabled:
+      process.env.SWAGGER_ENABLED === undefined
+        ? process.env.NODE_ENV !== 'prod'
+        : process.env.SWAGGER_ENABLED === 'true',
     // 审计写入模式：async（默认，进程内事件异步落库）| sync（请求内等落库，合规场景用）
     auditMode: parseAuditMode(process.env.AUDIT_MODE),
     // Outbox 终态事件保留天数（过期由 OutboxCleanupTask 回收）

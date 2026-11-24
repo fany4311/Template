@@ -175,8 +175,11 @@ export class UserController {
   })
   @ApiOperation({ summary: '删除用户（软删除）' })
   @ApiOkZod('BoolResult', z.boolean(), '返回 true 表示删除成功')
-  remove(@Param('id', { schema: idParamSchema }) id: number) {
-    return this.userService.remove(id);
+  remove(
+    @Param('id', { schema: idParamSchema }) id: number,
+    @CurrentUser() operator: JwtUser,
+  ) {
+    return this.userService.remove(id, operator.userId);
   }
 
   /**

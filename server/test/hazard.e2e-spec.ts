@@ -292,6 +292,45 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       expect(item.statusLabel).toBe('待受理');
     });
 
+    it('全校通报单：数据范围与协办都不覆盖的部门也能看到（scope=SCHOOL）', async () => {
+      // operator（业务操作员，消防科）报一条全校通报单：主责=消防科，无协办。
+      // 不用 manager_bw：部门管理员的 CASL 规则只有 read/accept/reject/rectify（无 create），
+      // 本来就不能上报 —— 用它会得到 403，那是另一层设计，不是本用例要验的东西。
+      const created = await report(operator, {
+        title: `${tag} 全校通报单`,
+        content: '验证 scope=SCHOOL：全校持有列表权限的人都能看到',
+        scope: 'SCHOOL',
+      });
+      expect(created.body.code, created.body.msg).toBe(200);
+      const id = created.body.data.id as number;
+
+      // 信息中心：数据范围只有本部门及以下，不是上报人，不在协办 —— 也能看到
+      const visible = await api()
+        .get(`${prefix}/hazard`)
+        .query({ keyword: `${tag} 全校通报单` })
+        .set(auth(managerXx))
+        .expect(200);
+      expect(visible.body.data.total).toBe(1);
+      expect((visible.body.data.list[0] as HazardView).scope).toBe('SCHOOL');
+
+      // 详情与附件鉴权复用同一套可见性 → 详情也是 200（不是 404）
+      await api()
+        .get(`${prefix}/hazard/${id}`)
+        .set(auth(managerXx))
+        .expect(200);
+
+      // 对照：同样由 operator 上报、但 scope=DEPT 的单，信息中心仍是 404
+      const deptOnly = await report(operator, {
+        title: `${tag} 本部门闭环对照`,
+        content: '对照组：非 SCHOOL 仍严格按数据范围',
+        scope: 'DEPT',
+      });
+      await api()
+        .get(`${prefix}/hazard/${deptOnly.body.data.id as number}`)
+        .set(auth(managerXx))
+        .expect(404);
+    });
+
     it('列表按可见性过滤，且只在可见集合内做分页', async () => {
       const mine = await api()
         .get(`${prefix}/hazard`)

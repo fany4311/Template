@@ -1,6 +1,14 @@
 # pnpm 12 设置入口（package.json 的 pnpm 字段已不再读取）
 # 本项目为单包，无需 packages 字段。
 strictDepBuilds: false
+
+# 定点覆盖（只动单个传递依赖，**不升级 @nestjs/* 主版本**）
+# multer: @nestjs/platform-express 带的是 2.4.0，命中 GHSA-q7qp-rjg7-q26m
+#   （<2.5.0，fileFilter 悬空时的 DoS）。本项目有真实上传路径，所以钉到 >=2.5.0。
+#   2.x 内 API 兼容，上传用例由 test/file.e2e-spec.ts 兜底。
+#   将来 upstream 自己跟上后，这里可以删掉（pnpm why multer 能看到实际来源）。
+overrides:
+  multer: '>=2.5.0'
 # 允许执行构建脚本的依赖（原生模块必须构建，否则运行时缺二进制）
 allowBuilds:
   '@node-rs/argon2': true

@@ -101,7 +101,7 @@ export class DeptController {
     resourceType: 'dept',
     resourceIdParam: 'id',
   })
-  @ApiOperation({ summary: '删除部门（软删除，有下级则拒绝）' })
+  @ApiOperation({ summary: '删除部门（软删除；有下级或仍有用户挂靠则拒绝）' })
   @ApiOkZod('BoolResult', z.boolean(), '返回 true 表示删除成功')
   remove(@Param('id', { schema: idParamSchema }) id: number) {
     return this.deptService.remove(id);

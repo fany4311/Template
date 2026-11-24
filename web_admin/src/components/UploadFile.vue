@@ -38,7 +38,8 @@ const props = withDefaults(
     tip?: string;
   }>(),
   {
-    accept: '.jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md,.zip,.rar,.7z,.tar,.gz,.mp4,.mp3,.wav',
+    accept:
+      '.jpg,.jpeg,.png,.gif,.webp,.bmp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md,.zip,.rar,.7z,.tar,.gz,.mp4,.mp3,.wav',
     maxSize: 10 * 1024 * 1024,
     multiple: false,
     disabled: false,
@@ -56,7 +57,9 @@ const percent = ref(0);
 
 function beforeUpload(raw: File): boolean {
   if (raw.size > props.maxSize) {
-    ElMessage.error(`文件不能超过 ${Math.round(props.maxSize / 1024 / 1024)}MB`);
+    ElMessage.error(
+      `文件不能超过 ${Math.round(props.maxSize / 1024 / 1024)}MB`,
+    );
     return false;
   }
   if (raw.size === 0) {
@@ -84,7 +87,9 @@ async function doUpload(options: UploadRequestOptions): Promise<void> {
     );
     emit('uploaded', result.file);
     options.onSuccess(result);
-    ElMessage.success(result.deduped ? '文件已存在，已复用（秒传）' : '上传成功');
+    ElMessage.success(
+      result.deduped ? '文件已存在，已复用（秒传）' : '上传成功',
+    );
   } catch (err) {
     const message = (err as Error).message || '上传失败';
     emit('error', message);
@@ -110,13 +115,14 @@ async function doUpload(options: UploadRequestOptions): Promise<void> {
     :http-request="doUpload"
   >
     <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-    <div class="el-upload__text">
-      把文件拖到这里，或 <em>点击选择</em>
-    </div>
+    <div class="el-upload__text">把文件拖到这里，或 <em>点击选择</em></div>
     <template #tip>
       <div class="el-upload__tip">
         <slot name="tip">
-          {{ tip || `单个文件不超过 ${Math.round(maxSize / 1024 / 1024)}MB，支持图片 / 文档 / 压缩包 / 音视频` }}
+          {{
+            tip ||
+            `单个文件不超过 ${Math.round(maxSize / 1024 / 1024)}MB，支持图片 / 文档 / 压缩包 / 音视频`
+          }}
         </slot>
       </div>
     </template>

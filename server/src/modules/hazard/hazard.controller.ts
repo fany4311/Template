@@ -69,7 +69,11 @@ export class HazardController {
   @ApiOperation({
     summary: '分页查询隐患（按角色数据范围 + 协办部门过滤）',
   })
-  @ApiOkZod('HazardPage', pageOf(hazardResponseSchema), '隐患分页结果 { list, total }')
+  @ApiOkZod(
+    'HazardPage',
+    pageOf(hazardResponseSchema),
+    '隐患分页结果 { list, total }',
+  )
   page(
     @Query({ schema: queryHazardSchema }) query: QueryHazardInput,
     @User() user: JwtUser,
@@ -174,7 +178,9 @@ export class HazardController {
     resourceIdParam: 'id',
   })
   @Idempotent({ scope: 'hazard:report:review' })
-  @ApiOperation({ summary: '复查隐患（passed=true 通过 → 待归档；false 退回整改）' })
+  @ApiOperation({
+    summary: '复查隐患（passed=true 通过 → 待归档；false 退回整改）',
+  })
   @ApiOkZod('Hazard', hazardResponseSchema, '返回复查后的隐患单')
   review(
     @Param('id', { schema: idParamSchema }) id: number,

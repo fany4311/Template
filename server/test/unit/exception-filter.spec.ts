@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  type ArgumentsHost,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, type ArgumentsHost } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 import { AllExceptionFilter } from '../../src/common/filters/all-exception.filter.js';
 import { ApiException } from '../../src/common/exceptions/api.exception.js';
@@ -33,19 +29,31 @@ function runFilter(exception: unknown) {
   } as unknown as ArgumentsHost;
 
   filter.catch(exception, host);
-  return { httpStatus: status.mock.calls[0]?.[0], body: json.mock.calls[0]?.[0] };
+  return {
+    httpStatus: status.mock.calls[0]?.[0],
+    body: json.mock.calls[0]?.[0],
+  };
 }
 
 describe('AllExceptionFilter 响应契约', () => {
   it('ApiException → HTTP 200 + 业务 code（若依约定）', () => {
-    const { httpStatus, body } = runFilter(new ApiException('用户名或密码错误', 500));
+    const { httpStatus, body } = runFilter(
+      new ApiException('用户名或密码错误', 500),
+    );
     expect(httpStatus).toBe(200);
-    expect(body).toMatchObject({ code: 500, msg: '用户名或密码错误', traceId: 'trace-1' });
+    expect(body).toMatchObject({
+      code: 500,
+      msg: '用户名或密码错误',
+      traceId: 'trace-1',
+    });
   });
 
   it('字符串构造的 HttpException(429) → body.code 必须是 429，不能是 500', () => {
     const { httpStatus, body } = runFilter(
-      new HttpException('请求过于频繁，请稍后再试', HttpStatus.TOO_MANY_REQUESTS),
+      new HttpException(
+        '请求过于频繁，请稍后再试',
+        HttpStatus.TOO_MANY_REQUESTS,
+      ),
     );
     expect(httpStatus).toBe(429);
     expect(body.code).toBe(429);

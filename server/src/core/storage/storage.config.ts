@@ -1,5 +1,10 @@
 import type { ConfigService } from '@nestjs/config';
-import { InMemoryDisk, LocalDisk, S3Disk, type StorageModuleOptions } from '@nestjs/storage';
+import {
+  InMemoryDisk,
+  LocalDisk,
+  S3Disk,
+  type StorageModuleOptions,
+} from '@nestjs/storage';
 
 /**
  * 存储引擎装配。
@@ -22,7 +27,9 @@ export type StorageDriver = 's3' | 'local' | 'memory';
  * 注意 `disks` 里放的是**实例**而不是类：本工厂持有配置，构造参数在此一次算清；
  * 放类的话 Nest 需要实例化，而它拿不到 ConfigService 里的这些值。
  */
-export function createStorageOptions(config: ConfigService): StorageModuleOptions {
+export function createStorageOptions(
+  config: ConfigService,
+): StorageModuleOptions {
   const driver = config.getOrThrow<StorageDriver>('storage.driver');
   const diskName = config.getOrThrow<string>('storage.disk');
 

@@ -60,7 +60,11 @@ describe('Transaction (integration)', () => {
         await txHost.withTransaction(async () => {
           const repo = txHost.tx.getRepository(Role);
           await repo.save(
-            repo.create({ roleName: key, level: await nextLevel(ds), status: 1 }),
+            repo.create({
+              roleName: key,
+              level: await nextLevel(ds),
+              status: 1,
+            }),
           );
           throw new Error('boom');
         });

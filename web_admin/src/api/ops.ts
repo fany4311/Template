@@ -24,7 +24,8 @@ export interface OpsOverview {
 }
 
 export const opsApi = {
-  overview: (): Promise<OpsOverview> => request.get<OpsOverview>('/ops/overview'),
+  overview: (): Promise<OpsOverview> =>
+    request.get<OpsOverview>('/ops/overview'),
   saveRetention: (retentionDays: number): Promise<{ retentionDays: number }> =>
     request.put('/ops/audit-retention', { retentionDays }),
   cleanup: (): Promise<{ deleted: number; retentionDays: number }> =>

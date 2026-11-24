@@ -159,9 +159,7 @@ export class HazardService {
   ): Promise<PageResult<HazardView>> {
     const { clause, params } = await this.visibility(user);
 
-    const qb = this.hazardRepo
-      .createQueryBuilder('h')
-      .where(clause, params);
+    const qb = this.hazardRepo.createQueryBuilder('h').where(clause, params);
 
     if (query.keyword) {
       qb.andWhere(
@@ -169,7 +167,8 @@ export class HazardService {
         { kw: `%${query.keyword}%` },
       );
     }
-    if (query.status) qb.andWhere('h.status = :status', { status: query.status });
+    if (query.status)
+      qb.andWhere('h.status = :status', { status: query.status });
     if (query.level) qb.andWhere('h.level = :level', { level: query.level });
     if (query.scope) qb.andWhere('h.scope = :scope', { scope: query.scope });
     if (query.category) {
@@ -244,7 +243,8 @@ export class HazardService {
   private isOverdue(hazard: Hazard): boolean {
     const deadline = hazard.rectifyDeadline;
     if (!deadline) return false;
-    if (hazard.status === 'ARCHIVED' || hazard.status === 'REJECTED') return false;
+    if (hazard.status === 'ARCHIVED' || hazard.status === 'REJECTED')
+      return false;
     return deadline.getTime() < Date.now();
   }
 
@@ -260,8 +260,7 @@ export class HazardService {
       const transition = HAZARD_TRANSITIONS.REPORT;
 
       const cooperate = dto.cooperateDeptIds ?? [];
-      const assignee =
-        dto.assigneeDeptId ?? user.deptId ?? null;
+      const assignee = dto.assigneeDeptId ?? user.deptId ?? null;
       if (dto.scope === 'OPEN' && !cooperate.length) {
         throw new ApiException('多部门协同单必须至少指定一个协办部门');
       }
@@ -289,8 +288,21 @@ export class HazardService {
         }),
       );
 
-      await this.writeLog(saved, 'REPORT', null, transition.to, dto.content.slice(0, 200), user);
-      await this.publish(saved, 'REPORT', null, user, dto.content.slice(0, 200));
+      await this.writeLog(
+        saved,
+        'REPORT',
+        null,
+        transition.to,
+        dto.content.slice(0, 200),
+        user,
+      );
+      await this.publish(
+        saved,
+        'REPORT',
+        null,
+        user,
+        dto.content.slice(0, 200),
+      );
       return saved;
     });
 
@@ -398,10 +410,7 @@ export class HazardService {
     action: HazardAction,
     user: JwtUser,
     remark: string,
-    mutate: (
-      hazard: Hazard,
-      repo: Repository<Hazard>,
-    ) => Promise<void>,
+    mutate: (hazard: Hazard, repo: Repository<Hazard>) => Promise<void>,
   ): Promise<HazardView> {
     const hazard = await this.txHost.withTransaction(async () => {
       const repo = this.txHost.tx.getRepository(Hazard);

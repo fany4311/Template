@@ -53,11 +53,12 @@ type OkBody<K extends keyof operations> = operations[K] extends {
   : never;
 
 /** 某个接口 200 响应里的 `data`（拦截器已解包，前端拿到的就是它） */
-export type DataOf<K extends keyof operations> = OkBody<K> extends {
-  data?: infer D;
-}
-  ? NonNullable<D>
-  : never;
+export type DataOf<K extends keyof operations> =
+  OkBody<K> extends {
+    data?: infer D;
+  }
+    ? NonNullable<D>
+    : never;
 
 /** 某个组件（响应包络）里的 `data` */
 type DataOfComponent<N extends keyof S> = S[N] extends { data?: infer D }

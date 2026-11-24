@@ -20,13 +20,35 @@ const ROOT = resolve(import.meta.dirname, '../../..');
 const SERVER = resolve(ROOT, 'server');
 const WEB_ADMIN = resolve(ROOT, 'web_admin');
 
-type FieldType = 'string' | 'text' | 'int' | 'decimal' | 'bool' | 'datetime' | 'dict' | 'file';
+type FieldType =
+  | 'string'
+  | 'text'
+  | 'int'
+  | 'decimal'
+  | 'bool'
+  | 'datetime'
+  | 'dict'
+  | 'file';
 
-interface Field { name: string; label: string; type: FieldType; dictType?: string; column: string }
+interface Field {
+  name: string;
+  label: string;
+  type: FieldType;
+  dictType?: string;
+  column: string;
+}
 
 interface Ctx {
-  slug: string; Name: string; camel: string; upper: string; label: string;
-  table: string; perm: string; fields: Field[]; ts: string; ts2: string;
+  slug: string;
+  Name: string;
+  camel: string;
+  upper: string;
+  label: string;
+  table: string;
+  perm: string;
+  fields: Field[];
+  ts: string;
+  ts2: string;
   /** --menu-parent：父菜单 path（如 /monitor）；不传则建根菜单 */
   menuParent?: string;
   /** --unique：建唯一键的字段（只在服务层做友好查重，并发兜底仍靠数据库） */
@@ -40,34 +62,84 @@ function die(msg: string): never {
   process.exit(1);
 }
 
-function cap(v: string): string { return v.charAt(0).toUpperCase() + v.slice(1); }
-function pascal(v: string): string { return v.split(/[-_]/).filter(Boolean).map(cap).join(''); }
-function camelName(v: string): string { const p = pascal(v); return p.charAt(0).toLowerCase() + p.slice(1); }
-function snake(v: string): string { return v.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase()); }
-function q(v: string): string { return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"; }
-function block(lines: string[]): string { return lines.join('\n'); }
+function cap(v: string): string {
+  return v.charAt(0).toUpperCase() + v.slice(1);
+}
+function pascal(v: string): string {
+  return v.split(/[-_]/).filter(Boolean).map(cap).join('');
+}
+function camelName(v: string): string {
+  const p = pascal(v);
+  return p.charAt(0).toLowerCase() + p.slice(1);
+}
+function snake(v: string): string {
+  return v.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
+}
+function q(v: string): string {
+  return "'" + v.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+}
+function block(lines: string[]): string {
+  return lines.join('\n');
+}
 
 function parseArgs(argv: string[]): {
-  slug: string; label: string; fields: Field[]; dryRun: boolean;
-  menuParent?: string; uniqueName?: string;
+  slug: string;
+  label: string;
+  fields: Field[];
+  dryRun: boolean;
+  menuParent?: string;
+  uniqueName?: string;
 } {
-  let slug = ''; let label = ''; let raw = ''; let dryRun = false;
-  let menuParent: string | undefined; let uniqueName: string | undefined;
+  let slug = '';
+  let label = '';
+  let raw = '';
+  let dryRun = false;
+  let menuParent: string | undefined;
+  let uniqueName: string | undefined;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i] as string;
-    if (arg === '--dry-run') { dryRun = true; continue; }
-    if (arg === '--label') { label = argv[i + 1] ?? ''; i += 1; continue; }
-    if (arg === '--field') { raw = argv[i + 1] ?? ''; i += 1; continue; }
-    if (arg === '--menu-parent') { menuParent = argv[i + 1] ?? ''; i += 1; continue; }
-    if (arg === '--unique') { uniqueName = argv[i + 1] ?? ''; i += 1; continue; }
+    if (arg === '--dry-run') {
+      dryRun = true;
+      continue;
+    }
+    if (arg === '--label') {
+      label = argv[i + 1] ?? '';
+      i += 1;
+      continue;
+    }
+    if (arg === '--field') {
+      raw = argv[i + 1] ?? '';
+      i += 1;
+      continue;
+    }
+    if (arg === '--menu-parent') {
+      menuParent = argv[i + 1] ?? '';
+      i += 1;
+      continue;
+    }
+    if (arg === '--unique') {
+      uniqueName = argv[i + 1] ?? '';
+      i += 1;
+      continue;
+    }
     if (arg.startsWith('-')) die('未知参数：' + arg);
     if (slug) die('只能给一个 slug');
     slug = arg;
   }
-  if (!slug || !SLUG_RE.test(slug)) die('slug 不合法（小写字母开头，仅 a-z0-9，长度 2-20）');
+  if (!slug || !SLUG_RE.test(slug))
+    die('slug 不合法（小写字母开头，仅 a-z0-9，长度 2-20）');
   if (!label) die('缺少 --label');
   if (!raw) die('缺少 --field');
-  const allowed: FieldType[] = ['string', 'text', 'int', 'decimal', 'bool', 'datetime', 'dict', 'file'];
+  const allowed: FieldType[] = [
+    'string',
+    'text',
+    'int',
+    'decimal',
+    'bool',
+    'datetime',
+    'dict',
+    'file',
+  ];
   const fields: Field[] = [];
   for (const seg of raw.split(',')) {
     const text = seg.trim();
@@ -77,14 +149,25 @@ function parseArgs(argv: string[]): {
     let type = parts[1] ?? 'string';
     let dictType: string | undefined;
     let fieldLabel = '';
-    if (type.startsWith('dict:')) { dictType = type.slice(5); type = 'dict'; fieldLabel = parts[2] ?? name; }
-    else if (type === 'dict') { dictType = parts[2] ?? ''; fieldLabel = parts[3] ?? name; }
-    else fieldLabel = parts[2] ?? name;
+    if (type.startsWith('dict:')) {
+      dictType = type.slice(5);
+      type = 'dict';
+      fieldLabel = parts[2] ?? name;
+    } else if (type === 'dict') {
+      dictType = parts[2] ?? '';
+      fieldLabel = parts[3] ?? name;
+    } else fieldLabel = parts[2] ?? name;
     if (!allowed.includes(type as FieldType)) die('字段类型不支持：' + type);
     if (!/^[a-z][a-zA-Z0-9]*$/.test(name)) die('字段名不合法：' + name);
     if (type === 'dict' && !dictType) die('dict 字段必须给字典类型：' + name);
     if (fields.some((f) => f.name === name)) die('字段重复：' + name);
-    fields.push({ name, label: fieldLabel, type: type as FieldType, dictType, column: snake(name) });
+    fields.push({
+      name,
+      label: fieldLabel,
+      type: type as FieldType,
+      dictType,
+      column: snake(name),
+    });
   }
   if (fields.length === 0) die('字段列表为空');
   if (fields.length > 30) die('字段超过 30 个，建议拆分模块');
@@ -94,58 +177,127 @@ function parseArgs(argv: string[]): {
 
   if (menuParent !== undefined) {
     if (!menuParent) die('--menu-parent 需要给父菜单 path（如 /monitor）');
-    if (!menuParent.startsWith('/')) die('--menu-parent 必须以 / 开头（菜单 path，不是 id）：' + menuParent);
-    if (menuParent.length > 1 && menuParent.endsWith('/')) menuParent = menuParent.slice(0, -1);
+    if (!menuParent.startsWith('/'))
+      die('--menu-parent 必须以 / 开头（菜单 path，不是 id）：' + menuParent);
+    if (menuParent.length > 1 && menuParent.endsWith('/'))
+      menuParent = menuParent.slice(0, -1);
   }
 
   if (uniqueName) {
     const field = fields.find((f) => f.name === uniqueName);
     if (!field) die('--unique 指向的字段不存在：' + uniqueName);
-    if (field.type === 'file') die('file 字段没有列，不能做 --unique：' + uniqueName);
+    if (field.type === 'file')
+      die('file 字段没有列，不能做 --unique：' + uniqueName);
   }
 
   return { slug, label, fields, dryRun, menuParent, uniqueName };
 }
 
 /** 参与列/契约生成的字段（file 走 sys_file 绑定，不建列） */
-function columnFields(ctx: Ctx): Field[] { return ctx.fields.filter((f) => f.type !== 'file'); }
+function columnFields(ctx: Ctx): Field[] {
+  return ctx.fields.filter((f) => f.type !== 'file');
+}
 
-function fileFields(ctx: Ctx): Field[] { return ctx.fields.filter((f) => f.type === 'file'); }
+function fileFields(ctx: Ctx): Field[] {
+  return ctx.fields.filter((f) => f.type === 'file');
+}
 
 // ── 字段 → 代码片段 ─────────────────────────────────────────────
 
 function entityDecorator(f: Field): string {
   switch (f.type) {
-    case 'text': return '@Column({ name: ' + q(f.column) + ", type: 'text', comment: " + q(f.label) + ' })';
-    case 'int': return '@Column({ name: ' + q(f.column) + ", type: 'int', default: 0, comment: " + q(f.label) + ' })';
-    case 'decimal': return '@Column({ name: ' + q(f.column) + ", type: 'decimal', precision: 12, scale: 2, default: 0, comment: " + q(f.label) + ' })';
-    case 'bool': return '@Column({ name: ' + q(f.column) + ", type: 'tinyint', width: 1, default: 0, comment: " + q(f.label + '（1是 0否）') + ' })';
-    case 'datetime': return '@Column({ name: ' + q(f.column) + ", type: 'datetime', nullable: true, comment: " + q(f.label) + ' })';
-    case 'dict': return '@Column({ name: ' + q(f.column) + ', length: 100, default: ' + q('') + ', comment: ' + q(f.label + '（字典 ' + (f.dictType ?? '') + '）') + ' })';
-    default: return '@Column({ name: ' + q(f.column) + ', length: 255, default: ' + q('') + ', comment: ' + q(f.label) + ' })';
+    case 'text':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ", type: 'text', comment: " +
+        q(f.label) +
+        ' })'
+      );
+    case 'int':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ", type: 'int', default: 0, comment: " +
+        q(f.label) +
+        ' })'
+      );
+    case 'decimal':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ", type: 'decimal', precision: 12, scale: 2, default: 0, comment: " +
+        q(f.label) +
+        ' })'
+      );
+    case 'bool':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ", type: 'tinyint', width: 1, default: 0, comment: " +
+        q(f.label + '（1是 0否）') +
+        ' })'
+      );
+    case 'datetime':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ", type: 'datetime', nullable: true, comment: " +
+        q(f.label) +
+        ' })'
+      );
+    case 'dict':
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ', length: 100, default: ' +
+        q('') +
+        ', comment: ' +
+        q(f.label + '（字典 ' + (f.dictType ?? '') + '）') +
+        ' })'
+      );
+    default:
+      return (
+        '@Column({ name: ' +
+        q(f.column) +
+        ', length: 255, default: ' +
+        q('') +
+        ', comment: ' +
+        q(f.label) +
+        ' })'
+      );
   }
 }
 
 function entityType(f: Field): string {
-  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool') return 'number';
+  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool')
+    return 'number';
   if (f.type === 'datetime') return 'Date | null';
   return 'string';
 }
 
 function zodCreate(f: Field): string {
   switch (f.type) {
-    case 'text': return "z.string().max(20000).default('')";
-    case 'int': return 'z.coerce.number().int().default(0)';
-    case 'decimal': return 'z.coerce.number().default(0)';
-    case 'bool': return 'z.coerce.number().int().min(0).max(1).default(0)';
-    case 'datetime': return 'z.coerce.date().nullish()';
-    case 'dict': return "z.string().max(100).default('')";
-    default: return 'z.string().trim().min(1, ' + q('请输入' + f.label) + ').max(255)';
+    case 'text':
+      return "z.string().max(20000).default('')";
+    case 'int':
+      return 'z.coerce.number().int().default(0)';
+    case 'decimal':
+      return 'z.coerce.number().default(0)';
+    case 'bool':
+      return 'z.coerce.number().int().min(0).max(1).default(0)';
+    case 'datetime':
+      return 'z.coerce.date().nullish()';
+    case 'dict':
+      return "z.string().max(100).default('')";
+    default:
+      return 'z.string().trim().min(1, ' + q('请输入' + f.label) + ').max(255)';
   }
 }
 
 function zodResponse(f: Field): string {
-  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool') return 'z.number()';
+  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool')
+    return 'z.number()';
   if (f.type === 'datetime') return 'z.iso.datetime().nullable()';
   return 'z.string()';
 }
@@ -153,40 +305,75 @@ function zodResponse(f: Field): string {
 function sqlColumn(f: Field): string {
   const comment = ' COMMENT ' + q(f.label) + ',';
   switch (f.type) {
-    case 'text': return f.column + ' text NOT NULL' + comment;
-    case 'int': return f.column + ' int NOT NULL DEFAULT 0' + comment;
-    case 'decimal': return f.column + ' decimal(12,2) NOT NULL DEFAULT 0.00' + comment;
-    case 'bool': return f.column + ' tinyint(1) NOT NULL DEFAULT 0' + comment;
-    case 'datetime': return f.column + ' datetime DEFAULT NULL' + comment;
-    case 'dict': return f.column + ' varchar(100) NOT NULL DEFAULT ' + q('') + comment;
-    default: return f.column + ' varchar(255) NOT NULL DEFAULT ' + q('') + comment;
+    case 'text':
+      return f.column + ' text NOT NULL' + comment;
+    case 'int':
+      return f.column + ' int NOT NULL DEFAULT 0' + comment;
+    case 'decimal':
+      return f.column + ' decimal(12,2) NOT NULL DEFAULT 0.00' + comment;
+    case 'bool':
+      return f.column + ' tinyint(1) NOT NULL DEFAULT 0' + comment;
+    case 'datetime':
+      return f.column + ' datetime DEFAULT NULL' + comment;
+    case 'dict':
+      return f.column + ' varchar(100) NOT NULL DEFAULT ' + q('') + comment;
+    default:
+      return f.column + ' varchar(255) NOT NULL DEFAULT ' + q('') + comment;
   }
 }
 
 function csvColumn(f: Field): string {
   let extra = '';
-  if (f.type === 'bool') extra = ", format: (row) => (row." + f.name + " === 1 ? '是' : '否'), parse: (cell) => (cell === '是' || cell === '1' ? '1' : '0')";
-  else if (f.type === 'datetime') extra = ", format: (row) => (row." + f.name + " ? row." + f.name + ".toISOString() : '')";
+  if (f.type === 'bool')
+    extra =
+      ', format: (row) => (row.' +
+      f.name +
+      " === 1 ? '是' : '否'), parse: (cell) => (cell === '是' || cell === '1' ? '1' : '0')";
+  else if (f.type === 'datetime')
+    extra =
+      ', format: (row) => (row.' +
+      f.name +
+      ' ? row.' +
+      f.name +
+      ".toISOString() : '')";
   return '  { header: ' + q(f.label) + ', field: ' + q(f.name) + extra + ' },';
 }
 
 function formColumn(f: Field): string {
   const head = '  { prop: ' + q(f.name) + ', label: ' + q(f.label);
   if (f.type === 'text') return head + ", type: 'textarea', rows: 3 },";
-  if (f.type === 'int' || f.type === 'decimal') return head + ", type: 'number' },";
-  if (f.type === 'bool') return head + ", type: 'switch', activeValue: 1, inactiveValue: 0, activeText: '是', inactiveText: '否' },";
-  if (f.type === 'datetime') return head + ", placeholder: 'YYYY-MM-DD HH:mm:ss' },";
-  if (f.type === 'dict') return head + ", type: 'select', options: dictOptions[" + q(f.dictType ?? '') + "] ?? [], placeholder: '请选择' },";
+  if (f.type === 'int' || f.type === 'decimal')
+    return head + ", type: 'number' },";
+  if (f.type === 'bool')
+    return (
+      head +
+      ", type: 'switch', activeValue: 1, inactiveValue: 0, activeText: '是', inactiveText: '否' },"
+    );
+  if (f.type === 'datetime')
+    return head + ", placeholder: 'YYYY-MM-DD HH:mm:ss' },";
+  if (f.type === 'dict')
+    return (
+      head +
+      ", type: 'select', options: dictOptions[" +
+      q(f.dictType ?? '') +
+      "] ?? [], placeholder: '请选择' },"
+    );
   return head + ' },';
 }
 
 function tableColumn(f: Field): string {
-  if (f.type === 'bool' || f.type === 'datetime') return '  { label: ' + q(f.label) + ', width: 120, slot: ' + q(f.name) + ' },';
-  return '  { prop: ' + q(f.name) + ', label: ' + q(f.label) + ', minWidth: 140 },';
+  if (f.type === 'bool' || f.type === 'datetime')
+    return (
+      '  { label: ' + q(f.label) + ', width: 120, slot: ' + q(f.name) + ' },'
+    );
+  return (
+    '  { prop: ' + q(f.name) + ', label: ' + q(f.label) + ', minWidth: 140 },'
+  );
 }
 
 function jsType(f: Field): string {
-  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool') return 'number';
+  if (f.type === 'int' || f.type === 'decimal' || f.type === 'bool')
+    return 'number';
   if (f.type === 'datetime') return 'string | null';
   return 'string';
 }
@@ -200,13 +387,34 @@ function entityFile(ctx: Ctx): string {
       : "import { Column, Entity } from 'typeorm';",
     "import { BaseEntity } from '../../../common/entities/base.entity.js';",
     '',
-    '/** ' + ctx.label + '实体（' + ctx.table + ' 表）。由 gen:module 生成：改字段请同步追加迁移。 */',
+    '/** ' +
+      ctx.label +
+      '实体（' +
+      ctx.table +
+      ' 表）。由 gen:module 生成：改字段请同步追加迁移。 */',
     ...(unique
-      ? ["@Index('uk_" + ctx.table + '_' + unique.column + "', ['" + unique.name + "'], { unique: true })"]
+      ? [
+          "@Index('uk_" +
+            ctx.table +
+            '_' +
+            unique.column +
+            "', ['" +
+            unique.name +
+            "'], { unique: true })",
+        ]
       : []),
     "@Entity('" + ctx.table + "')",
     'export class ' + ctx.Name + ' extends BaseEntity {',
-    ...columnFields(ctx).map((f) => '  ' + entityDecorator(f) + '\n  ' + f.name + '!: ' + entityType(f) + ';\n'),
+    ...columnFields(ctx).map(
+      (f) =>
+        '  ' +
+        entityDecorator(f) +
+        '\n  ' +
+        f.name +
+        '!: ' +
+        entityType(f) +
+        ';\n',
+    ),
     '}',
   ]);
 }
@@ -221,21 +429,43 @@ function dtoFile(ctx: Ctx): string {
     'export const create' + ctx.Name + 'Schema = z.object({',
     ...columnFields(ctx).map((f) => '  ' + f.name + ': ' + zodCreate(f) + ','),
     '});',
-    'export type Create' + ctx.Name + 'Input = z.infer<typeof create' + ctx.Name + 'Schema>;',
+    'export type Create' +
+      ctx.Name +
+      'Input = z.infer<typeof create' +
+      ctx.Name +
+      'Schema>;',
     '',
     '/** 更新（全部可选） */',
-    'export const update' + ctx.Name + 'Schema = updateSchemaOf(create' + ctx.Name + 'Schema);',
-    'export type Update' + ctx.Name + 'Input = z.infer<typeof update' + ctx.Name + 'Schema>;',
+    'export const update' +
+      ctx.Name +
+      'Schema = updateSchemaOf(create' +
+      ctx.Name +
+      'Schema);',
+    'export type Update' +
+      ctx.Name +
+      'Input = z.infer<typeof update' +
+      ctx.Name +
+      'Schema>;',
     '',
     '/** 查询（分页 + 关键字） */',
     'export const query' + ctx.Name + 'Schema = paginationSchema.extend({',
     '  keyword: filterString(100),',
     '});',
-    'export type Query' + ctx.Name + 'Input = z.infer<typeof query' + ctx.Name + 'Schema>;',
+    'export type Query' +
+      ctx.Name +
+      'Input = z.infer<typeof query' +
+      ctx.Name +
+      'Schema>;',
     '',
     '/** 导出条件（与列表同筛选，不分页） */',
-    'export const export' + ctx.Name + 'Schema = z.object({ keyword: filterString(100) });',
-    'export type Export' + ctx.Name + 'Query = z.infer<typeof export' + ctx.Name + 'Schema>;',
+    'export const export' +
+      ctx.Name +
+      'Schema = z.object({ keyword: filterString(100) });',
+    'export type Export' +
+      ctx.Name +
+      'Query = z.infer<typeof export' +
+      ctx.Name +
+      'Schema>;',
   ]);
 }
 
@@ -248,7 +478,9 @@ function responseFile(ctx: Ctx): string {
     '  id: z.number(),',
     '  createTime: z.iso.datetime(),',
     '  updateTime: z.iso.datetime(),',
-    ...columnFields(ctx).map((f) => '  ' + f.name + ': ' + zodResponse(f) + ','),
+    ...columnFields(ctx).map(
+      (f) => '  ' + f.name + ': ' + zodResponse(f) + ',',
+    ),
     '});',
   ]);
 }
@@ -257,10 +489,18 @@ function csvFile(ctx: Ctx): string {
   return block([
     "import { z } from 'zod';",
     "import type { CsvColumn } from '../../common/import-export/csv.js';",
-    "import type { " + ctx.Name + " } from './entities/" + ctx.slug + ".entity.js';",
+    'import type { ' +
+      ctx.Name +
+      " } from './entities/" +
+      ctx.slug +
+      ".entity.js';",
     '',
     '/** ' + ctx.label + '的 CSV 契约：导出列 + 导入归一 + 逐行校验。 */',
-    'export const ' + ctx.upper + '_CSV_COLUMNS: CsvColumn<' + ctx.Name + '>[] = [',
+    'export const ' +
+      ctx.upper +
+      '_CSV_COLUMNS: CsvColumn<' +
+      ctx.Name +
+      '>[] = [',
     ...columnFields(ctx).map(csvColumn),
     '];',
     '',
@@ -272,7 +512,9 @@ function csvFile(ctx: Ctx): string {
 
 function serviceFile(ctx: Ctx): string {
   const cols = columnFields(ctx);
-  const first = cols.find((f) => f.type === 'string' || f.type === 'text') ?? (cols[0] as Field);
+  const first =
+    cols.find((f) => f.type === 'string' || f.type === 'text') ??
+    (cols[0] as Field);
   const where = q('(r.' + first.name + ' LIKE :kw)');
   const kwParam = "{ kw: '%' + query.keyword + '%' }";
   return block([
@@ -286,24 +528,30 @@ function serviceFile(ctx: Ctx): string {
     ...(fileFields(ctx).length
       ? ["import type { FileBizContext } from '../file/file-biz.registry.js';"]
       : []),
-    "import {",
+    'import {',
     '  CSV_MAX_FAILED,',
     '  CSV_MAX_ROWS,',
     '  type ImportFailure,',
     '  type ImportResult,',
     "} from '../../common/import-export/csv.js';",
-    "import { " + ctx.camel + "ImportRowSchema } from './" + ctx.slug + ".csv.js';",
+    'import { ' +
+      ctx.camel +
+      "ImportRowSchema } from './" +
+      ctx.slug +
+      ".csv.js';",
     'import {',
     '  type Create' + ctx.Name + 'Input,',
     '  type Export' + ctx.Name + 'Query,',
     '  type Query' + ctx.Name + 'Input,',
     '  type Update' + ctx.Name + 'Input,',
     "} from './dto/" + ctx.slug + ".dto.js';",
-    "import { " + ctx.Name + " } from './entities/" + ctx.slug + ".entity.js';",
+    'import { ' + ctx.Name + " } from './entities/" + ctx.slug + ".entity.js';",
     '',
     "const MSG_NOT_FOUND = '记录不存在';",
     '',
-    '/** ' + ctx.label + '服务（gen:module 生成：分页 / CRUD / 导出 / 逐行导入）。 */',
+    '/** ' +
+      ctx.label +
+      '服务（gen:module 生成：分页 / CRUD / 导出 / 逐行导入）。 */',
     '@Injectable()',
     'export class ' + ctx.Name + 'Service {',
     '  constructor(',
@@ -326,13 +574,21 @@ function serviceFile(ctx: Ctx): string {
       ? [
           '  /** 唯一字段前置查重：给出人话错误，并发兜底仍靠数据库唯一键 */',
           '  private async assertUnique(value: unknown, excludeId?: number): Promise<void> {',
-          '    const dup = await this.repo.findOne({ where: { ' + ctx.unique.name + ': value } as never });',
-          '    if (dup && dup.id !== excludeId) throw new ApiException(' + q(ctx.unique.label + '已存在') + ');',
+          '    const dup = await this.repo.findOne({ where: { ' +
+            ctx.unique.name +
+            ': value } as never });',
+          '    if (dup && dup.id !== excludeId) throw new ApiException(' +
+            q(ctx.unique.label + '已存在') +
+            ');',
           '  }',
           '',
         ]
       : []),
-    '  async page(query: Query' + ctx.Name + 'Input): Promise<PageResult<' + ctx.Name + '>> {',
+    '  async page(query: Query' +
+      ctx.Name +
+      'Input): Promise<PageResult<' +
+      ctx.Name +
+      '>> {',
     "    const qb = this.repo.createQueryBuilder('r');",
     '    if (query.keyword) {',
     '      qb.andWhere(' + where + ', ' + kwParam + ');',
@@ -350,17 +606,33 @@ function serviceFile(ctx: Ctx): string {
     '    return row;',
     '  }',
     '',
-    '  async create(dto: Create' + ctx.Name + 'Input): Promise<' + ctx.Name + '> {',
-    ...(ctx.unique ? ['    await this.assertUnique(dto.' + ctx.unique.name + ');'] : []),
+    '  async create(dto: Create' +
+      ctx.Name +
+      'Input): Promise<' +
+      ctx.Name +
+      '> {',
+    ...(ctx.unique
+      ? ['    await this.assertUnique(dto.' + ctx.unique.name + ');']
+      : []),
     '    return this.txHost.withTransaction(async () => {',
     '      const repo = this.txHost.tx.getRepository(' + ctx.Name + ');',
     '      return repo.save(repo.create(dto as Partial<' + ctx.Name + '>));',
     '    });',
     '  }',
     '',
-    '  async update(id: number, dto: Update' + ctx.Name + 'Input): Promise<' + ctx.Name + '> {',
+    '  async update(id: number, dto: Update' +
+      ctx.Name +
+      'Input): Promise<' +
+      ctx.Name +
+      '> {',
     ...(ctx.unique
-      ? ['    if (dto.' + ctx.unique.name + ' !== undefined) await this.assertUnique(dto.' + ctx.unique.name + ', id);']
+      ? [
+          '    if (dto.' +
+            ctx.unique.name +
+            ' !== undefined) await this.assertUnique(dto.' +
+            ctx.unique.name +
+            ', id);',
+        ]
       : []),
     '    return this.txHost.withTransaction(async () => {',
     '      const repo = this.txHost.tx.getRepository(' + ctx.Name + ');',
@@ -382,7 +654,11 @@ function serviceFile(ctx: Ctx): string {
     '  }',
     '',
     '  /** 导出：超上限报错而不是静默截断 */',
-    '  async exportRows(query: Export' + ctx.Name + 'Query): Promise<' + ctx.Name + '[]> {',
+    '  async exportRows(query: Export' +
+      ctx.Name +
+      'Query): Promise<' +
+      ctx.Name +
+      '[]> {',
     "    const qb = this.repo.createQueryBuilder('r');",
     '    if (query.keyword) {',
     '      qb.andWhere(' + where + ', ' + kwParam + ');',
@@ -407,7 +683,9 @@ function serviceFile(ctx: Ctx): string {
     '',
     '    for (let index = 0; index < records.length; index += 1) {',
     '      const rowNo = index + 2;',
-    '      const parsed = ' + ctx.camel + 'ImportRowSchema.safeParse(records[index]);',
+    '      const parsed = ' +
+      ctx.camel +
+      'ImportRowSchema.safeParse(records[index]);',
     '      if (!parsed.success) {',
     "        pushFailure(rowNo, parsed.error.issues[0]?.message ?? '格式不正确');",
     '        continue;',
@@ -417,7 +695,11 @@ function serviceFile(ctx: Ctx): string {
     '        ok += 1;',
     '      } catch {',
     ...(ctx.unique
-      ? ["        pushFailure(rowNo, '写入失败：' + " + q(ctx.unique.label) + " + '可能重复或超长');"]
+      ? [
+          "        pushFailure(rowNo, '写入失败：' + " +
+            q(ctx.unique.label) +
+            " + '可能重复或超长');",
+        ]
       : ["        pushFailure(rowNo, '写入失败，请检查字段长度');"]),
     '      }',
     '    }',
@@ -430,7 +712,7 @@ function serviceFile(ctx: Ctx): string {
 function controllerFile(ctx: Ctx): string {
   const p = ctx.perm;
   return block([
-    "import {",
+    'import {',
     '  Body,',
     '  Controller,',
     '  Delete,',
@@ -457,7 +739,11 @@ function controllerFile(ctx: Ctx): string {
     "import { ApiException } from '../../common/exceptions/api.exception.js';",
     "import { exportRows as rowsToCsv, readRows } from '../../common/import-export/csv.js';",
     "import { ApiOkZod, pageOf } from '../../common/swagger/api-ok.js';",
-    "import { " + ctx.upper + "_CSV_COLUMNS } from './" + ctx.slug + ".csv.js';",
+    'import { ' +
+      ctx.upper +
+      "_CSV_COLUMNS } from './" +
+      ctx.slug +
+      ".csv.js';",
     'import {',
     '  create' + ctx.Name + 'Schema,',
     '  export' + ctx.Name + 'Schema,',
@@ -468,8 +754,12 @@ function controllerFile(ctx: Ctx): string {
     '  type Query' + ctx.Name + 'Input,',
     '  type Update' + ctx.Name + 'Input,',
     "} from './dto/" + ctx.slug + ".dto.js';",
-    "import { " + ctx.camel + "ResponseSchema } from './dto/" + ctx.slug + ".response.js';",
-    "import { " + ctx.Name + "Service } from './" + ctx.slug + ".service.js';",
+    'import { ' +
+      ctx.camel +
+      "ResponseSchema } from './dto/" +
+      ctx.slug +
+      ".response.js';",
+    'import { ' + ctx.Name + "Service } from './" + ctx.slug + ".service.js';",
     '',
     'const idParamSchema = z.coerce.number().int().positive();',
     '',
@@ -492,19 +782,39 @@ function controllerFile(ctx: Ctx): string {
     '  @Get()',
     '  @RequiresPermissions(' + q(p + ':list') + ')',
     "  @ApiOperation({ summary: '分页查询" + ctx.label + "' })",
-    "  @ApiOkZod('" + ctx.Name + "Page', pageOf(" + ctx.camel + "ResponseSchema), '" + ctx.label + "分页结果 { list, total }')",
-    '  page(@Query({ schema: query' + ctx.Name + 'Schema }) query: Query' + ctx.Name + 'Input) {',
+    "  @ApiOkZod('" +
+      ctx.Name +
+      "Page', pageOf(" +
+      ctx.camel +
+      "ResponseSchema), '" +
+      ctx.label +
+      "分页结果 { list, total }')",
+    '  page(@Query({ schema: query' +
+      ctx.Name +
+      'Schema }) query: Query' +
+      ctx.Name +
+      'Input) {',
     '    return this.service.page(query);',
     '  }',
     '',
     '  @Get(' + q('export') + ')',
     '  @RequiresPermissions(' + q(p + ':export') + ')',
-    '  @Auditable({ action: ' + q(p + ':export') + ', resourceType: ' + q(ctx.slug) + ' })',
-    "  @ApiOperation({ summary: '导出" + ctx.label + "（CSV，最多 5000 行）' })",
+    '  @Auditable({ action: ' +
+      q(p + ':export') +
+      ', resourceType: ' +
+      q(ctx.slug) +
+      ' })',
+    "  @ApiOperation({ summary: '导出" +
+      ctx.label +
+      "（CSV，最多 5000 行）' })",
     "  @ApiProduces('text/csv')",
     '  @Keep()',
     '  async exportCsv(',
-    '    @Query({ schema: export' + ctx.Name + 'Schema }) query: Export' + ctx.Name + 'Query,',
+    '    @Query({ schema: export' +
+      ctx.Name +
+      'Schema }) query: Export' +
+      ctx.Name +
+      'Query,',
     '    @Res({ passthrough: true }) res: Response,',
     '  ): Promise<StreamableFile> {',
     '    const rows = await this.service.exportRows(query);',
@@ -512,31 +822,49 @@ function controllerFile(ctx: Ctx): string {
     "    res.setHeader('Content-Type', 'text/csv; charset=utf-8');",
     '    res.setHeader(',
     "      'Content-Disposition',",
-    "      'attachment; filename=\"" + ctx.slug + "-' + date + '.csv\"',",
+    '      \'attachment; filename="' + ctx.slug + "-' + date + '.csv\"',",
     '    );',
-    '    return new StreamableFile(Buffer.from(rowsToCsv(rows, ' + ctx.upper + "_CSV_COLUMNS), 'utf8'));",
+    '    return new StreamableFile(Buffer.from(rowsToCsv(rows, ' +
+      ctx.upper +
+      "_CSV_COLUMNS), 'utf8'));",
     '  }',
     '',
     '  @Post(' + q('import') + ')',
     '  @HttpCode(HttpStatus.OK)',
     '  @RequiresPermissions(' + q(p + ':import') + ')',
-    '  @Auditable({ action: ' + q(p + ':import') + ', resourceType: ' + q(ctx.slug) + ' })',
+    '  @Auditable({ action: ' +
+      q(p + ':import') +
+      ', resourceType: ' +
+      q(ctx.slug) +
+      ' })',
     "  @UseInterceptors(FileInterceptor('file', { limits: { files: 1, fileSize: 2 * 1024 * 1024 } }))",
-    "  @ApiOperation({ summary: '导入" + ctx.label + "（CSV，逐行返回失败原因）' })",
-    "  @ApiOkZod('" + ctx.Name + "ImportResult', importResultSchema, '导入结果')",
+    "  @ApiOperation({ summary: '导入" +
+      ctx.label +
+      "（CSV，逐行返回失败原因）' })",
+    "  @ApiOkZod('" +
+      ctx.Name +
+      "ImportResult', importResultSchema, '导入结果')",
     '  importCsv(@UploadedFile() file?: Express.Multer.File) {',
     "    if (!file) throw new ApiException('请选择要导入的 CSV 文件', 400);",
     "    if (!file.originalname.toLowerCase().endsWith('.csv')) {",
     "      throw new ApiException('只支持 .csv 文件（Excel 请另存为 CSV UTF-8）', 400);",
     '    }',
-    "    const records = readRows(file.buffer.toString('utf8'), " + ctx.upper + '_CSV_COLUMNS);',
+    "    const records = readRows(file.buffer.toString('utf8'), " +
+      ctx.upper +
+      '_CSV_COLUMNS);',
     '    return this.service.importRows(records);',
     '  }',
     '',
     '  @Get(' + q(':id') + ')',
     '  @RequiresPermissions(' + q(p + ':query') + ')',
     "  @ApiOperation({ summary: '" + ctx.label + "详情' })",
-    "  @ApiOkZod('" + ctx.Name + "', " + ctx.camel + "ResponseSchema, '" + ctx.label + "详情')",
+    "  @ApiOkZod('" +
+      ctx.Name +
+      "', " +
+      ctx.camel +
+      "ResponseSchema, '" +
+      ctx.label +
+      "详情')",
     '  detail(@Param(' + q('id') + ', { schema: idParamSchema }) id: number) {',
     '    return this.service.detail(id);',
     '  }',
@@ -544,24 +872,52 @@ function controllerFile(ctx: Ctx): string {
     '  @Post()',
     '  @HttpCode(HttpStatus.OK)',
     '  @RequiresPermissions(' + q(p + ':add') + ')',
-    '  @Auditable({ action: ' + q(p + ':add') + ', resourceType: ' + q(ctx.slug) + ' })',
+    '  @Auditable({ action: ' +
+      q(p + ':add') +
+      ', resourceType: ' +
+      q(ctx.slug) +
+      ' })',
     '  @Idempotent({ scope: ' + q(p + ':add') + ' })',
     "  @ApiOperation({ summary: '新建" + ctx.label + "' })",
-    "  @ApiOkZod('" + ctx.Name + "', " + ctx.camel + "ResponseSchema, '新建后的" + ctx.label + "')",
-    '  create(@Body({ schema: create' + ctx.Name + 'Schema }) dto: Create' + ctx.Name + 'Input) {',
+    "  @ApiOkZod('" +
+      ctx.Name +
+      "', " +
+      ctx.camel +
+      "ResponseSchema, '新建后的" +
+      ctx.label +
+      "')",
+    '  create(@Body({ schema: create' +
+      ctx.Name +
+      'Schema }) dto: Create' +
+      ctx.Name +
+      'Input) {',
     '    return this.service.create(dto);',
     '  }',
     '',
     '  @Put(' + q(':id') + ')',
     '  @HttpCode(HttpStatus.OK)',
     '  @RequiresPermissions(' + q(p + ':edit') + ')',
-    '  @Auditable({ action: ' + q(p + ':edit') + ', resourceType: ' + q(ctx.slug) + ", resourceIdParam: 'id' })",
+    '  @Auditable({ action: ' +
+      q(p + ':edit') +
+      ', resourceType: ' +
+      q(ctx.slug) +
+      ", resourceIdParam: 'id' })",
     '  @Idempotent({ scope: ' + q(p + ':edit') + ' })',
     "  @ApiOperation({ summary: '更新" + ctx.label + "' })",
-    "  @ApiOkZod('" + ctx.Name + "', " + ctx.camel + "ResponseSchema, '更新后的" + ctx.label + "')",
+    "  @ApiOkZod('" +
+      ctx.Name +
+      "', " +
+      ctx.camel +
+      "ResponseSchema, '更新后的" +
+      ctx.label +
+      "')",
     '  update(',
     '    @Param(' + q('id') + ', { schema: idParamSchema }) id: number,',
-    '    @Body({ schema: update' + ctx.Name + 'Schema }) dto: Update' + ctx.Name + 'Input,',
+    '    @Body({ schema: update' +
+      ctx.Name +
+      'Schema }) dto: Update' +
+      ctx.Name +
+      'Input,',
     '  ) {',
     '    return this.service.update(id, dto);',
     '  }',
@@ -569,7 +925,11 @@ function controllerFile(ctx: Ctx): string {
     '  @Delete(' + q(':id') + ')',
     '  @HttpCode(HttpStatus.OK)',
     '  @RequiresPermissions(' + q(p + ':remove') + ')',
-    '  @Auditable({ action: ' + q(p + ':remove') + ', resourceType: ' + q(ctx.slug) + ", resourceIdParam: 'id' })",
+    '  @Auditable({ action: ' +
+      q(p + ':remove') +
+      ', resourceType: ' +
+      q(ctx.slug) +
+      ", resourceIdParam: 'id' })",
     '  @Idempotent({ scope: ' + q(p + ':remove') + ' })',
     "  @ApiOperation({ summary: '删除" + ctx.label + "（软删除）' })",
     "  @ApiOkZod('BoolResult', z.boolean(), '返回 true 表示删除成功')",
@@ -585,17 +945,39 @@ function moduleFile(ctx: Ctx): string {
   return block([
     "import { Module } from '@nestjs/common';",
     "import { TypeOrmModule } from '@nestjs/typeorm';",
-    ...(withFile ? ["import { FileModule } from '../file/file.module.js';"] : []),
-    ...(withFile ? ["import { " + ctx.Name + "FileHandler } from './adapters/" + ctx.slug + "-file.handler.js';"] : []),
-    "import { " + ctx.Name + "Controller } from './" + ctx.slug + ".controller.js';",
-    "import { " + ctx.Name + "Service } from './" + ctx.slug + ".service.js';",
-    "import { " + ctx.Name + " } from './entities/" + ctx.slug + ".entity.js';",
+    ...(withFile
+      ? ["import { FileModule } from '../file/file.module.js';"]
+      : []),
+    ...(withFile
+      ? [
+          'import { ' +
+            ctx.Name +
+            "FileHandler } from './adapters/" +
+            ctx.slug +
+            "-file.handler.js';",
+        ]
+      : []),
+    'import { ' +
+      ctx.Name +
+      "Controller } from './" +
+      ctx.slug +
+      ".controller.js';",
+    'import { ' + ctx.Name + "Service } from './" + ctx.slug + ".service.js';",
+    'import { ' + ctx.Name + " } from './entities/" + ctx.slug + ".entity.js';",
     '',
     '/** ' + ctx.label + '模块（gen:module 生成）。 */',
     '@Module({',
-    '  imports: [TypeOrmModule.forFeature([' + ctx.Name + '])' + (withFile ? ', FileModule' : '') + '],',
+    '  imports: [TypeOrmModule.forFeature([' +
+      ctx.Name +
+      '])' +
+      (withFile ? ', FileModule' : '') +
+      '],',
     '  controllers: [' + ctx.Name + 'Controller],',
-    '  providers: [' + ctx.Name + 'Service' + (withFile ? ', ' + ctx.Name + 'FileHandler' : '') + '],',
+    '  providers: [' +
+      ctx.Name +
+      'Service' +
+      (withFile ? ', ' + ctx.Name + 'FileHandler' : '') +
+      '],',
     '})',
     'export class ' + ctx.Name + 'Module {}',
   ]);
@@ -605,8 +987,13 @@ function createMigration(ctx: Ctx): string {
   return block([
     "import type { MigrationInterface, QueryRunner } from 'typeorm';",
     '',
-    '/** ' + ctx.label + '建表（gen:module 生成）。已跑迁移不可改，字段调整请追加新迁移。 */',
-    'export class Create' + ctx.Name + ctx.ts + ' implements MigrationInterface {',
+    '/** ' +
+      ctx.label +
+      '建表（gen:module 生成）。已跑迁移不可改，字段调整请追加新迁移。 */',
+    'export class Create' +
+      ctx.Name +
+      ctx.ts +
+      ' implements MigrationInterface {',
     "  name = 'Create" + ctx.Name + ctx.ts + "';",
     '',
     '  public async up(queryRunner: QueryRunner): Promise<void> {',
@@ -619,10 +1006,20 @@ function createMigration(ctx: Ctx): string {
     ...columnFields(ctx).map((f) => '      "  ' + sqlColumn(f) + '",'),
     "      '  PRIMARY KEY (id),',",
     ...(ctx.unique
-      ? ["      '  UNIQUE KEY uk_" + ctx.table + '_' + ctx.unique.column + ' (' + ctx.unique.column + "),',"]
+      ? [
+          "      '  UNIQUE KEY uk_" +
+            ctx.table +
+            '_' +
+            ctx.unique.column +
+            ' (' +
+            ctx.unique.column +
+            "),',",
+        ]
       : []),
     "      '  KEY idx_" + ctx.table + "_create_time (create_time)',",
-    "      \") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='" + ctx.label + "'\",",
+    '      ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT=\'' +
+      ctx.label +
+      '\'",',
     "    ].join('\\n');",
     '    await queryRunner.query(sql);',
     '  }',
@@ -641,9 +1038,18 @@ function seedMigration(ctx: Ctx): string {
     '',
     '/** ' + ctx.label + '菜单（gen:module 生成）。',
     ' * 只建菜单、不自动授权：业务权限给谁是人的决定。',
-    ' * 幂等：按 path 判重。' + (ctx.menuParent ? '父菜单：' + ctx.menuParent + '（不存在直接报错，不静默退化成根菜单）。' : ''),
+    ' * 幂等：按 path 判重。' +
+      (ctx.menuParent
+        ? '父菜单：' +
+          ctx.menuParent +
+          '（不存在直接报错，不静默退化成根菜单）。'
+        : ''),
     ' */',
-    'export class Seed' + ctx.Name + 'Setup' + ctx.ts2 + ' implements MigrationInterface {',
+    'export class Seed' +
+      ctx.Name +
+      'Setup' +
+      ctx.ts2 +
+      ' implements MigrationInterface {',
     "  name = 'Seed" + ctx.Name + 'Setup' + ctx.ts2 + "';",
     '',
     '  public async up(queryRunner: QueryRunner): Promise<void> {',
@@ -655,7 +1061,13 @@ function seedMigration(ctx: Ctx): string {
     '        )) as Array<{ id: number; ancestors: string }>)',
     '      : [];',
     '    if (parentPath && parent.length === 0) {',
-    '      throw new Error(' + q('父菜单不存在：' + (ctx.menuParent ?? '') + '（--menu-parent 只认已存在的 path）') + ');',
+    '      throw new Error(' +
+      q(
+        '父菜单不存在：' +
+          (ctx.menuParent ?? '') +
+          '（--menu-parent 只认已存在的 path）',
+      ) +
+      ');',
     '    }',
     '    const parentId = parent[0]?.id ?? null;',
     "    const ancestors = parent[0] ? parent[0].ancestors + ',' + parent[0].id : '0';",
@@ -678,7 +1090,11 @@ function seedMigration(ctx: Ctx): string {
     '  }',
     '',
     '  public async down(queryRunner: QueryRunner): Promise<void> {',
-    '    await queryRunner.query(' + q('DELETE FROM sys_menu WHERE path = ?') + ', [' + q(menuPath) + ']);',
+    '    await queryRunner.query(' +
+      q('DELETE FROM sys_menu WHERE path = ?') +
+      ', [' +
+      q(menuPath) +
+      ']);',
     '  }',
     '}',
   ]);
@@ -689,18 +1105,26 @@ function handlerFile(ctx: Ctx): string {
   const fields = fileFields(ctx).map((f) => q(f.name));
   return block([
     "import { Injectable, type OnModuleInit } from '@nestjs/common';",
-    "import {",
-    "  FileBizRegistry,",
-    "  type FileBizContext,",
-    "  type FileBizHandler,",
+    'import {',
+    '  FileBizRegistry,',
+    '  type FileBizContext,',
+    '  type FileBizHandler,',
     "} from '../../file/file-biz.registry.js';",
-    "import { " + ctx.Name + "Service } from '../" + ctx.slug + ".service.js';",
+    'import { ' + ctx.Name + "Service } from '../" + ctx.slug + ".service.js';",
     '',
-    '/** ' + ctx.label + '附件接入（gen:module 生成）。允许的用途：' + fileFields(ctx).map((f) => f.name).join(' / ') + '。',
+    '/** ' +
+      ctx.label +
+      '附件接入（gen:module 生成）。允许的用途：' +
+      fileFields(ctx)
+        .map((f) => f.name)
+        .join(' / ') +
+      '。',
     ' * 文件模块按 bizType 查到这里，判定权不写在底座里。',
     ' */',
     '@Injectable()',
-    'export class ' + ctx.Name + 'FileHandler implements FileBizHandler, OnModuleInit {',
+    'export class ' +
+      ctx.Name +
+      'FileHandler implements FileBizHandler, OnModuleInit {',
     '  constructor(',
     '    private readonly registry: FileBizRegistry,',
     '    private readonly service: ' + ctx.Name + 'Service,',
@@ -724,7 +1148,9 @@ function apiFile(ctx: Ctx): string {
     "import { downloadCsv } from '../utils/download';",
     "import { request } from './http';",
     '',
-    '/** ' + ctx.label + '（与后端响应契约对齐；跑过 openapi:dump 后可换成 types.ts 的生成类型） */',
+    '/** ' +
+      ctx.label +
+      '（与后端响应契约对齐；跑过 openapi:dump 后可换成 types.ts 的生成类型） */',
     'export interface ' + ctx.Name + 'Item {',
     '  id: number;',
     '  createTime: string;',
@@ -744,17 +1170,27 @@ function apiFile(ctx: Ctx): string {
     '}',
     '',
     'export const ' + ctx.camel + 'Api = {',
-    '  page: (params: object): Promise<{ list: ' + ctx.Name + 'Item[]; total: number }> =>',
+    '  page: (params: object): Promise<{ list: ' +
+      ctx.Name +
+      'Item[]; total: number }> =>',
     "    request.get('/" + ctx.slug + "', params),",
     '  create: (body: ' + ctx.Name + 'Body): Promise<' + ctx.Name + 'Item> =>',
     "    request.post('/" + ctx.slug + "', body),",
-    '  update: (id: number, body: Partial<' + ctx.Name + 'Body>): Promise<' + ctx.Name + 'Item> =>',
+    '  update: (id: number, body: Partial<' +
+      ctx.Name +
+      'Body>): Promise<' +
+      ctx.Name +
+      'Item> =>',
     "    request.put('/" + ctx.slug + "/' + id, body),",
     '  remove: (id: number): Promise<boolean> =>',
     "    request.delete('/" + ctx.slug + "/' + id),",
     '  exportCsv: (params: { keyword?: string }): Promise<void> => {',
     "    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');",
-    "    return downloadCsv('/" + ctx.slug + "/export', params, '" + ctx.label + "-' + stamp + '.csv');",
+    "    return downloadCsv('/" +
+      ctx.slug +
+      "/export', params, '" +
+      ctx.label +
+      "-' + stamp + '.csv');",
     '  },',
     '  importCsv: (file: File): Promise<' + ctx.Name + 'ImportResult> => {',
     '    const form = new FormData();',
@@ -768,8 +1204,11 @@ function apiFile(ctx: Ctx): string {
 function viewFile(ctx: Ctx): string {
   const dictFields = ctx.fields.filter((f) => f.type === 'dict');
   const attachFields = fileFields(ctx);
-  const titleField = columnFields(ctx).find((f) => f.type === 'string')?.name ?? 'id';
-  const dictTypes = Array.from(new Set(dictFields.map((f) => f.dictType ?? '')));
+  const titleField =
+    columnFields(ctx).find((f) => f.type === 'string')?.name ?? 'id';
+  const dictTypes = Array.from(
+    new Set(dictFields.map((f) => f.dictType ?? '')),
+  );
   const boolFields = ctx.fields.filter((f) => f.type === 'bool');
   const dateFields = ctx.fields.filter((f) => f.type === 'datetime');
   const requiredStrings = ctx.fields.filter((f) => f.type === 'string');
@@ -778,10 +1217,21 @@ function viewFile(ctx: Ctx): string {
     '<script setup lang="ts">',
     "import { Download, Plus, Refresh, Search, Upload } from '@element-plus/icons-vue';",
     "import { ElMessage, type FormRules } from 'element-plus';",
-    "import { computed, " + (dictFields.length ? 'onMounted, ' : '') + "reactive, ref } from 'vue';",
-    "import { " + ctx.camel + "Api, type " + ctx.Name + "Body, type " + ctx.Name + "Item } from '../../api/" + ctx.slug + "';",
+    'import { computed, ' +
+      (dictFields.length ? 'onMounted, ' : '') +
+      "reactive, ref } from 'vue';",
+    'import { ' +
+      ctx.camel +
+      'Api, type ' +
+      ctx.Name +
+      'Body, type ' +
+      ctx.Name +
+      "Item } from '../../api/" +
+      ctx.slug +
+      "';",
   ];
-  if (dictFields.length) lines.push("import { dictApi } from '../../api/dict';");
+  if (dictFields.length)
+    lines.push("import { dictApi } from '../../api/dict';");
   lines.push(
     ...(attachFields.length
       ? ["import BizFiles from '../../components/BizFiles.vue';"]
@@ -791,7 +1241,9 @@ function viewFile(ctx: Ctx): string {
     "import ImportDialog from '../../components/ImportDialog.vue';",
     "import { useCrud } from '../../composables/useCrud';",
     '',
-    '/** ' + ctx.label + '（gen:module 生成：列表 + 新建/编辑 + 导入导出）。 */',
+    '/** ' +
+      ctx.label +
+      '（gen:module 生成：列表 + 新建/编辑 + 导入导出）。 */',
     'type Query = { pageNum: number; pageSize: number; keyword: string };',
     '',
     'const fmtTime = (value?: string | null): string =>',
@@ -805,7 +1257,7 @@ function viewFile(ctx: Ctx): string {
     "  query: { pageNum: 1, pageSize: 10, keyword: '' },",
     "  removeText: () => '确认删除该" + ctx.label + "？',",
     '});',
-    ''
+    '',
   );
 
   if (dictFields.length) {
@@ -814,9 +1266,12 @@ function viewFile(ctx: Ctx): string {
       'const dictOptions = reactive<Record<string, Array<{ label: string; value: string }>>>({});',
       '',
       'async function loadDicts(): Promise<void> {',
-      ...dictTypes.map((d) => '  dictOptions[' + q(d) + '] = await dictApi.options(' + q(d) + ');'),
+      ...dictTypes.map(
+        (d) =>
+          '  dictOptions[' + q(d) + '] = await dictApi.options(' + q(d) + ');',
+      ),
       '}',
-      ''
+      '',
     );
   }
 
@@ -835,7 +1290,16 @@ function viewFile(ctx: Ctx): string {
     '',
     'const EMPTY: ' + ctx.Name + 'Body = {',
     ...columnFields(ctx).map(
-      (f) => '  ' + f.name + ': ' + (f.type === 'int' || f.type === 'decimal' || f.type === 'bool' ? '0' : f.type === 'datetime' ? 'null' : q('')) + ',',
+      (f) =>
+        '  ' +
+        f.name +
+        ': ' +
+        (f.type === 'int' || f.type === 'decimal' || f.type === 'bool'
+          ? '0'
+          : f.type === 'datetime'
+            ? 'null'
+            : q('')) +
+        ',',
     ),
     '};',
     '',
@@ -846,7 +1310,14 @@ function viewFile(ctx: Ctx): string {
     ']);',
     '',
     'const rules: FormRules = {',
-    ...requiredStrings.map((f) => '  ' + f.name + ": [{ required: true, message: " + q('请输入' + f.label) + ", trigger: 'blur' }],"),
+    ...requiredStrings.map(
+      (f) =>
+        '  ' +
+        f.name +
+        ': [{ required: true, message: ' +
+        q('请输入' + f.label) +
+        ", trigger: 'blur' }],",
+    ),
     '};',
     '',
     'function openCreate(): void {',
@@ -887,14 +1358,16 @@ function viewFile(ctx: Ctx): string {
     'async function handleExport(): Promise<void> {',
     '  exporting.value = true;',
     '  try {',
-    '    await ' + ctx.camel + 'Api.exportCsv({ keyword: query.keyword || undefined });',
+    '    await ' +
+      ctx.camel +
+      'Api.exportCsv({ keyword: query.keyword || undefined });',
     '  } catch {',
     '    // 已提示',
     '  } finally {',
     '    exporting.value = false;',
     '  }',
     '}',
-    ''
+    '',
   );
 
   if (dictFields.length) {
@@ -912,21 +1385,37 @@ function viewFile(ctx: Ctx): string {
       '}',
       '',
       'const fileTitle = computed(() =>',
-      "  '附件 - ' + (fileTarget.value ? String(fileTarget.value." + titleField + ") : ''),",
+      "  '附件 - ' + (fileTarget.value ? String(fileTarget.value." +
+        titleField +
+        ") : ''),",
       ');',
-      ''
+      '',
     );
   }
 
-  lines.push('</script>', '', '<template>', '  <div>', '    <el-card shadow="never" class="page-card">', '      <div class="page-toolbar">',
+  lines.push(
+    '</script>',
+    '',
+    '<template>',
+    '  <div>',
+    '    <el-card shadow="never" class="page-card">',
+    '      <div class="page-toolbar">',
     '        <el-input v-model="query.keyword" placeholder="关键字" clearable style="width: 200px" @keyup.enter="search" />',
     '        <el-button :icon="Search" type="primary" @click="search">查询</el-button>',
     '        <el-button :icon="Refresh" @click="reset">重置</el-button>',
     '        <div class="page-toolbar-right">',
-    '          <el-button v-perm="' + q(ctx.perm + ':export') + '" :icon="Download" :loading="exporting" @click="handleExport">导出</el-button>',
-    '          <el-button v-perm="' + q(ctx.perm + ':import') + '" :icon="Upload" @click="importVisible = true">导入</el-button>',
-    '          <el-button v-perm="' + q(ctx.perm + ':add') + '" :icon="Plus" type="primary" @click="openCreate">新建</el-button>',
-    '        </div>', '      </div>', '',
+    '          <el-button v-perm="' +
+      q(ctx.perm + ':export') +
+      '" :icon="Download" :loading="exporting" @click="handleExport">导出</el-button>',
+    '          <el-button v-perm="' +
+      q(ctx.perm + ':import') +
+      '" :icon="Upload" @click="importVisible = true">导入</el-button>',
+    '          <el-button v-perm="' +
+      q(ctx.perm + ':add') +
+      '" :icon="Plus" type="primary" @click="openCreate">新建</el-button>',
+    '        </div>',
+    '      </div>',
+    '',
     '      <DataTable',
     '        v-model:page="query.pageNum"',
     '        v-model:page-size="query.pageSize"',
@@ -935,32 +1424,56 @@ function viewFile(ctx: Ctx): string {
     '        :loading="loading"',
     '        :total="total"',
     '        @change="reload"',
-    '      >');
+    '      >',
+  );
 
   for (const f of boolFields) {
     lines.push(
       '        <template #' + f.name + '="{ row }">',
-      '          <el-tag :type="row.' + f.name + " === 1 ? 'success' : 'info'\" size=\"small\">",
+      '          <el-tag :type="row.' +
+        f.name +
+        " === 1 ? 'success' : 'info'\" size=\"small\">",
       '            {{ row.' + f.name + " === 1 ? '是' : '否' }}",
       '          </el-tag>',
       '        </template>',
-      ''
+      '',
     );
   }
   for (const f of dateFields) {
-    lines.push('        <template #' + f.name + '="{ row }">{{ fmtTime(row.' + f.name + ') }}</template>', '');
+    lines.push(
+      '        <template #' +
+        f.name +
+        '="{ row }">{{ fmtTime(row.' +
+        f.name +
+        ') }}</template>',
+      '',
+    );
   }
 
   lines.push(
     '        <template #createTime="{ row }">{{ fmtTime(row.createTime) }}</template>',
     '',
-    '        <el-table-column label="操作" width="' + (attachFields.length ? 200 : 140) + '" fixed="right">',
+    '        <el-table-column label="操作" width="' +
+      (attachFields.length ? 200 : 140) +
+      '" fixed="right">',
     '          <template #default="{ row }">',
-    '            <el-button v-perm="' + q(ctx.perm + ':edit') + '" link type="primary" @click="openEdit(row as ' + ctx.Name + 'Item)">编辑</el-button>',
+    '            <el-button v-perm="' +
+      q(ctx.perm + ':edit') +
+      '" link type="primary" @click="openEdit(row as ' +
+      ctx.Name +
+      'Item)">编辑</el-button>',
     ...(attachFields.length
-      ? ['            <el-button link type="primary" @click="openFiles(row as ' + ctx.Name + 'Item)">附件</el-button>']
+      ? [
+          '            <el-button link type="primary" @click="openFiles(row as ' +
+            ctx.Name +
+            'Item)">附件</el-button>',
+        ]
       : []),
-    '            <el-button v-perm="' + q(ctx.perm + ':remove') + '" link type="danger" @click="remove(row as ' + ctx.Name + 'Item)">删除</el-button>',
+    '            <el-button v-perm="' +
+      q(ctx.perm + ':remove') +
+      '" link type="danger" @click="remove(row as ' +
+      ctx.Name +
+      'Item)">删除</el-button>',
     '          </template>',
     '        </el-table-column>',
     '      </DataTable>',
@@ -975,7 +1488,11 @@ function viewFile(ctx: Ctx): string {
     '',
     '    <FormDialog',
     '      v-model="dialogVisible"',
-    "      :title=\"dialogMode === 'create' ? '新建" + ctx.label + "' : '编辑" + ctx.label + "'\"",
+    "      :title=\"dialogMode === 'create' ? '新建" +
+      ctx.label +
+      "' : '编辑" +
+      ctx.label +
+      '\'"',
     '      :model="form"',
     '      :columns="formColumns"',
     '      :rules="rules"',
@@ -1019,7 +1536,7 @@ function viewFile(ctx: Ctx): string {
           '</style>',
           '',
         ]
-      : [])
+      : []),
   );
 
   return lines.join('\n');
@@ -1031,32 +1548,76 @@ function buildFiles(ctx: Ctx): Array<{ path: string; content: string }> {
   const dir = resolve(SERVER, 'src/modules/' + ctx.slug);
   const mig = resolve(SERVER, 'src/core/database/migrations');
   return [
-    { path: resolve(dir, 'entities/' + ctx.slug + '.entity.ts'), content: entityFile(ctx) },
-    { path: resolve(dir, 'dto/' + ctx.slug + '.dto.ts'), content: dtoFile(ctx) },
-    { path: resolve(dir, 'dto/' + ctx.slug + '.response.ts'), content: responseFile(ctx) },
+    {
+      path: resolve(dir, 'entities/' + ctx.slug + '.entity.ts'),
+      content: entityFile(ctx),
+    },
+    {
+      path: resolve(dir, 'dto/' + ctx.slug + '.dto.ts'),
+      content: dtoFile(ctx),
+    },
+    {
+      path: resolve(dir, 'dto/' + ctx.slug + '.response.ts'),
+      content: responseFile(ctx),
+    },
     { path: resolve(dir, ctx.slug + '.csv.ts'), content: csvFile(ctx) },
     { path: resolve(dir, ctx.slug + '.service.ts'), content: serviceFile(ctx) },
-    { path: resolve(dir, ctx.slug + '.controller.ts'), content: controllerFile(ctx) },
+    {
+      path: resolve(dir, ctx.slug + '.controller.ts'),
+      content: controllerFile(ctx),
+    },
     { path: resolve(dir, ctx.slug + '.module.ts'), content: moduleFile(ctx) },
     ...(fileFields(ctx).length
-      ? [{ path: resolve(dir, 'adapters/' + ctx.slug + '-file.handler.ts'), content: handlerFile(ctx) }]
+      ? [
+          {
+            path: resolve(dir, 'adapters/' + ctx.slug + '-file.handler.ts'),
+            content: handlerFile(ctx),
+          },
+        ]
       : []),
-    { path: resolve(mig, ctx.ts + '-Create' + ctx.Name + '.ts'), content: createMigration(ctx) },
-    { path: resolve(mig, ctx.ts2 + '-Seed' + ctx.Name + 'Setup.ts'), content: seedMigration(ctx) },
-    { path: resolve(WEB_ADMIN, 'src/api/' + ctx.slug + '.ts'), content: apiFile(ctx) },
-    { path: resolve(WEB_ADMIN, 'src/views/' + ctx.slug + '/' + ctx.Name + 'View.vue'), content: viewFile(ctx) },
+    {
+      path: resolve(mig, ctx.ts + '-Create' + ctx.Name + '.ts'),
+      content: createMigration(ctx),
+    },
+    {
+      path: resolve(mig, ctx.ts2 + '-Seed' + ctx.Name + 'Setup.ts'),
+      content: seedMigration(ctx),
+    },
+    {
+      path: resolve(WEB_ADMIN, 'src/api/' + ctx.slug + '.ts'),
+      content: apiFile(ctx),
+    },
+    {
+      path: resolve(
+        WEB_ADMIN,
+        'src/views/' + ctx.slug + '/' + ctx.Name + 'View.vue',
+      ),
+      content: viewFile(ctx),
+    },
   ];
 }
 
 function patchAppModule(ctx: Ctx): void {
   const file = resolve(SERVER, 'src/app.module.ts');
   let text = readFileSync(file, 'utf8');
-  const importLine = "import { " + ctx.Name + "Module } from './modules/" + ctx.slug + '/' + ctx.slug + ".module.js';";
+  const importLine =
+    'import { ' +
+    ctx.Name +
+    "Module } from './modules/" +
+    ctx.slug +
+    '/' +
+    ctx.slug +
+    ".module.js';";
   if (text.includes(importLine)) return;
-  if (!text.includes('// <gen:import>')) die('app.module.ts 缺少 // <gen:import> 锚点');
-  if (!text.includes('// <gen:module>')) die('app.module.ts 缺少 // <gen:module> 锚点');
+  if (!text.includes('// <gen:import>'))
+    die('app.module.ts 缺少 // <gen:import> 锚点');
+  if (!text.includes('// <gen:module>'))
+    die('app.module.ts 缺少 // <gen:module> 锚点');
   text = text.replace('// <gen:import>', importLine + '\n// <gen:import>');
-  text = text.replace('    // <gen:module>', '    ' + ctx.Name + 'Module,\n    // <gen:module>');
+  text = text.replace(
+    '    // <gen:module>',
+    '    ' + ctx.Name + 'Module,\n    // <gen:module>',
+  );
   writeFileSync(file, text, 'utf8');
 }
 
@@ -1075,7 +1636,9 @@ function main(): void {
     ts: String(now),
     ts2: String(now + 1),
     menuParent: args.menuParent,
-    unique: args.uniqueName ? args.fields.find((f) => f.name === args.uniqueName) : undefined,
+    unique: args.uniqueName
+      ? args.fields.find((f) => f.name === args.uniqueName)
+      : undefined,
   };
 
   const files = buildFiles(ctx);
@@ -1087,12 +1650,17 @@ function main(): void {
     if (conflicts.length) {
       console.log('');
       console.log('⚠️  以下文件已存在，实际执行会拒绝：');
-      for (const f of conflicts) console.log('   ' + f.path.replace(ROOT + '/', ''));
+      for (const f of conflicts)
+        console.log('   ' + f.path.replace(ROOT + '/', ''));
     }
     return;
   }
 
-  if (conflicts.length) die('目标文件已存在，先删除或换 slug：\n   ' + conflicts.map((f) => f.path).join('\n   '));
+  if (conflicts.length)
+    die(
+      '目标文件已存在，先删除或换 slug：\n   ' +
+        conflicts.map((f) => f.path).join('\n   '),
+    );
 
   for (const file of files) {
     mkdirSync(dirname(file.path), { recursive: true });
@@ -1100,7 +1668,15 @@ function main(): void {
   }
   patchAppModule(ctx);
 
-  console.log('==> 已生成 ' + files.length + ' 个文件（' + ctx.slug + ' / ' + ctx.label + '）');
+  console.log(
+    '==> 已生成 ' +
+      files.length +
+      ' 个文件（' +
+      ctx.slug +
+      ' / ' +
+      ctx.label +
+      '）',
+  );
   console.log('');
   console.log('下一步：');
   console.log('  1. cd server && pnpm build         # 类型检查');

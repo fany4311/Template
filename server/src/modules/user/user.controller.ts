@@ -14,13 +14,21 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { z } from 'zod';
 import { Keep } from '../../common/decorators/keep.decorator.js';
 import { ApiException } from '../../common/exceptions/api.exception.js';
-import { exportRows as rowsToCsv, readRows } from '../../common/import-export/csv.js';
+import {
+  exportRows as rowsToCsv,
+  readRows,
+} from '../../common/import-export/csv.js';
 import { USER_EXPORT_COLUMNS, USER_IMPORT_COLUMNS } from './user.csv.js';
 import { ApiOkZod, pageOf } from '../../common/swagger/api-ok.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -73,7 +81,11 @@ export class UserController {
   @Get()
   @RequiresPermissions('system:user:list')
   @ApiOperation({ summary: '分页查询用户（受 dataScope 约束）' })
-  @ApiOkZod('SysUserPage', pageOf(userResponseSchema), '分页结果 { list, total }')
+  @ApiOkZod(
+    'SysUserPage',
+    pageOf(userResponseSchema),
+    '分页结果 { list, total }',
+  )
   page(
     @Query({ schema: queryUserSchema }) query: QueryUserInput,
     @CurrentUser() user: JwtUser,
@@ -95,21 +107,33 @@ export class UserController {
     const rows = await this.userService.exportRows(query, user);
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="users-' + date + '.csv"');
-    return new StreamableFile(Buffer.from(rowsToCsv(rows, USER_EXPORT_COLUMNS), 'utf8'));
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="users-' + date + '.csv"',
+    );
+    return new StreamableFile(
+      Buffer.from(rowsToCsv(rows, USER_EXPORT_COLUMNS), 'utf8'),
+    );
   }
 
   @Post('import')
   @HttpCode(HttpStatus.OK)
   @RequiresPermissions('system:user:import')
   @Auditable({ action: 'system:user:import', resourceType: 'user' })
-  @UseInterceptors(FileInterceptor('file', { limits: { files: 1, fileSize: 2 * 1024 * 1024 } }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { files: 1, fileSize: 2 * 1024 * 1024 },
+    }),
+  )
   @ApiOperation({ summary: '导入用户（CSV，逐行返回失败原因）' })
   @ApiOkZod('UserImportResult', importResultSchema, '导入结果')
   importCsv(@UploadedFile() file?: Express.Multer.File) {
     if (!file) throw new ApiException('请选择要导入的 CSV 文件', 400);
     if (!file.originalname.toLowerCase().endsWith('.csv')) {
-      throw new ApiException('只支持 .csv 文件（Excel 请另存为 CSV UTF-8）', 400);
+      throw new ApiException(
+        '只支持 .csv 文件（Excel 请另存为 CSV UTF-8）',
+        400,
+      );
     }
     const records = readRows(file.buffer.toString('utf8'), USER_IMPORT_COLUMNS);
     return this.userService.importRows(records);
@@ -183,7 +207,11 @@ export class UserController {
   @Get(':id/roles')
   @RequiresPermissions('system:user:list')
   @ApiOperation({ summary: '用户角色授权列表' })
-  @ApiOkZod('SysUserRoles', z.array(userRoleResponseSchema), '授权记录列表（含临时授权到期时间）')
+  @ApiOkZod(
+    'SysUserRoles',
+    z.array(userRoleResponseSchema),
+    '授权记录列表（含临时授权到期时间）',
+  )
   listGrants(@Param('id', { schema: idParamSchema }) id: number) {
     return this.userService.listGrants(id);
   }

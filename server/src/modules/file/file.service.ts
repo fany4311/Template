@@ -98,7 +98,9 @@ export class FileService {
       : resolveGlobalAcceptPolicy();
 
     if (!acceptsExtension(policy, upload.originalname)) {
-      throw new ApiException(`不支持的文件类型：.${extOf(upload.originalname)}`);
+      throw new ApiException(
+        `不支持的文件类型：.${extOf(upload.originalname)}`,
+      );
     }
     if (upload.size > policy.maxSize) {
       throw new ApiException(
@@ -217,7 +219,10 @@ export class FileService {
       // 业务后处理（如解析 Excel）。失败则整个绑定回滚，避免半成品
       await this.registry.notifyBound(ctx, dto.bizType, dto.bizId, newlyBound);
 
-      return { bound: newlyBound.length, skipped: files.length - newlyBound.length };
+      return {
+        bound: newlyBound.length,
+        skipped: files.length - newlyBound.length,
+      };
     });
 
     if (result.bound > 0) {
@@ -281,7 +286,8 @@ export class FileService {
       qb.andWhere('f.original_name LIKE :kw', { kw: `%${query.keyword}%` });
     }
     if (query.ext) qb.andWhere('f.ext = :ext', { ext: query.ext });
-    if (query.status) qb.andWhere('f.status = :status', { status: query.status });
+    if (query.status)
+      qb.andWhere('f.status = :status', { status: query.status });
     if (query.uploaderId) {
       qb.andWhere('f.uploader_id = :uid', { uid: query.uploaderId });
     }
@@ -356,10 +362,7 @@ export class FileService {
    * 走服务端代理而不是直链：只有这样才能同时满足鉴权、数据隔离、审计与防盗链。
    * 流式返回，不把整个文件读进内存。
    */
-  async openDownload(
-    id: number,
-    user: JwtUser,
-  ): Promise<FileDownload> {
+  async openDownload(id: number, user: JwtUser): Promise<FileDownload> {
     const file = await this.findOrFail(id);
     await this.assertCanRead(file, user);
 
@@ -371,10 +374,7 @@ export class FileService {
       body,
       size: file.size,
       contentType: file.mime,
-      contentDisposition: contentDisposition(
-        'attachment',
-        file.originalName,
-      ),
+      contentDisposition: contentDisposition('attachment', file.originalName),
       etag: `"${file.sha256.slice(0, 32)}"`,
     };
   }
@@ -450,7 +450,9 @@ export class FileService {
   private async softRemove(file: FileEntity): Promise<void> {
     await this.txHost.withTransaction(async () => {
       await this.txHost.tx.getRepository(FileLink).delete({ fileId: file.id });
-      await this.txHost.tx.getRepository(FileEntity).softDelete({ id: file.id });
+      await this.txHost.tx
+        .getRepository(FileEntity)
+        .softDelete({ id: file.id });
     });
 
     try {

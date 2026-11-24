@@ -1,8 +1,5 @@
 import { PERMISSIONS_KEY } from '../constants/decorator.constant.js';
-import {
-  isConcretePermissionCode,
-  moduleKeyOf,
-} from './permission-code.js';
+import { isConcretePermissionCode, moduleKeyOf } from './permission-code.js';
 
 /**
  * 权限清单采集器：从**运行时的控制器元数据**反射出系统里真实存在的权限码。
@@ -128,10 +125,9 @@ export function collectPermissionCatalog(
         | undefined;
       if (!declared?.length) continue;
 
-      const operation = Reflect.getOwnMetadata(
-        API_OPERATION_KEY,
-        handler,
-      ) as SwaggerOperationMeta | undefined;
+      const operation = Reflect.getOwnMetadata(API_OPERATION_KEY, handler) as
+        | SwaggerOperationMeta
+        | undefined;
       const summary = operation?.summary?.trim();
 
       for (const code of declared.flat()) {

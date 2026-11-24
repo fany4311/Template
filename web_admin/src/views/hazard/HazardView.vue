@@ -95,7 +95,13 @@ type TagType = 'primary' | 'success' | 'warning' | 'info' | 'danger';
 
 /** 字典里的 tagType 来自后端，可能不在联合内，收窄一次 */
 function asTagType(value: string | undefined): TagType {
-  const allowed: TagType[] = ['primary', 'success', 'warning', 'info', 'danger'];
+  const allowed: TagType[] = [
+    'primary',
+    'success',
+    'warning',
+    'info',
+    'danger',
+  ];
   return allowed.includes(value as TagType) ? (value as TagType) : 'info';
 }
 
@@ -130,7 +136,6 @@ const SCOPE_TAG: Record<string, TagType> = {
 // ---------------------------------------------------------------------------
 // 列表
 // ---------------------------------------------------------------------------
-
 
 // ---------------------------------------------------------------------------
 // 上报
@@ -185,7 +190,8 @@ async function submitReport(): Promise<void> {
   try {
     await hazardApi.report({
       ...reportForm,
-      cooperateDeptIds: reportForm.scope === 'OPEN' ? reportForm.cooperateDeptIds : [],
+      cooperateDeptIds:
+        reportForm.scope === 'OPEN' ? reportForm.cooperateDeptIds : [],
     });
     ElMessage.success('上报成功');
     reportVisible.value = false;
@@ -207,7 +213,9 @@ const detail = ref<HazardDetail | null>(null);
 
 const flowVisible = ref(false);
 const flowSubmitting = ref(false);
-const flowKind = ref<'' | 'accept' | 'reject' | 'rectify' | 'review' | 'archive'>('');
+const flowKind = ref<
+  '' | 'accept' | 'reject' | 'rectify' | 'review' | 'archive'
+>('');
 const flowForm = reactive({
   assigneeDeptId: undefined as number | undefined,
   cooperateDeptIds: [] as number[],
@@ -249,7 +257,8 @@ function openFlow(kind: typeof flowKind.value, passed = true): void {
   Object.assign(flowForm, {
     assigneeDeptId: detail.value?.assigneeDeptId ?? undefined,
     cooperateDeptIds: [...(detail.value?.cooperateDeptIds ?? [])],
-    rectifyDeadline: detail.value?.rectifyDeadline ?? detail.value?.deadlineAt ?? '',
+    rectifyDeadline:
+      detail.value?.rectifyDeadline ?? detail.value?.deadlineAt ?? '',
     remark: '',
     reason: '',
     rectifyMeasure: '',
@@ -319,9 +328,13 @@ async function submitFlow(): Promise<void> {
 async function handleDelete(): Promise<void> {
   if (!detail.value) return;
   try {
-    await ElMessageBox.confirm(`确认删除隐患「${detail.value.hazardNo}」？`, '提示', {
-      type: 'warning',
-    });
+    await ElMessageBox.confirm(
+      `确认删除隐患「${detail.value.hazardNo}」？`,
+      '提示',
+      {
+        type: 'warning',
+      },
+    );
   } catch {
     return;
   }
@@ -359,7 +372,12 @@ onMounted(async () => {
           style="width: 200px"
           @keyup.enter="search"
         />
-        <el-select v-model="query.status" placeholder="状态" clearable style="width: 130px">
+        <el-select
+          v-model="query.status"
+          placeholder="状态"
+          clearable
+          style="width: 130px"
+        >
           <el-option label="待受理" value="REPORTED" />
           <el-option label="整改中" value="PROCESSING" />
           <el-option label="待复查" value="RECTIFIED" />
@@ -367,7 +385,12 @@ onMounted(async () => {
           <el-option label="已归档" value="ARCHIVED" />
           <el-option label="已驳回" value="REJECTED" />
         </el-select>
-        <el-select v-model="query.level" placeholder="等级" clearable style="width: 120px">
+        <el-select
+          v-model="query.level"
+          placeholder="等级"
+          clearable
+          style="width: 120px"
+        >
           <el-option
             v-for="item in levels"
             :key="item.value"
@@ -375,7 +398,12 @@ onMounted(async () => {
             :value="item.value"
           />
         </el-select>
-        <el-select v-model="query.category" placeholder="类别" clearable style="width: 130px">
+        <el-select
+          v-model="query.category"
+          placeholder="类别"
+          clearable
+          style="width: 130px"
+        >
           <el-option
             v-for="item in categories"
             :key="item.value"
@@ -384,7 +412,9 @@ onMounted(async () => {
           />
         </el-select>
         <el-checkbox v-model="query.onlyMine">只看我部门</el-checkbox>
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button
@@ -408,15 +438,23 @@ onMounted(async () => {
         @change="reload"
       >
         <template #category="{ row }">
-          <el-tag :type="catTag(row.category)" size="small">{{ catLabel(row.category) }}</el-tag>
+          <el-tag :type="catTag(row.category)" size="small">{{
+            catLabel(row.category)
+          }}</el-tag>
         </template>
 
         <template #level="{ row }">
-          <el-tag :type="levelTag(row.level)" size="small">{{ levelLabel(row.level) }}</el-tag>
+          <el-tag :type="levelTag(row.level)" size="small">{{
+            levelLabel(row.level)
+          }}</el-tag>
         </template>
 
         <template #scope="{ row }">
-          <el-tag :type="SCOPE_TAG[row.scope] ?? 'info'" size="small" effect="plain">
+          <el-tag
+            :type="SCOPE_TAG[row.scope] ?? 'info'"
+            size="small"
+            effect="plain"
+          >
             {{ SCOPE_LABEL[row.scope] ?? row.scope }}
           </el-tag>
         </template>
@@ -450,7 +488,12 @@ onMounted(async () => {
 
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button :icon="View" link type="primary" @click="openDetail(row.id)">
+            <el-button
+              :icon="View"
+              link
+              type="primary"
+              @click="openDetail(row.id)"
+            >
               详情
             </el-button>
           </template>
@@ -459,8 +502,18 @@ onMounted(async () => {
     </el-card>
 
     <!-- 上报 -->
-    <el-dialog v-model="reportVisible" title="上报隐患" width="620px" destroy-on-close>
-      <el-form ref="reportRef" :model="reportForm" :rules="reportRules" label-width="90px">
+    <el-dialog
+      v-model="reportVisible"
+      title="上报隐患"
+      width="620px"
+      destroy-on-close
+    >
+      <el-form
+        ref="reportRef"
+        :model="reportForm"
+        :rules="reportRules"
+        label-width="90px"
+      >
         <el-form-item label="标题" prop="title">
           <el-input v-model="reportForm.title" placeholder="简要描述隐患" />
         </el-form-item>
@@ -468,7 +521,10 @@ onMounted(async () => {
           <el-input v-model="reportForm.content" type="textarea" :rows="4" />
         </el-form-item>
         <el-form-item label="地点">
-          <el-input v-model="reportForm.location" placeholder="如：第三教学楼 3F 东侧" />
+          <el-input
+            v-model="reportForm.location"
+            placeholder="如：第三教学楼 3F 东侧"
+          />
         </el-form-item>
         <el-form-item label="类别">
           <el-select v-model="reportForm.category" style="width: 100%">
@@ -512,7 +568,11 @@ onMounted(async () => {
       </el-form>
       <template #footer>
         <el-button @click="reportVisible = false">取消</el-button>
-        <el-button type="primary" :loading="reportSubmitting" @click="submitReport">
+        <el-button
+          type="primary"
+          :loading="reportSubmitting"
+          @click="submitReport"
+        >
           提交
         </el-button>
       </template>
@@ -523,21 +583,35 @@ onMounted(async () => {
       <div v-loading="detailLoading">
         <template v-if="detail">
           <el-descriptions :column="2" border size="small">
-            <el-descriptions-item label="编号">{{ detail.hazardNo }}</el-descriptions-item>
+            <el-descriptions-item label="编号">{{
+              detail.hazardNo
+            }}</el-descriptions-item>
             <el-descriptions-item label="状态">
               <el-tag :type="STATUS_TAG[detail.status] ?? 'info'" size="small">
                 {{ detail.statusLabel }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="标题" :span="2">{{ detail.title }}</el-descriptions-item>
-            <el-descriptions-item label="描述" :span="2">{{ detail.content }}</el-descriptions-item>
-            <el-descriptions-item label="地点">{{ detail.location || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="类别">{{ catLabel(detail.category) }}</el-descriptions-item>
-            <el-descriptions-item label="等级">{{ levelLabel(detail.level) }}</el-descriptions-item>
+            <el-descriptions-item label="标题" :span="2">{{
+              detail.title
+            }}</el-descriptions-item>
+            <el-descriptions-item label="描述" :span="2">{{
+              detail.content
+            }}</el-descriptions-item>
+            <el-descriptions-item label="地点">{{
+              detail.location || '-'
+            }}</el-descriptions-item>
+            <el-descriptions-item label="类别">{{
+              catLabel(detail.category)
+            }}</el-descriptions-item>
+            <el-descriptions-item label="等级">{{
+              levelLabel(detail.level)
+            }}</el-descriptions-item>
             <el-descriptions-item label="范围">
               {{ SCOPE_LABEL[detail.scope] ?? detail.scope }}
             </el-descriptions-item>
-            <el-descriptions-item label="上报人">{{ detail.reporterName }}</el-descriptions-item>
+            <el-descriptions-item label="上报人">{{
+              detail.reporterName
+            }}</el-descriptions-item>
             <el-descriptions-item label="主责部门">
               {{ detail.assigneeDeptName || '-' }}
             </el-descriptions-item>
@@ -552,16 +626,32 @@ onMounted(async () => {
             <el-descriptions-item label="处理人">
               {{ detail.handlerName || '-' }}
             </el-descriptions-item>
-            <el-descriptions-item v-if="detail.rectifyMeasure" label="整改措施" :span="2">
+            <el-descriptions-item
+              v-if="detail.rectifyMeasure"
+              label="整改措施"
+              :span="2"
+            >
               {{ detail.rectifyMeasure }}
             </el-descriptions-item>
-            <el-descriptions-item v-if="detail.reviewOpinion" label="复查意见" :span="2">
+            <el-descriptions-item
+              v-if="detail.reviewOpinion"
+              label="复查意见"
+              :span="2"
+            >
               {{ detail.reviewOpinion }}
             </el-descriptions-item>
-            <el-descriptions-item v-if="detail.archiveOpinion" label="归档意见" :span="2">
+            <el-descriptions-item
+              v-if="detail.archiveOpinion"
+              label="归档意见"
+              :span="2"
+            >
               {{ detail.archiveOpinion }}
             </el-descriptions-item>
-            <el-descriptions-item v-if="detail.rejectReason" label="驳回原因" :span="2">
+            <el-descriptions-item
+              v-if="detail.rejectReason"
+              label="驳回原因"
+              :span="2"
+            >
               {{ detail.rejectReason }}
             </el-descriptions-item>
           </el-descriptions>
@@ -575,10 +665,18 @@ onMounted(async () => {
             >
               受理
             </el-button>
-            <el-button v-if="canDo('RECTIFY')" type="primary" @click="openFlow('rectify')">
+            <el-button
+              v-if="canDo('RECTIFY')"
+              type="primary"
+              @click="openFlow('rectify')"
+            >
               提交整改
             </el-button>
-            <el-button v-if="canDo('REVIEW_PASS')" type="success" @click="openFlow('review', true)">
+            <el-button
+              v-if="canDo('REVIEW_PASS')"
+              type="success"
+              @click="openFlow('review', true)"
+            >
               复查通过
             </el-button>
             <el-button
@@ -588,10 +686,19 @@ onMounted(async () => {
             >
               退回整改
             </el-button>
-            <el-button v-if="canDo('ARCHIVE')" type="success" @click="openFlow('archive')">
+            <el-button
+              v-if="canDo('ARCHIVE')"
+              type="success"
+              @click="openFlow('archive')"
+            >
               归档
             </el-button>
-            <el-button v-if="canDo('REJECT')" type="danger" plain @click="openFlow('reject')">
+            <el-button
+              v-if="canDo('REJECT')"
+              type="danger"
+              plain
+              @click="openFlow('reject')"
+            >
               驳回
             </el-button>
             <el-button
@@ -615,11 +722,14 @@ onMounted(async () => {
               <div class="timeline-title">
                 <strong>{{ log.actionLabel }}</strong>
                 <span class="muted">
-                  {{ log.fromStatus ? `${log.fromStatus} → ` : '' }}{{ log.toStatus }}
+                  {{ log.fromStatus ? `${log.fromStatus} → ` : ''
+                  }}{{ log.toStatus }}
                 </span>
               </div>
               <div class="muted">{{ log.operatorName }}</div>
-              <div v-if="log.remark" class="timeline-remark">{{ log.remark }}</div>
+              <div v-if="log.remark" class="timeline-remark">
+                {{ log.remark }}
+              </div>
             </el-timeline-item>
           </el-timeline>
 
@@ -629,14 +739,24 @@ onMounted(async () => {
             <el-table-column prop="toStatus" label="状态" width="110" />
             <el-table-column label="结果" width="90">
               <template #default="{ row }">
-                <el-tag :type="row.status === 'SUCCESS' ? 'success' : 'danger'" size="small">
+                <el-tag
+                  :type="row.status === 'SUCCESS' ? 'success' : 'danger'"
+                  size="small"
+                >
                   {{ row.status === 'SUCCESS' ? '成功' : '失败' }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="target" label="目标" min-width="150" show-overflow-tooltip />
+            <el-table-column
+              prop="target"
+              label="目标"
+              min-width="150"
+              show-overflow-tooltip
+            />
             <el-table-column label="时间" width="160">
-              <template #default="{ row }">{{ fmtTime(row.createTime) }}</template>
+              <template #default="{ row }">{{
+                fmtTime(row.createTime)
+              }}</template>
             </el-table-column>
           </el-table>
           <el-empty
@@ -707,7 +827,11 @@ onMounted(async () => {
             label="整改措施"
             :rules="[{ required: true, min: 2, message: '请填写整改措施' }]"
           >
-            <el-input v-model="flowForm.rectifyMeasure" type="textarea" :rows="4" />
+            <el-input
+              v-model="flowForm.rectifyMeasure"
+              type="textarea"
+              :rows="4"
+            />
           </el-form-item>
         </template>
 

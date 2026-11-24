@@ -70,7 +70,9 @@ function sanitize(raw: unknown): Partial<ThemeConfig> {
 
   if (src.mode === 'light' || src.mode === 'dark') out.mode = src.mode;
 
-  const primary = normalizeHex(typeof src.primary === 'string' ? src.primary : null);
+  const primary = normalizeHex(
+    typeof src.primary === 'string' ? src.primary : null,
+  );
   if (primary) out.primary = primary;
 
   const fontSize = Number(src.fontSize);
@@ -83,13 +85,17 @@ function sanitize(raw: unknown): Partial<ThemeConfig> {
 
   if (src.navBg === null) out.navBg = null;
   else {
-    const navBg = normalizeHex(typeof src.navBg === 'string' ? src.navBg : null);
+    const navBg = normalizeHex(
+      typeof src.navBg === 'string' ? src.navBg : null,
+    );
     if (navBg) out.navBg = navBg;
   }
 
   if (src.navText === null) out.navText = null;
   else {
-    const navText = normalizeHex(typeof src.navText === 'string' ? src.navText : null);
+    const navText = normalizeHex(
+      typeof src.navText === 'string' ? src.navText : null,
+    );
     if (navText) out.navText = navText;
   }
 
@@ -146,8 +152,8 @@ function applyConfig(cfg: ThemeConfig): void {
   setVar(root, '--el-font-size-base', size + 'px');
   setVar(root, '--el-font-size-small', Math.max(10, size - 2) + 'px');
   setVar(root, '--el-font-size-extra-small', Math.max(10, size - 3) + 'px');
-  setVar(root, '--el-font-size-medium', (size + 2) + 'px');
-  setVar(root, '--el-font-size-large', (size + 4) + 'px');
+  setVar(root, '--el-font-size-medium', size + 2 + 'px');
+  setVar(root, '--el-font-size-large', size + 4 + 'px');
 
   // 菜单变量挂在根上：折叠弹层被 teleport 到 body，只能靠继承
   setVar(root, '--el-menu-bg-color', navBg);

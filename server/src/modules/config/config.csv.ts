@@ -40,7 +40,11 @@ export const CONFIG_CSV_COLUMNS: CsvColumn<Config>[] = [
 ];
 
 export const configImportRowSchema = z.object({
-  configName: z.string().trim().min(1, '参数名称不能为空').max(100, '参数名称不超过 100 字'),
+  configName: z
+    .string()
+    .trim()
+    .min(1, '参数名称不能为空')
+    .max(100, '参数名称不超过 100 字'),
   configKey: z
     .string()
     .trim()

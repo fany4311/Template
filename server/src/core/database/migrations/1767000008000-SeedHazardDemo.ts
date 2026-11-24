@@ -86,9 +86,27 @@ export class SeedHazardDemo1767000008000 implements MigrationInterface {
       xiaoFang,
       'operator',
     );
-    await this.ensureUser(queryRunner, 'manager_bw', '保卫处管理员', baoWei, 'manager');
-    await this.ensureUser(queryRunner, 'manager_xx', '信息中心管理员', xinXi, 'manager');
-    await this.ensureUser(queryRunner, 'auditor_school', '校级审计员', root, 'auditor');
+    await this.ensureUser(
+      queryRunner,
+      'manager_bw',
+      '保卫处管理员',
+      baoWei,
+      'manager',
+    );
+    await this.ensureUser(
+      queryRunner,
+      'manager_xx',
+      '信息中心管理员',
+      xinXi,
+      'manager',
+    );
+    await this.ensureUser(
+      queryRunner,
+      'auditor_school',
+      '校级审计员',
+      root,
+      'auditor',
+    );
 
     // ---------------- 3. 两条对照单据 ----------------
 

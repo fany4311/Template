@@ -7,14 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
-import {
-  Observable,
-  catchError,
-  from,
-  map,
-  mergeMap,
-  throwError,
-} from 'rxjs';
+import { Observable, catchError, from, map, mergeMap, throwError } from 'rxjs';
 import { AUDIT_KEY } from '../constants/decorator.constant.js';
 import type { AuditMetadata } from '../decorators/auditable.decorator.js';
 import { AuditService } from '../../modules/audit/audit.service.js';

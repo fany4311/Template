@@ -20,7 +20,12 @@ export class Menu extends BaseEntity {
   name: string;
 
   /** 类型：M=目录 C=菜单 F=按钮（联合取值，必须显式 varchar） */
-  @Column({ name: 'type', type: 'varchar', length: 1, comment: 'M目录 C菜单 F按钮' })
+  @Column({
+    name: 'type',
+    type: 'varchar',
+    length: 1,
+    comment: 'M目录 C菜单 F按钮',
+  })
   type: MenuType;
 
   @Column({ length: 200, default: '', comment: '路由地址' })

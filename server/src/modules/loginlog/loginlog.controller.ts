@@ -1,9 +1,5 @@
 import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { ApiOkZod, pageOf } from '../../common/swagger/api-ok.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -31,7 +27,11 @@ export class LoginLogController {
   @Get()
   @RequiresPermissions('system:loginlog:list')
   @ApiOperation({ summary: '分页查询登录日志' })
-  @ApiOkZod('SysLoginLogPage', pageOf(loginLogResponseSchema), '登录日志分页结果 { list, total }，按时间倒序')
+  @ApiOkZod(
+    'SysLoginLogPage',
+    pageOf(loginLogResponseSchema),
+    '登录日志分页结果 { list, total }，按时间倒序',
+  )
   page(@Query({ schema: queryLoginLogSchema }) query: QueryLoginLogInput) {
     return this.loginLogService.page(query);
   }

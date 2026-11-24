@@ -109,7 +109,10 @@ export class OutboxPublisher implements OnApplicationShutdown {
     await this.repo.update({ id }, { status: 'sent', sentAt: new Date() });
   }
 
-  private async markFailedOrRetry(row: OutboxEvent, err: unknown): Promise<void> {
+  private async markFailedOrRetry(
+    row: OutboxEvent,
+    err: unknown,
+  ): Promise<void> {
     const retries = row.retries + 1;
     const message = err instanceof Error ? err.message : String(err);
     if (retries >= MAX_RETRIES) {

@@ -44,5 +44,6 @@ export const hazardApi = {
     request.post<HazardItem>(`/hazard/${id}/review`, body),
   archive: (id: number, body: HazardArchiveBody): Promise<HazardItem> =>
     request.post<HazardItem>(`/hazard/${id}/archive`, body),
-  remove: (id: number): Promise<boolean> => request.delete<boolean>(`/hazard/${id}`),
+  remove: (id: number): Promise<boolean> =>
+    request.delete<boolean>(`/hazard/${id}`),
 };

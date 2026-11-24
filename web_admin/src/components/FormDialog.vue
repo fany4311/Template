@@ -1,6 +1,11 @@
 <script lang="ts">
 /** 表单字段：只覆盖通用管理域里真正用到的几种控件 */
-export type FormFieldType = 'input' | 'textarea' | 'number' | 'select' | 'switch';
+export type FormFieldType =
+  | 'input'
+  | 'textarea'
+  | 'number'
+  | 'select'
+  | 'switch';
 
 export interface FormOption {
   label: string;
@@ -77,7 +82,9 @@ function setValue(prop: string, value: unknown): void {
 
 function text(prop: string): string | number | undefined {
   const value = read(prop);
-  return typeof value === 'string' || typeof value === 'number' ? value : undefined;
+  return typeof value === 'string' || typeof value === 'number'
+    ? value
+    : undefined;
 }
 
 function num(prop: string): number | undefined {
@@ -88,7 +95,9 @@ function num(prop: string): number | undefined {
 /** switch 可能是 boolean，也可能是 'Y'/'N'、1/0 —— 统一按「可绑定的原始值」处理 */
 function flag(prop: string): string | number | boolean {
   const value = read(prop);
-  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+  return typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
     ? value
     : false;
 }
@@ -100,14 +109,25 @@ async function handleSubmit(): Promise<void> {
 }
 
 defineExpose<FormDialogExpose>({
-  validate: async () => (await formRef.value?.validate().catch(() => false)) ?? false,
+  validate: async () =>
+    (await formRef.value?.validate().catch(() => false)) ?? false,
 });
 </script>
 
 <template>
   <el-dialog v-model="visible" :title="title" :width="width" destroy-on-close>
-    <el-form ref="formRef" :model="model" :rules="rules" :label-width="labelWidth">
-      <el-form-item v-for="col in columns" :key="col.prop" :label="col.label" :prop="col.prop">
+    <el-form
+      ref="formRef"
+      :model="model"
+      :rules="rules"
+      :label-width="labelWidth"
+    >
+      <el-form-item
+        v-for="col in columns"
+        :key="col.prop"
+        :label="col.label"
+        :prop="col.prop"
+      >
         <template v-if="!col.type || col.type === 'input'">
           <el-input
             :model-value="text(col.prop)"
@@ -171,7 +191,9 @@ defineExpose<FormDialogExpose>({
 
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="saving" @click="handleSubmit">确定</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSubmit"
+        >确定</el-button
+      >
     </template>
   </el-dialog>
 </template>

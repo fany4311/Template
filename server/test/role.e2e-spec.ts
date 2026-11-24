@@ -59,7 +59,11 @@ describe('Role CRUD (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: adminUser.id, roleId: adminRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: adminUser.id,
+        roleId: adminRole.id,
+        source: 'direct',
+      }),
     );
     await userRepo.save(
       userRepo.create({

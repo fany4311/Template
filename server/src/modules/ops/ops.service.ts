@@ -15,7 +15,12 @@ export interface OpsOverview {
   http: ReturnType<MetricsService['summary']>;
   db: { up: boolean; latencyMs: number };
   outbox: { pending: number; failed: number };
-  audit: { total: number; earliest: string | null; latest: string | null; retentionDays: number };
+  audit: {
+    total: number;
+    earliest: string | null;
+    latest: string | null;
+    retentionDays: number;
+  };
 }
 
 /**
@@ -40,7 +45,10 @@ export class OpsService {
   async overview(): Promise<OpsOverview> {
     const memory = process.memoryUsage();
     const db = await this.pingDb();
-    const [outbox, audit] = await Promise.all([this.outboxCounts(), this.auditStats()]);
+    const [outbox, audit] = await Promise.all([
+      this.outboxCounts(),
+      this.auditStats(),
+    ]);
 
     return {
       app: {
@@ -68,14 +76,18 @@ export class OpsService {
 
   private async outboxCounts(): Promise<{ pending: number; failed: number }> {
     try {
-      const rows: Array<{ status: string; c: string | number }> = await this.dataSource.query(
-        'SELECT status, COUNT(*) AS c FROM sys_outbox GROUP BY status',
-      );
+      const rows: Array<{ status: string; c: string | number }> =
+        await this.dataSource.query(
+          'SELECT status, COUNT(*) AS c FROM sys_outbox GROUP BY status',
+        );
       const pick = (status: string): number => {
         const hit = rows.find((r) => r.status === status);
         return hit ? Number(hit.c) : 0;
       };
-      return { pending: pick('pending') + pick('processing'), failed: pick('failed') };
+      return {
+        pending: pick('pending') + pick('processing'),
+        failed: pick('failed'),
+      };
     } catch {
       return { pending: 0, failed: 0 };
     }
@@ -87,10 +99,13 @@ export class OpsService {
     latest: string | null;
   }> {
     try {
-      const rows: Array<{ c: string | number; minT: Date | null; maxT: Date | null }> =
-        await this.dataSource.query(
-          'SELECT COUNT(*) AS c, MIN(create_time) AS minT, MAX(create_time) AS maxT FROM sys_audit_log',
-        );
+      const rows: Array<{
+        c: string | number;
+        minT: Date | null;
+        maxT: Date | null;
+      }> = await this.dataSource.query(
+        'SELECT COUNT(*) AS c, MIN(create_time) AS minT, MAX(create_time) AS maxT FROM sys_audit_log',
+      );
       const row = rows[0];
       return {
         total: row ? Number(row.c) : 0,
@@ -111,7 +126,9 @@ export class OpsService {
       // 未配置是常态
     }
     const env = Number(process.env.AUDIT_RETENTION_DAYS);
-    return Number.isFinite(env) && env > 0 ? Math.floor(env) : DEFAULT_RETENTION_DAYS;
+    return Number.isFinite(env) && env > 0
+      ? Math.floor(env)
+      : DEFAULT_RETENTION_DAYS;
   }
 
   /** 保存留存天数（写 sys_config；按键 upsert，不新增接口） */
@@ -143,7 +160,9 @@ export class OpsService {
    * 为什么分批：一次删 50 万行会长时间持锁、把 binlog 撑爆，期间写接口全被拖慢。
    * 每批 2000 行、最多 100 批（一轮上限 20 万），没删完下一小时 cron 继续。
    */
-  async cleanupAudit(retentionDays?: number): Promise<{ deleted: number; retentionDays: number }> {
+  async cleanupAudit(
+    retentionDays?: number,
+  ): Promise<{ deleted: number; retentionDays: number }> {
     const days = retentionDays ?? (await this.retentionDays());
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     let deleted = 0;
@@ -160,7 +179,13 @@ export class OpsService {
 
     if (deleted > 0) {
       this.logger.log(
-        '审计清理：删除 ' + deleted + ' 条（早于 ' + cutoff.toISOString() + '，留存 ' + days + ' 天）',
+        '审计清理：删除 ' +
+          deleted +
+          ' 条（早于 ' +
+          cutoff.toISOString() +
+          '，留存 ' +
+          days +
+          ' 天）',
       );
     }
     this.metrics.incCounter('audit_cleanup_deleted_total', deleted);
@@ -181,7 +206,10 @@ export class OpsService {
   /** gauge 需要查库，每 5 分钟刷新一次（不在渲染 /metrics 时查库，避免拖慢抓取） */
   @Cron(CronExpression.EVERY_5_MINUTES, { name: 'ops-gauges' })
   async refreshGauges(): Promise<void> {
-    const [outbox, audit] = await Promise.all([this.outboxCounts(), this.auditStats()]);
+    const [outbox, audit] = await Promise.all([
+      this.outboxCounts(),
+      this.auditStats(),
+    ]);
     this.metrics.setGauge('outbox_pending', outbox.pending);
     this.metrics.setGauge('outbox_failed', outbox.failed);
     this.metrics.setGauge('audit_rows_total', audit.total);

@@ -11,7 +11,11 @@ import { menuApi, type MenuCreateBody } from '../../api/menu';
 import type { MenuItem, MenuType } from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 
-const TYPE_LABEL: Record<MenuType, string> = { M: '目录', C: '菜单', F: '按钮' };
+const TYPE_LABEL: Record<MenuType, string> = {
+  M: '目录',
+  C: '菜单',
+  F: '按钮',
+};
 const TYPE_TAG: Record<MenuType, 'primary' | 'success' | 'info'> = {
   M: 'primary',
   C: 'success',
@@ -30,7 +34,12 @@ const columns: TableColumn[] = [
   { prop: 'name', label: '名称', minWidth: 200 },
   { label: '类型', width: 90, slot: 'type' },
   { prop: 'path', label: '路由地址', minWidth: 150 },
-  { prop: 'component', label: '组件路径', minWidth: 160, showOverflowTooltip: true },
+  {
+    prop: 'component',
+    label: '组件路径',
+    minWidth: 160,
+    showOverflowTooltip: true,
+  },
   { prop: 'perms', label: '权限码', minWidth: 170, showOverflowTooltip: true },
   { prop: 'sort', label: '排序', width: 70 },
   { label: '可见', width: 80, slot: 'visible' },
@@ -83,7 +92,8 @@ const rules = computed<FormRules>(() => ({
 
 /** 上级菜单候选：编辑时排除自己与自己的子孙 */
 const parentTreeData = computed<MenuItem[]>(() => {
-  if (dialogMode.value !== 'edit' || editingId.value === null) return tree.value;
+  if (dialogMode.value !== 'edit' || editingId.value === null)
+    return tree.value;
   const excluded = editingId.value;
   const filter = (nodes: MenuItem[]): MenuItem[] =>
     nodes
@@ -183,11 +193,18 @@ onMounted(fetchTree);
           style="width: 200px"
           @keyup.enter="fetchTree"
         />
-        <el-select v-model="query.status" placeholder="状态" clearable style="width: 120px">
+        <el-select
+          v-model="query.status"
+          placeholder="状态"
+          clearable
+          style="width: 120px"
+        >
           <el-option label="正常" :value="1" />
           <el-option label="停用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="fetchTree">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="fetchTree"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="handleReset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button
@@ -215,7 +232,9 @@ onMounted(fetchTree);
           </el-tag>
         </template>
 
-        <template #visible="{ row }">{{ row.visible === 1 ? '显示' : '隐藏' }}</template>
+        <template #visible="{ row }">{{
+          row.visible === 1 ? '显示' : '隐藏'
+        }}</template>
 
         <template #status="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
@@ -284,16 +303,26 @@ onMounted(fetchTree);
           <el-input v-model="form.name" placeholder="如：用户管理" />
         </el-form-item>
         <el-form-item label="路由地址" prop="path">
-          <el-input v-model="form.path" placeholder="如 /system/user（目录也可填 /system）" />
+          <el-input
+            v-model="form.path"
+            placeholder="如 /system/user（目录也可填 /system）"
+          />
         </el-form-item>
-        <el-form-item v-if="form.type === 'C'" label="组件路径" prop="component">
+        <el-form-item
+          v-if="form.type === 'C'"
+          label="组件路径"
+          prop="component"
+        >
           <el-input
             v-model="form.component"
             placeholder="相对 src/views，如 system/UserView（不写 .vue）"
           />
         </el-form-item>
         <el-form-item label="权限码" prop="perms">
-          <el-input v-model="form.perms" placeholder="如 system:user:list（按钮填 system:user:add）" />
+          <el-input
+            v-model="form.perms"
+            placeholder="如 system:user:list（按钮填 system:user:add）"
+          />
           <div class="form-tip">
             为空表示登录即可见；按钮类型（F）只用于权限码，不参与菜单渲染。
           </div>
@@ -305,7 +334,11 @@ onMounted(fetchTree);
           <el-input-number v-model="form.sort" :min="0" :max="9999" />
         </el-form-item>
         <el-form-item label="显示" prop="visible">
-          <el-switch v-model="form.visible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="form.visible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch
@@ -319,7 +352,9 @@ onMounted(fetchTree);
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submitForm">确定</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitForm"
+          >确定</el-button
+        >
       </template>
     </el-dialog>
   </div>

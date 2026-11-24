@@ -121,7 +121,10 @@ export class ConfigService {
     if (query.status !== undefined) {
       qb.andWhere('c.status = :status', { status: query.status });
     }
-    const rows = await qb.orderBy('c.id', 'ASC').limit(CSV_MAX_ROWS + 1).getMany();
+    const rows = await qb
+      .orderBy('c.id', 'ASC')
+      .limit(CSV_MAX_ROWS + 1)
+      .getMany();
     if (rows.length > CSV_MAX_ROWS) {
       throw new ApiException(
         '单次最多导出 ' + CSV_MAX_ROWS + ' 行，请先按关键字或状态缩小范围',
@@ -157,7 +160,9 @@ export class ConfigService {
 
       const row = parsed.data;
       try {
-        const exists = await this.configRepo.findOneBy({ configKey: row.configKey });
+        const exists = await this.configRepo.findOneBy({
+          configKey: row.configKey,
+        });
         if (exists) {
           pushFailure(rowNo, '参数键已存在：' + row.configKey);
           continue;

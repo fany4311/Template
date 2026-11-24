@@ -39,7 +39,11 @@ const fmtTime = (value?: string | null): string =>
 async function reload(): Promise<void> {
   loading.value = true;
   try {
-    files.value = await fileApi.listByBiz(props.bizType, props.bizId, props.bizField);
+    files.value = await fileApi.listByBiz(
+      props.bizType,
+      props.bizId,
+      props.bizField,
+    );
   } catch {
     // 已提示
   } finally {
@@ -79,9 +83,13 @@ async function handleDownload(row: FileBizItem): Promise<void> {
 /** 移除 = 解绑：文件回到 TEMP，由清理任务按过期回收，不在这里物理删 */
 async function handleUnbind(row: FileBizItem): Promise<void> {
   try {
-    await ElMessageBox.confirm(`确认移除附件「${row.file.originalName}」？`, '提示', {
-      type: 'warning',
-    });
+    await ElMessageBox.confirm(
+      `确认移除附件「${row.file.originalName}」？`,
+      '提示',
+      {
+        type: 'warning',
+      },
+    );
   } catch {
     return;
   }
@@ -108,7 +116,13 @@ async function handleUnbind(row: FileBizItem): Promise<void> {
       tip="上传后自动关联到当前记录"
       @uploaded="handleUploaded"
     />
-    <el-table v-loading="loading" :data="files" border size="small" class="biz-files__table">
+    <el-table
+      v-loading="loading"
+      :data="files"
+      border
+      size="small"
+      class="biz-files__table"
+    >
       <el-table-column label="文件名" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">{{ row.file.originalName }}</template>
       </el-table-column>
@@ -116,7 +130,9 @@ async function handleUnbind(row: FileBizItem): Promise<void> {
         <template #default="{ row }">{{ fmtSize(row.file.size) }}</template>
       </el-table-column>
       <el-table-column label="上传时间" width="160">
-        <template #default="{ row }">{{ fmtTime(row.file.createTime) }}</template>
+        <template #default="{ row }">{{
+          fmtTime(row.file.createTime)
+        }}</template>
       </el-table-column>
       <el-table-column label="操作" width="130">
         <template #default="{ row }">
@@ -128,7 +144,12 @@ async function handleUnbind(row: FileBizItem): Promise<void> {
           >
             下载
           </el-button>
-          <el-button :icon="Delete" link type="danger" @click="handleUnbind(row as FileBizItem)">
+          <el-button
+            :icon="Delete"
+            link
+            type="danger"
+            @click="handleUnbind(row as FileBizItem)"
+          >
             移除
           </el-button>
         </template>

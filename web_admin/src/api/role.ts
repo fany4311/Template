@@ -7,7 +7,10 @@ export type RoleUpdateBody = Partial<RoleCreateBody>;
 
 export const roleApi = {
   page: (query: RoleQuery) =>
-    request.get<PageResult<RoleItem>>('/role', query as Record<string, unknown>),
+    request.get<PageResult<RoleItem>>(
+      '/role',
+      query as Record<string, unknown>,
+    ),
   detail: (id: number) => request.get<RoleItem>(`/role/${id}`),
   create: (body: RoleCreateBody) => request.post<RoleItem>('/role', body),
   update: (id: number, body: RoleUpdateBody) =>

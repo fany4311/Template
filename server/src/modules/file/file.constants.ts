@@ -46,18 +46,66 @@ export const TEMP_FILE_TTL_HOURS = 2;
  */
 export const FORBIDDEN_EXTENSIONS: ReadonlySet<string> = new Set([
   // Windows 可执行 / 库 / 安装包
-  'exe', 'dll', 'sys', 'scr', 'com', 'pif', 'cpl', 'msi', 'msp', 'msc',
-  'bat', 'cmd', 'vbs', 'vbe', 'js', 'jse', 'wsf', 'wsh', 'ps1', 'psm1',
-  'hta', 'reg', 'lnk', 'inf',
+  'exe',
+  'dll',
+  'sys',
+  'scr',
+  'com',
+  'pif',
+  'cpl',
+  'msi',
+  'msp',
+  'msc',
+  'bat',
+  'cmd',
+  'vbs',
+  'vbe',
+  'js',
+  'jse',
+  'wsf',
+  'wsh',
+  'ps1',
+  'psm1',
+  'hta',
+  'reg',
+  'lnk',
+  'inf',
   // Linux / Unix 可执行与脚本
-  'sh', 'bash', 'zsh', 'run', 'bin', 'elf', 'so', 'ko',
+  'sh',
+  'bash',
+  'zsh',
+  'run',
+  'bin',
+  'elf',
+  'so',
+  'ko',
   // 跨平台脚本 / 解释器
-  'php', 'php3', 'php4', 'php5', 'phtml', 'py', 'pyc', 'pl', 'rb', 'jar',
-  'class', 'war', 'asp', 'aspx', 'jsp', 'cgi',
+  'php',
+  'php3',
+  'php4',
+  'php5',
+  'phtml',
+  'py',
+  'pyc',
+  'pl',
+  'rb',
+  'jar',
+  'class',
+  'war',
+  'asp',
+  'aspx',
+  'jsp',
+  'cgi',
   // 容器 / 磁盘镜像
-  'iso', 'img', 'vhd', 'vhdx', 'vmdk',
+  'iso',
+  'img',
+  'vhd',
+  'vhdx',
+  'vmdk',
   // 快捷方式式钓鱼
-  'url', 'scf', 'application',
+  'url',
+  'scf',
+  'application',
 ]);
 
 /**
@@ -67,14 +115,33 @@ export const FORBIDDEN_EXTENSIONS: ReadonlySet<string> = new Set([
  */
 export const ALLOWED_EXTENSIONS: ReadonlySet<string> = new Set([
   // 图片
-  'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'webp',
+  'bmp',
   // 文档
-  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-  'txt', 'csv', 'md',
+  'pdf',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'ppt',
+  'pptx',
+  'txt',
+  'csv',
+  'md',
   // 压缩包
-  'zip', 'rar', '7z', 'tar', 'gz',
+  'zip',
+  'rar',
+  '7z',
+  'tar',
+  'gz',
   // 音视频（隐患整改佐证常用）
-  'mp4', 'mp3', 'wav',
+  'mp4',
+  'mp3',
+  'wav',
 ]);
 
 /**
@@ -89,7 +156,9 @@ export const ALLOWED_MIME_PATTERN =
 
 /** 依赖 fallbackToMimetype 的文本类扩展名（Magic Number 检测不到） */
 export const TEXT_EXTENSIONS: ReadonlySet<string> = new Set([
-  'txt', 'csv', 'md',
+  'txt',
+  'csv',
+  'md',
 ]);
 
 /**

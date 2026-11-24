@@ -29,5 +29,6 @@ export const menuApi = {
     request.post<MenuItem>('/menu', body),
   update: (id: number, body: Partial<MenuCreateBody>): Promise<MenuItem> =>
     request.put<MenuItem>(`/menu/${id}`, body),
-  remove: (id: number): Promise<boolean> => request.delete<boolean>(`/menu/${id}`),
+  remove: (id: number): Promise<boolean> =>
+    request.delete<boolean>(`/menu/${id}`),
 };

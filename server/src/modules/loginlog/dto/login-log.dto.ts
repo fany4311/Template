@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { filterStatus, filterString, paginationSchema } from '../../../common/dto/pagination.dto.js';
+import {
+  filterStatus,
+  filterString,
+  paginationSchema,
+} from '../../../common/dto/pagination.dto.js';
 
 /**
  * 查询登录日志（分页 + 账号模糊 + 结果）。

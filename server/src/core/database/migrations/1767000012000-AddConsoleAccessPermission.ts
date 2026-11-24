@@ -23,9 +23,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *
  * 幂等：`NOT LIKE '%console:access%'` + 只在缺的时候追加，重复执行无副作用。
  */
-export class AddConsoleAccessPermission1767000012000
-  implements MigrationInterface
-{
+export class AddConsoleAccessPermission1767000012000 implements MigrationInterface {
   name = 'AddConsoleAccessPermission1767000012000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -40,10 +38,10 @@ export class AddConsoleAccessPermission1767000012000
     if (current.split(',').includes('console:access')) return;
 
     const next = current ? `${current},console:access` : 'console:access';
-    await queryRunner.query(`UPDATE sys_role SET permissions = ? WHERE id = ?`, [
-      next,
-      rows[0].id,
-    ]);
+    await queryRunner.query(
+      `UPDATE sys_role SET permissions = ? WHERE id = ?`,
+      [next, rows[0].id],
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -60,9 +58,9 @@ export class AddConsoleAccessPermission1767000012000
       .filter((p) => p && p !== 'console:access')
       .join(',');
 
-    await queryRunner.query(`UPDATE sys_role SET permissions = ? WHERE id = ?`, [
-      next,
-      rows[0].id,
-    ]);
+    await queryRunner.query(
+      `UPDATE sys_role SET permissions = ? WHERE id = ?`,
+      [next, rows[0].id],
+    );
   }
 }

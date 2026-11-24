@@ -75,7 +75,11 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       .post(`${prefix}/hazard`)
       .set(auth(token))
       .set(idem())
-      .send({ title: `${tag} 标题`, content: '这是一条用于端到端测试的隐患描述', ...body })
+      .send({
+        title: `${tag} 标题`,
+        content: '这是一条用于端到端测试的隐患描述',
+        ...body,
+      })
       .expect(200);
   }
 
@@ -143,8 +147,10 @@ describe('Hazard 隐患闭环 (e2e)', () => {
 
     // 演示数据里的部门由迁移按名称创建，id 因环境而异，这里按名称/层级解析
     const deptRepo = ds.getRepository(Dept);
-    rootDeptId = (await deptRepo.findOne({ where: { parentId: IsNull() } }))?.id ?? 0;
-    infoDeptId = (await deptRepo.findOne({ where: { name: '信息中心' } }))?.id ?? 0;
+    rootDeptId =
+      (await deptRepo.findOne({ where: { parentId: IsNull() } }))?.id ?? 0;
+    infoDeptId =
+      (await deptRepo.findOne({ where: { name: '信息中心' } }))?.id ?? 0;
     expect(rootDeptId).toBeGreaterThan(0);
     expect(infoDeptId).toBeGreaterThan(0);
   });
@@ -169,7 +175,11 @@ describe('Hazard 隐患闭环 (e2e)', () => {
     );
     await ds
       .getRepository(UserRole)
-      .save(ds.getRepository(UserRole).create({ userId: user.id, roleId, source: 'direct' }));
+      .save(
+        ds
+          .getRepository(UserRole)
+          .create({ userId: user.id, roleId, source: 'direct' }),
+      );
     return login(username, 'pass1234');
   }
 
@@ -341,9 +351,14 @@ describe('Hazard 隐患闭环 (e2e)', () => {
   describe('状态机', () => {
     it('未受理不能直接整改', async () => {
       const created = await report(operator, { scope: 'DEPT' });
-      const res = await flow(managerBw, created.body.data.id as number, 'rectify', {
-        rectifyMeasure: '试图跳过受理直接整改',
-      });
+      const res = await flow(
+        managerBw,
+        created.body.data.id as number,
+        'rectify',
+        {
+          rectifyMeasure: '试图跳过受理直接整改',
+        },
+      );
       expect(res.body.code).not.toBe(200);
       expect(res.body.msg).toContain('不允许执行');
     });
@@ -362,7 +377,9 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       const created = await report(operator, { scope: 'DEPT' });
       const id = created.body.data.id as number;
 
-      const rejected = await flow(managerBw, id, 'reject', { reason: '重复上报' });
+      const rejected = await flow(managerBw, id, 'reject', {
+        reason: '重复上报',
+      });
       expect(rejected.body.data.status).toBe('REJECTED');
       expect(rejected.body.data.availableActions).toEqual([]);
 
@@ -375,9 +392,14 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       const created = await report(operator, { scope: 'DEPT' });
       expect(created.body.data.availableActions).toEqual(['ACCEPT', 'REJECT']);
 
-      const accepted = await flow(managerBw, created.body.data.id as number, 'accept', {
-        rectifyDeadline: new Date(Date.now() + 86400000).toISOString(),
-      });
+      const accepted = await flow(
+        managerBw,
+        created.body.data.id as number,
+        'accept',
+        {
+          rectifyDeadline: new Date(Date.now() + 86400000).toISOString(),
+        },
+      );
       expect(accepted.body.data.availableActions).toEqual([
         'REJECT',
         'RECTIFY',
@@ -393,15 +415,25 @@ describe('Hazard 隐患闭环 (e2e)', () => {
   describe('权限分层（RBAC 权限码 + CASL 动作）', () => {
     it('业务员无受理权限码 → 403', async () => {
       const created = await report(operator, { scope: 'DEPT' });
-      const res = await flow(operator, created.body.data.id as number, 'accept', {});
+      const res = await flow(
+        operator,
+        created.body.data.id as number,
+        'accept',
+        {},
+      );
       expect(res.body.code).toBe(403);
     });
 
     it('审计员无整改权限码 → 403', async () => {
       const created = await report(operator, { scope: 'DEPT' });
-      const res = await flow(auditor, created.body.data.id as number, 'rectify', {
-        rectifyMeasure: '审计员试图整改',
-      });
+      const res = await flow(
+        auditor,
+        created.body.data.id as number,
+        'rectify',
+        {
+          rectifyMeasure: '审计员试图整改',
+        },
+      );
       expect(res.body.code).toBe(403);
     });
 
@@ -475,7 +507,9 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       expect(back.body.data.rectifyMeasure).toBeNull();
 
       // 重新整改 → 复查通过
-      await flow(managerBw, id, 'rectify', { rectifyMeasure: '已重新施工并留存影像' });
+      await flow(managerBw, id, 'rectify', {
+        rectifyMeasure: '已重新施工并留存影像',
+      });
       const passed = await flow(admin, id, 'review', {
         passed: true,
         opinion: '现场复核通过',
@@ -484,7 +518,9 @@ describe('Hazard 隐患闭环 (e2e)', () => {
       expect(passed.body.data.reviewTime).toBeTruthy();
 
       // 归档（审计员）
-      const archived = await flow(auditor, id, 'archive', { opinion: '材料齐全，予以归档' });
+      const archived = await flow(auditor, id, 'archive', {
+        opinion: '材料齐全，予以归档',
+      });
       expect(archived.body.data.status).toBe('ARCHIVED');
       expect(archived.body.data.archiveTime).toBeTruthy();
       expect(archived.body.data.availableActions).toEqual([]);

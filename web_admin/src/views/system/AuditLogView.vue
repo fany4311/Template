@@ -24,7 +24,10 @@ type Query = {
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
 
-const { query, rows, total, loading, reload, search, reset } = useCrud<AuditLogItem, Query>({
+const { query, rows, total, loading, reload, search, reset } = useCrud<
+  AuditLogItem,
+  Query
+>({
   api: {
     page: (q) =>
       auditLogApi.page({
@@ -102,7 +105,12 @@ const prettyDetail = (): string => {
           style="width: 220px"
           @keyup.enter="search"
         />
-        <el-select v-model="query.result" placeholder="结果" clearable style="width: 110px">
+        <el-select
+          v-model="query.result"
+          placeholder="结果"
+          clearable
+          style="width: 110px"
+        >
           <el-option label="成功" value="success" />
           <el-option label="失败" value="fail" />
         </el-select>
@@ -114,7 +122,9 @@ const prettyDetail = (): string => {
           end-placeholder="结束时间"
           style="width: 360px"
         />
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
       </div>
 
@@ -128,7 +138,10 @@ const prettyDetail = (): string => {
         @change="reload"
       >
         <template #result="{ row }">
-          <el-tag :type="row.result === 'success' ? 'success' : 'danger'" size="small">
+          <el-tag
+            :type="row.result === 'success' ? 'success' : 'danger'"
+            size="small"
+          >
             {{ row.result === 'success' ? '成功' : '失败' }}
           </el-tag>
         </template>
@@ -139,7 +152,11 @@ const prettyDetail = (): string => {
 
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row as AuditLogItem)">
+            <el-button
+              link
+              type="primary"
+              @click="openDetail(row as AuditLogItem)"
+            >
               详情
             </el-button>
           </template>
@@ -151,11 +168,15 @@ const prettyDetail = (): string => {
       <el-skeleton v-if="detailLoading" :rows="8" animated />
       <el-descriptions v-else-if="detail" :column="1" border size="small">
         <el-descriptions-item label="ID">{{ detail.id }}</el-descriptions-item>
-        <el-descriptions-item label="追踪ID">{{ detail.traceId || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="追踪ID">{{
+          detail.traceId || '-'
+        }}</el-descriptions-item>
         <el-descriptions-item label="操作人">
           {{ detail.actorName || '-' }}（{{ detail.actorId ?? '-' }}）
         </el-descriptions-item>
-        <el-descriptions-item label="动作">{{ detail.action }}</el-descriptions-item>
+        <el-descriptions-item label="动作">{{
+          detail.action
+        }}</el-descriptions-item>
         <el-descriptions-item label="资源">
           {{ detail.resourceType || '-' }} / {{ detail.resourceId || '-' }}
         </el-descriptions-item>
@@ -166,12 +187,18 @@ const prettyDetail = (): string => {
         <el-descriptions-item label="请求">
           {{ detail.method }} {{ detail.path }}
         </el-descriptions-item>
-        <el-descriptions-item label="IP">{{ detail.ip || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="IP">{{
+          detail.ip || '-'
+        }}</el-descriptions-item>
         <el-descriptions-item label="User-Agent">
           {{ detail.userAgent || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item label="耗时">{{ detail.durationMs ?? '-' }} ms</el-descriptions-item>
-        <el-descriptions-item label="时间">{{ fmtTime(detail.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="耗时"
+          >{{ detail.durationMs ?? '-' }} ms</el-descriptions-item
+        >
+        <el-descriptions-item label="时间">{{
+          fmtTime(detail.createTime)
+        }}</el-descriptions-item>
         <el-descriptions-item label="详情">
           <pre class="detail-json">{{ prettyDetail() }}</pre>
         </el-descriptions-item>

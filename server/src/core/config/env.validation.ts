@@ -39,7 +39,9 @@ export const envValidationSchema = z
   .object({
     NODE_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
     PORT: z.coerce.number().int().min(0).max(65535).default(3000),
-    DB_TYPE: z.enum(['mysql', 'mariadb', 'postgres', 'sqlite']).default('mysql'),
+    DB_TYPE: z
+      .enum(['mysql', 'mariadb', 'postgres', 'sqlite'])
+      .default('mysql'),
 
     // 认证密钥：全环境最低 16 字符；prod 另有更严要求（见下方 superRefine）
     JWT_SECRET: z

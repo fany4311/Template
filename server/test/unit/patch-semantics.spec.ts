@@ -12,7 +12,9 @@ describe('PATCH 语义：未传字段不得被默认值污染', () => {
     expect(out).toEqual({ name: '改名' });
   });
   it('role: 显式传空数组视为有意清空', () => {
-    expect(updateRoleSchema.parse({ permissions: [] })).toEqual({ permissions: [] });
+    expect(updateRoleSchema.parse({ permissions: [] })).toEqual({
+      permissions: [],
+    });
   });
   it('role: 权限码格式校验在 update 下依然生效', () => {
     expect(() => updateRoleSchema.parse({ permissions: ['*:*:*'] })).toThrow();

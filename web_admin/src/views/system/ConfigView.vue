@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Download, Plus, Refresh, Search, Upload } from '@element-plus/icons-vue';
+import {
+  Download,
+  Plus,
+  Refresh,
+  Search,
+  Upload,
+} from '@element-plus/icons-vue';
 import { ElMessage, type FormRules } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { configApi, type ConfigCreateBody } from '../../api/config';
@@ -41,8 +47,18 @@ const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
 const columns: TableColumn[] = [
   { prop: 'id', label: 'ID', width: 70 },
   { prop: 'configName', label: '参数名称', minWidth: 150 },
-  { prop: 'configKey', label: '参数键', minWidth: 180, showOverflowTooltip: true },
-  { prop: 'configValue', label: '参数值', minWidth: 180, showOverflowTooltip: true },
+  {
+    prop: 'configKey',
+    label: '参数键',
+    minWidth: 180,
+    showOverflowTooltip: true,
+  },
+  {
+    prop: 'configValue',
+    label: '参数值',
+    minWidth: 180,
+    showOverflowTooltip: true,
+  },
   { label: '类型', width: 100, slot: 'type' },
   { label: '状态', width: 80, slot: 'status' },
   { prop: 'remark', label: '备注', minWidth: 140, showOverflowTooltip: true },
@@ -186,11 +202,18 @@ async function submitForm(): Promise<void> {
           style="width: 200px"
           @keyup.enter="search"
         />
-        <el-select v-model="query.status" placeholder="状态" clearable style="width: 120px">
+        <el-select
+          v-model="query.status"
+          placeholder="状态"
+          clearable
+          style="width: 120px"
+        >
           <el-option label="正常" :value="1" />
           <el-option label="停用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button
@@ -229,7 +252,10 @@ async function submitForm(): Promise<void> {
         @change="reload"
       >
         <template #type="{ row }">
-          <el-tag :type="row.configType === 'Y' ? 'warning' : 'info'" size="small">
+          <el-tag
+            :type="row.configType === 'Y' ? 'warning' : 'info'"
+            size="small"
+          >
             {{ row.configType === 'Y' ? '系统内置' : '自定义' }}
           </el-tag>
         </template>
@@ -257,7 +283,9 @@ async function submitForm(): Promise<void> {
               content="系统内置参数不可删除"
               placement="top"
             >
-              <span><el-button link type="danger" disabled>删除</el-button></span>
+              <span
+                ><el-button link type="danger" disabled>删除</el-button></span
+              >
             </el-tooltip>
             <el-button
               v-else

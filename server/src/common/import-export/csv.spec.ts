@@ -29,7 +29,13 @@ const columns: CsvColumn<Row>[] = [
 
 describe('encodeCsv', () => {
   it('带 BOM 与 CRLF，逗号/引号/换行会被转义', () => {
-    const csv = encodeCsv(['a', 'b'], [['x,1', 'he said "hi"'], ['line\nbreak', ' y ']]);
+    const csv = encodeCsv(
+      ['a', 'b'],
+      [
+        ['x,1', 'he said "hi"'],
+        ['line\nbreak', ' y '],
+      ],
+    );
     expect(csv.startsWith('\uFEFF')).toBe(true);
     expect(csv).toContain('\r\n');
     expect(csv).toContain('"x,1"');
@@ -40,8 +46,14 @@ describe('encodeCsv', () => {
 
 describe('decodeCsv', () => {
   it('往返一致（含引号、逗号、换行）', () => {
-    const rows = [['a,b', 'c"d'], ['e\nf', 'g']];
-    expect(decodeCsv(encodeCsv(['h1', 'h2'], rows))).toEqual([['h1', 'h2'], ...rows]);
+    const rows = [
+      ['a,b', 'c"d'],
+      ['e\nf', 'g'],
+    ];
+    expect(decodeCsv(encodeCsv(['h1', 'h2'], rows))).toEqual([
+      ['h1', 'h2'],
+      ...rows,
+    ]);
   });
 
   it('兼容 LF 与结尾空行', () => {
@@ -76,7 +88,9 @@ describe('readRows', () => {
 
   it('超过上限报错', () => {
     const line = '1,n1,正常,r';
-    const text = 'ID,名称,状态,备注\n' + Array.from({ length: CSV_MAX_ROWS + 1 }, () => line).join('\n');
+    const text =
+      'ID,名称,状态,备注\n' +
+      Array.from({ length: CSV_MAX_ROWS + 1 }, () => line).join('\n');
     expect(() => readRows(text, columns)).toThrow(/最多导入/);
   });
 });

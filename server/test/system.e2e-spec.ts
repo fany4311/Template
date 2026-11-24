@@ -80,7 +80,11 @@ describe('System management (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: adminUser.id, roleId: adminRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: adminUser.id,
+        roleId: adminRole.id,
+        source: 'direct',
+      }),
     );
     adminToken = await login(`${tag}_admin`);
 
@@ -183,7 +187,10 @@ describe('System management (e2e)', () => {
       expect(child.body.data.ancestors).toBe(`0,${dir.body.data.id as number}`);
       menuId = child.body.data.id as number;
 
-      const tree = await api().get(`${prefix}/menu/tree`).set(auth()).expect(200);
+      const tree = await api()
+        .get(`${prefix}/menu/tree`)
+        .set(auth())
+        .expect(200);
       const names = JSON.stringify(tree.body.data);
       expect(names).toContain(menuName);
     });
@@ -248,8 +255,13 @@ describe('System management (e2e)', () => {
     });
 
     it('存在下级时禁止删除；删完下级后可删', async () => {
-      const tree = await api().get(`${prefix}/menu/tree`).set(auth()).expect(200);
-      const parent = (tree.body.data as Menu[]).find((m) => m.name === menuName);
+      const tree = await api()
+        .get(`${prefix}/menu/tree`)
+        .set(auth())
+        .expect(200);
+      const parent = (tree.body.data as Menu[]).find(
+        (m) => m.name === menuName,
+      );
       expect(parent).toBeDefined();
       const parentId = parent?.id ?? 0;
 
@@ -369,7 +381,12 @@ describe('System management (e2e)', () => {
         .post(`${prefix}/config`)
         .set(auth())
         .set(idem())
-        .send({ configName: '内置', configKey: `${configKey}.sys`, configValue: 'x', configType: 'Y' })
+        .send({
+          configName: '内置',
+          configKey: `${configKey}.sys`,
+          configValue: 'x',
+          configType: 'Y',
+        })
         .expect(200);
       const res = await api()
         .delete(`${prefix}/config/${created.body.data.id as number}`)

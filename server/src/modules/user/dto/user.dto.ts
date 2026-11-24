@@ -29,7 +29,9 @@ export const createUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 /** 更新用户：所有字段可选，密码不更新（另设改密接口） */
-export const updateUserSchema = updateSchemaOf(createUserSchema.omit({ password: true }));
+export const updateUserSchema = updateSchemaOf(
+  createUserSchema.omit({ password: true }),
+);
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 

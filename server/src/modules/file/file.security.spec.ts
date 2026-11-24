@@ -74,7 +74,9 @@ describe('文件安全：文件名处理', () => {
   });
 
   it('文本内容黑名单只命中脚本特征', () => {
-    expect(matchTextBlocklist(Buffer.from('#!/bin/sh\nrm -rf /\n'))).not.toBeNull();
+    expect(
+      matchTextBlocklist(Buffer.from('#!/bin/sh\nrm -rf /\n')),
+    ).not.toBeNull();
     expect(matchTextBlocklist(Buffer.from('<?php echo 1;'))).not.toBeNull();
     expect(matchTextBlocklist(Buffer.from('sku,name\n1,foo\n'))).toBeNull();
     expect(matchTextBlocklist(Buffer.alloc(0))).toBeNull();
@@ -102,7 +104,9 @@ describe('文件安全：校验器', () => {
 
     // 无法识别的字节 → fail-closed
     expect(
-      await v.isValid(fakeFile('a.png', Buffer.from('not-a-real-png'), 'image/png')),
+      await v.isValid(
+        fakeFile('a.png', Buffer.from('not-a-real-png'), 'image/png'),
+      ),
     ).toBe(false);
   });
 
@@ -110,13 +114,19 @@ describe('文件安全：校验器', () => {
     const v = new FileContentTypeValidator();
 
     // curl 常把 csv 声明成 octet-stream，仍应通过并规范化 MIME
-    const csv = fakeFile('a.csv', Buffer.from('sku,name\n1,foo\n'), 'application/octet-stream');
+    const csv = fakeFile(
+      'a.csv',
+      Buffer.from('sku,name\n1,foo\n'),
+      'application/octet-stream',
+    );
     expect(await v.isValid(csv)).toBe(true);
     expect(csv.mimetype).toBe('text/csv');
 
     // 脚本改名 .txt 必须拒
     expect(
-      await v.isValid(fakeFile('a.txt', Buffer.from('#!/bin/sh\nrm -rf /'), 'text/plain')),
+      await v.isValid(
+        fakeFile('a.txt', Buffer.from('#!/bin/sh\nrm -rf /'), 'text/plain'),
+      ),
     ).toBe(false);
   });
 });

@@ -99,7 +99,10 @@ export class FileController {
       required: ['file'],
       properties: {
         file: { type: 'string', format: 'binary' },
-        bizType: { type: 'string', description: '业务类型（可选，用于收紧收件策略）' },
+        bizType: {
+          type: 'string',
+          description: '业务类型（可选，用于收紧收件策略）',
+        },
         bizId: { type: 'string', description: '业务对象 id（可选）' },
         bizField: { type: 'string', description: '附件用途（可选）' },
       },
@@ -108,7 +111,11 @@ export class FileController {
   @ApiOperation({
     summary: '上传文件（服务端判定类型、内容寻址去重、可选立即绑定）',
   })
-  @ApiOkZod('FileUploadResult', uploadResultSchema, '上传结果 { file, deduped }')
+  @ApiOkZod(
+    'FileUploadResult',
+    uploadResultSchema,
+    '上传结果 { file, deduped }',
+  )
   @Auditable({ action: 'system:file:upload', resourceType: 'file' })
   async upload(
     @UploadedFile(
@@ -164,7 +171,10 @@ export class FileController {
   @ApiOperation({ summary: '把已上传文件绑定到业务对象（重复绑定幂等）' })
   @ApiOkZod('FileBindResult', bindResultSchema, '绑定结果 { bound, skipped }')
   @Auditable({ action: 'system:file:bind', resourceType: 'file' })
-  bind(@Body({ schema: bindFilesSchema }) dto: BindFilesInput, @User() user: JwtUser) {
+  bind(
+    @Body({ schema: bindFilesSchema }) dto: BindFilesInput,
+    @User() user: JwtUser,
+  ) {
     return this.fileService.bind(dto, user);
   }
 
@@ -188,7 +198,11 @@ export class FileController {
   @Get()
   @RequiresPermissions(FILE_PERMISSIONS.LIST)
   @ApiOperation({ summary: '分页查询文件（管理端）' })
-  @ApiOkZod('FilePage', pageOf(fileResponseSchema), '文件分页结果 { list, total }')
+  @ApiOkZod(
+    'FilePage',
+    pageOf(fileResponseSchema),
+    '文件分页结果 { list, total }',
+  )
   async page(@Query({ schema: queryFileSchema }) query: QueryFileInput) {
     const { list, total } = await this.fileService.page(query);
     return { list: list.map(toFileView), total };
@@ -197,10 +211,7 @@ export class FileController {
   @Get(':id')
   @ApiOperation({ summary: '文件详情（含绑定关系）' })
   @ApiOkZod('FileDetail', fileDetailResponseSchema, '文件详情 { file, links }')
-  async detail(
-    @Param('id', ParseIntPipe) id: number,
-    @User() user: JwtUser,
-  ) {
+  async detail(@Param('id', ParseIntPipe) id: number, @User() user: JwtUser) {
     const { file, links } = await this.fileService.detail(id, user);
     return { file: toFileView(file), links: links.map(toLinkView) };
   }

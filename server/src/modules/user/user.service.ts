@@ -77,9 +77,14 @@ export class UserService {
       qb.andWhere('u.deptId = :deptId', { deptId: query.deptId });
     }
 
-    const rows = await qb.orderBy('u.id', 'ASC').limit(CSV_MAX_ROWS + 1).getMany();
+    const rows = await qb
+      .orderBy('u.id', 'ASC')
+      .limit(CSV_MAX_ROWS + 1)
+      .getMany();
     if (rows.length > CSV_MAX_ROWS) {
-      throw new ApiException('单次最多导出 ' + CSV_MAX_ROWS + ' 条，请先按关键字或部门缩小范围');
+      throw new ApiException(
+        '单次最多导出 ' + CSV_MAX_ROWS + ' 条，请先按关键字或部门缩小范围',
+      );
     }
     return rows;
   }
@@ -114,7 +119,9 @@ export class UserService {
 
       try {
         // 先判重：账号已存在时，提示"密码不够"会把人带偏
-        const exists = await this.userRepo.findOneBy({ username: row.username });
+        const exists = await this.userRepo.findOneBy({
+          username: row.username,
+        });
         if (exists) {
           pushFailure(rowNo, '账号已存在：' + row.username);
           continue;
@@ -122,7 +129,10 @@ export class UserService {
 
         const plain = row.initialPassword || fallbackPassword;
         if (!plain || plain.length < 8) {
-          pushFailure(rowNo, '缺少初始密码（至少 8 位），且参数 sys.user.initPassword 未配置');
+          pushFailure(
+            rowNo,
+            '缺少初始密码（至少 8 位），且参数 sys.user.initPassword 未配置',
+          );
           continue;
         }
 
@@ -280,7 +290,9 @@ export class UserService {
       const exists = await userRepo.findOneBy({ username: dto.username });
       if (exists) throw new ApiException(MSG_USER_EXISTS);
 
-      const created = await userRepo.save(userRepo.create({ ...rest, password }));
+      const created = await userRepo.save(
+        userRepo.create({ ...rest, password }),
+      );
       if (roleIds?.length) {
         const urRepo = this.txHost.tx.getRepository(UserRole);
         await urRepo.save(

@@ -39,7 +39,9 @@ function toRgb(hex: string): [number, number, number] {
 
 function toHex(r: number, g: number, b: number): string {
   const part = (n: number): string =>
-    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+    Math.max(0, Math.min(255, Math.round(n)))
+      .toString(16)
+      .padStart(2, '0');
   return '#' + part(r) + part(g) + part(b);
 }
 
@@ -51,11 +53,7 @@ export function mixHex(base: string, toward: string, weight: number): string {
   const [r1, g1, b1] = toRgb(base);
   const [r2, g2, b2] = toRgb(toward);
   const w = Math.max(0, Math.min(1, weight));
-  return toHex(
-    r1 + (r2 - r1) * w,
-    g1 + (g2 - g1) * w,
-    b1 + (b2 - b1) * w,
-  );
+  return toHex(r1 + (r2 - r1) * w, g1 + (g2 - g1) * w, b1 + (b2 - b1) * w);
 }
 
 /** 转成 rgba()，用于半透明悬停底色（比再算一个实色更稳） */

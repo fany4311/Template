@@ -7,11 +7,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -51,7 +47,11 @@ export class AuthController {
   @Public()
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: '获取图形验证码' })
-  @ApiOkZod('CaptchaResult', captchaResponseSchema, '返回 { img: svg, uuid }，登录时回传 uuid+code')
+  @ApiOkZod(
+    'CaptchaResult',
+    captchaResponseSchema,
+    '返回 { img: svg, uuid }，登录时回传 uuid+code',
+  )
   captcha() {
     return this.authService.createCaptcha();
   }
@@ -85,7 +85,11 @@ export class AuthController {
 
   @Get('profile')
   @ApiOperation({ summary: '当前登录用户信息（含角色/权限）' })
-  @ApiOkZod('Profile', profileResponseSchema, '当前用户信息（含角色/权限/数据范围）')
+  @ApiOkZod(
+    'Profile',
+    profileResponseSchema,
+    '当前用户信息（含角色/权限/数据范围）',
+  )
   profile(@User() user: JwtUser) {
     return this.authService.getInfo(user);
   }

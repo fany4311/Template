@@ -45,7 +45,11 @@ export const USER_IMPORT_COLUMNS: CsvColumn<UserImportRow>[] = [
 ];
 
 export const userImportRowSchema = z.object({
-  username: z.string().trim().min(2, '账号至少 2 位').max(50, '账号不超过 50 位'),
+  username: z
+    .string()
+    .trim()
+    .min(2, '账号至少 2 位')
+    .max(50, '账号不超过 50 位'),
   nickname: z.string().trim().max(50, '昵称不超过 50 位').default(''),
   deptName: z.string().trim().max(100).default(''),
   phone: z.string().trim().max(20, '手机号不超过 20 位').default(''),

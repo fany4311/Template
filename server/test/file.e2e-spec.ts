@@ -40,7 +40,10 @@ describe('File 文件与附件 (e2e)', () => {
     'base64',
   );
   /** MZ 头：典型 Windows 可执行文件 */
-  const MZ = Buffer.concat([Buffer.from([0x4d, 0x5a, 0x90, 0x00]), Buffer.alloc(256)]);
+  const MZ = Buffer.concat([
+    Buffer.from([0x4d, 0x5a, 0x90, 0x00]),
+    Buffer.alloc(256),
+  ]);
 
   /** 本 spec 创建过的用户 id（清理文件行时用，避免留下孤儿元数据） */
   const createdUserIds: number[] = [];
@@ -54,7 +57,9 @@ describe('File 文件与附件 (e2e)', () => {
   const idem = () => ({ 'Idempotency-Key': `${tag}-${Math.random()}` });
 
   async function login(username: string, password: string): Promise<string> {
-    const res = await api().post(`${prefix}/auth/login`).send({ username, password });
+    const res = await api()
+      .post(`${prefix}/auth/login`)
+      .send({ username, password });
     expect(res.body.code, `登录失败: ${username} ${res.body.msg}`).toBe(200);
     return res.body.data.token as string;
   }
@@ -66,18 +71,35 @@ describe('File 文件与附件 (e2e)', () => {
   ): Promise<{ token: string; id: number }> {
     const userRepo = ds.getRepository(User);
     const user = await userRepo.save(
-      userRepo.create({ username, password: await hash('pass1234'), deptId, status: 1 }),
+      userRepo.create({
+        username,
+        password: await hash('pass1234'),
+        deptId,
+        status: 1,
+      }),
     );
     await ds
       .getRepository(UserRole)
-      .save(ds.getRepository(UserRole).create({ userId: user.id, roleId, source: 'direct' }));
+      .save(
+        ds
+          .getRepository(UserRole)
+          .create({ userId: user.id, roleId, source: 'direct' }),
+      );
     createdUserIds.push(user.id);
     return { token: await login(username, 'pass1234'), id: user.id };
   }
 
   /** 上传（默认 PNG） */
-  function upload(token: string, buffer: Buffer, filename: string, fields: Record<string, string> = {}) {
-    const req = api().post(`${prefix}/file`).set(auth(token)).attach('file', buffer, filename);
+  function upload(
+    token: string,
+    buffer: Buffer,
+    filename: string,
+    fields: Record<string, string> = {},
+  ) {
+    const req = api()
+      .post(`${prefix}/file`)
+      .set(auth(token))
+      .attach('file', buffer, filename);
     for (const [k, v] of Object.entries(fields)) req.field(k, v);
     return req;
   }
@@ -117,7 +139,11 @@ describe('File 文件与附件 (e2e)', () => {
     });
     owner = (await createUserWithRole(`${tag}_owner`, userRole.id, 31)).token;
 
-    const strangerUser = await createUserWithRole(`${tag}_stranger`, userRole.id, 30);
+    const strangerUser = await createUserWithRole(
+      `${tag}_stranger`,
+      userRole.id,
+      30,
+    );
     stranger = strangerUser.token;
   });
 
@@ -154,7 +180,9 @@ describe('File 文件与附件 (e2e)', () => {
         { p: `${tag}%` },
       )
       .execute();
-    await ds.getRepository(User).delete({ username: In([`${tag}_mgr`, `${tag}_owner`, `${tag}_stranger`]) });
+    await ds.getRepository(User).delete({
+      username: In([`${tag}_mgr`, `${tag}_owner`, `${tag}_stranger`]),
+    });
     await ds
       .getRepository(Role)
       .delete({ roleName: In([`${tag}_文件管理员`, `${tag}_普通用户`]) });
@@ -194,17 +222,28 @@ describe('File 文件与附件 (e2e)', () => {
     });
 
     it('CSV 不看客户端 MIME，按内容规范化成 text/csv', async () => {
-      const res = await upload(owner, Buffer.from('sku,name\n1,foo\n'), `${tag}-data.csv`).expect(200);
+      const res = await upload(
+        owner,
+        Buffer.from('sku,name\n1,foo\n'),
+        `${tag}-data.csv`,
+      ).expect(200);
       expect(res.body.data.file.mime).toBe('text/csv');
     });
 
     it('脚本改名 .txt 被内容特征拦下', async () => {
-      const res = await upload(owner, Buffer.from('#!/bin/sh\nrm -rf /\n'), `${tag}-x.txt`).expect(400);
+      const res = await upload(
+        owner,
+        Buffer.from('#!/bin/sh\nrm -rf /\n'),
+        `${tag}-x.txt`,
+      ).expect(400);
       expect(res.body.code).toBe(400);
     });
 
     it('空请求体报错而不是写一条空记录', async () => {
-      const res = await api().post(`${prefix}/file`).set(auth(owner)).expect(400);
+      const res = await api()
+        .post(`${prefix}/file`)
+        .set(auth(owner))
+        .expect(400);
       expect(res.body.code).toBe(400);
     });
   });
@@ -233,7 +272,12 @@ describe('File 文件与附件 (e2e)', () => {
         .post(`${prefix}/file/bind`)
         .set(auth(mgr))
         .set(idem())
-        .send({ fileIds: [fileId], bizType: 'hazard', bizId: '1', bizField: 'reportPhoto' })
+        .send({
+          fileIds: [fileId],
+          bizType: 'hazard',
+          bizId: '1',
+          bizField: 'reportPhoto',
+        })
         .expect(200);
       expect(first.body.data.bound).toBe(1);
 
@@ -241,7 +285,12 @@ describe('File 文件与附件 (e2e)', () => {
         .post(`${prefix}/file/bind`)
         .set(auth(mgr))
         .set(idem())
-        .send({ fileIds: [fileId], bizType: 'hazard', bizId: '1', bizField: 'reportPhoto' })
+        .send({
+          fileIds: [fileId],
+          bizType: 'hazard',
+          bizId: '1',
+          bizField: 'reportPhoto',
+        })
         .expect(200);
       expect(again.body.data.bound).toBe(0);
       expect(again.body.data.skipped).toBe(1);
@@ -252,23 +301,37 @@ describe('File 文件与附件 (e2e)', () => {
         .post(`${prefix}/file/bind`)
         .set(auth(mgr))
         .set(idem())
-        .send({ fileIds: [fileId], bizType: 'hazard', bizId: '1', bizField: 'evilField' })
+        .send({
+          fileIds: [fileId],
+          bizType: 'hazard',
+          bizId: '1',
+          bizField: 'evilField',
+        })
         .expect(200);
       expect(res.body.code).toBe(500);
     });
 
     it('绑定后状态变 ACTIVE，引用计数 +1', async () => {
-      const res = await api().get(`${prefix}/file/${fileId}`).set(auth(mgr)).expect(200);
+      const res = await api()
+        .get(`${prefix}/file/${fileId}`)
+        .set(auth(mgr))
+        .expect(200);
       expect(res.body.data.file.status).toBe('ACTIVE');
       expect(res.body.data.file.refCount).toBe(1);
       expect(res.body.data.links).toHaveLength(1);
     });
 
     it('业务附件列表：可见者能查，不可见者 403', async () => {
-      const ok = await api().get(`${prefix}/file/biz/hazard/1`).set(auth(mgr)).expect(200);
+      const ok = await api()
+        .get(`${prefix}/file/biz/hazard/1`)
+        .set(auth(mgr))
+        .expect(200);
       expect(ok.body.data.length).toBeGreaterThan(0);
 
-      const denied = await api().get(`${prefix}/file/biz/hazard/1`).set(auth(stranger)).expect(200);
+      const denied = await api()
+        .get(`${prefix}/file/biz/hazard/1`)
+        .set(auth(stranger))
+        .expect(200);
       expect(denied.body.code).toBe(403);
     });
 
@@ -277,11 +340,19 @@ describe('File 文件与附件 (e2e)', () => {
         .post(`${prefix}/file/unbind`)
         .set(auth(mgr))
         .set(idem())
-        .send({ fileIds: [fileId], bizType: 'hazard', bizId: '1', bizField: 'reportPhoto' })
+        .send({
+          fileIds: [fileId],
+          bizType: 'hazard',
+          bizId: '1',
+          bizField: 'reportPhoto',
+        })
         .expect(200);
       expect(res.body.data.unbound).toBe(1);
 
-      const after = await api().get(`${prefix}/file/${fileId}`).set(auth(mgr)).expect(200);
+      const after = await api()
+        .get(`${prefix}/file/${fileId}`)
+        .set(auth(mgr))
+        .expect(200);
       expect(after.body.data.file.status).toBe('TEMP');
       expect(after.body.data.file.refCount).toBe(0);
       expect(after.body.data.links).toHaveLength(0);
@@ -307,33 +378,53 @@ describe('File 文件与附件 (e2e)', () => {
     });
 
     it('文件管理员可下载（system:file:list 通路）', async () => {
-      await api().get(`${prefix}/file/${fileId}/download`).set(auth(mgr)).expect(200);
+      await api()
+        .get(`${prefix}/file/${fileId}/download`)
+        .set(auth(mgr))
+        .expect(200);
     });
 
     it('无关用户得到 404 而不是 403（不泄漏文件是否存在）', async () => {
-      const res = await api().get(`${prefix}/file/${fileId}/download`).set(auth(stranger)).expect(404);
+      const res = await api()
+        .get(`${prefix}/file/${fileId}/download`)
+        .set(auth(stranger))
+        .expect(404);
       expect(res.body.code).toBe(404);
 
-      const detail = await api().get(`${prefix}/file/${fileId}`).set(auth(stranger)).expect(404);
+      const detail = await api()
+        .get(`${prefix}/file/${fileId}`)
+        .set(auth(stranger))
+        .expect(404);
       expect(detail.body.code).toBe(404);
     });
 
     it('普通用户不能查文件总览（无 system:file:list）', async () => {
-      const res = await api().get(`${prefix}/file`).set(auth(owner)).expect(200);
+      const res = await api()
+        .get(`${prefix}/file`)
+        .set(auth(owner))
+        .expect(200);
       expect(res.body.code).toBe(403);
     });
 
     it('文件管理员能查总览，空串过滤不影响 total', async () => {
-      const plain = await api().get(`${prefix}/file?pageNum=1&pageSize=10`).set(auth(mgr)).expect(200);
+      const plain = await api()
+        .get(`${prefix}/file?pageNum=1&pageSize=10`)
+        .set(auth(mgr))
+        .expect(200);
       const blank = await api()
-        .get(`${prefix}/file?pageNum=1&pageSize=10&keyword=&ext=&status=&uploaderId=`)
+        .get(
+          `${prefix}/file?pageNum=1&pageSize=10&keyword=&ext=&status=&uploaderId=`,
+        )
         .set(auth(mgr))
         .expect(200);
       expect(blank.body.data.total).toBe(plain.body.data.total);
     });
 
     it('普通用户不能删除别人的文件', async () => {
-      const res = await api().delete(`${prefix}/file/${fileId}`).set(auth(stranger)).expect(200);
+      const res = await api()
+        .delete(`${prefix}/file/${fileId}`)
+        .set(auth(stranger))
+        .expect(200);
       expect(res.body.code).toBe(403);
     });
   });
@@ -343,14 +434,21 @@ describe('File 文件与附件 (e2e)', () => {
       // 必须用唯一内容：objectKey 含 uploaderId，跨用户不再共享字节，
       // 但同一用户重复上传同内容会复用同一条记录 —— 复用记录就不会真删物理对象
       const unique = Buffer.concat([PNG, Buffer.from(`unique-${Date.now()}`)]);
-      const up = await upload(owner, unique, `${tag}-to-delete.png`).expect(200);
+      const up = await upload(owner, unique, `${tag}-to-delete.png`).expect(
+        200,
+      );
       const fileId = up.body.data.file.id as number;
 
       // 找一下对象键（只在测试里读内部字段，用于验证物理删除）
-      const entity = await ds.getRepository(FileEntity).findOneByOrFail({ id: fileId });
+      const entity = await ds
+        .getRepository(FileEntity)
+        .findOneByOrFail({ id: fileId });
       expect(await disk.exists(entity.objectKey)).toBe(true);
 
-      await api().delete(`${prefix}/file/${fileId}`).set(auth(owner)).expect(200);
+      await api()
+        .delete(`${prefix}/file/${fileId}`)
+        .set(auth(owner))
+        .expect(200);
       await api().get(`${prefix}/file/${fileId}`).set(auth(owner)).expect(404);
 
       expect(await disk.exists(entity.objectKey)).toBe(false);

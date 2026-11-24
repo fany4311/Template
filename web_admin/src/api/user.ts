@@ -25,14 +25,21 @@ export type ResetPasswordBody = JsonBody<'UserController_resetPassword_v1'>;
 
 export const userApi = {
   page: (query: UserQuery) =>
-    request.get<PageResult<UserItem>>('/user', query as Record<string, unknown>),
+    request.get<PageResult<UserItem>>(
+      '/user',
+      query as Record<string, unknown>,
+    ),
   create: (body: UserCreateBody) => request.post<UserItem>('/user', body),
   update: (id: number, body: UserUpdateBody) =>
     request.put<UserItem>(`/user/${id}`, body),
   remove: (id: number) => request.delete<boolean>(`/user/${id}`),
 
   /** 导出（后端按数据范围过滤，不含密码） */
-  exportCsv: (params: { keyword?: string; deptId?: number; status?: number }): Promise<void> => {
+  exportCsv: (params: {
+    keyword?: string;
+    deptId?: number;
+    status?: number;
+  }): Promise<void> => {
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     return downloadCsv('/user/export', params, '用户-' + stamp + '.csv');
   },

@@ -84,7 +84,12 @@ export class FileEntity extends BaseEntity {
   @Column({ name: 'uploader_id', type: 'int', comment: '上传人' })
   uploaderId: number;
 
-  @Column({ name: 'uploader_name', length: 50, default: '', comment: '上传人快照' })
+  @Column({
+    name: 'uploader_name',
+    length: 50,
+    default: '',
+    comment: '上传人快照',
+  })
   uploaderName: string;
 
   @Column({
@@ -97,7 +102,12 @@ export class FileEntity extends BaseEntity {
 
   // ---------------- 状态 ----------------
 
-  @Column({ type: 'varchar', length: 16, default: 'TEMP', comment: 'TEMP/ACTIVE' })
+  @Column({
+    type: 'varchar',
+    length: 16,
+    default: 'TEMP',
+    comment: 'TEMP/ACTIVE',
+  })
   status: FileStatus;
 
   /** 被业务对象引用的次数（绑定 +1、解绑 -1；0 且 TEMP 超期即回收） */

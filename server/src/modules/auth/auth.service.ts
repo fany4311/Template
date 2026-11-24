@@ -60,7 +60,10 @@ export class AuthService {
     }
   }
 
-  /** 登录：验证码 → 账号密码（argon2）→ 签发 JWT → 缓存会话 */  async login(dto: LoginInput, meta?: LoginMeta) {
+  /** 登录：验证码 → 账号密码（argon2）→ 签发 JWT → 缓存会话 */ async login(
+    dto: LoginInput,
+    meta?: LoginMeta,
+  ) {
     try {
       if (this.config.get<boolean>('app.captchaEnabled', false)) {
         await this.verifyCaptcha(dto.captchaUuid, dto.captchaCode);

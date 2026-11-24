@@ -10,7 +10,12 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -55,7 +60,9 @@ export class OpsController {
   @Public()
   @Keep()
   @ApiProduces('text/plain')
-  @ApiOperation({ summary: 'Prometheus 指标（默认仅本机；配置 METRICS_TOKEN 后需带请求头）' })
+  @ApiOperation({
+    summary: 'Prometheus 指标（默认仅本机；配置 METRICS_TOKEN 后需带请求头）',
+  })
   prometheus(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -63,12 +70,16 @@ export class OpsController {
   ): string {
     const expected = process.env.METRICS_TOKEN ?? '';
     const ip = req.ip ?? '';
-    const loopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+    const loopback =
+      ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
 
     if (expected) {
       if (token !== expected) throw new ApiException('指标访问令牌无效', 403);
     } else if (!loopback) {
-      throw new ApiException('指标端点仅限本机访问（或配置 METRICS_TOKEN）', 403);
+      throw new ApiException(
+        '指标端点仅限本机访问（或配置 METRICS_TOKEN）',
+        403,
+      );
     }
 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -80,7 +91,9 @@ export class OpsController {
   @RequiresPermissions('system:ops:cleanup')
   @Auditable({ action: 'system:ops:retention', resourceType: 'audit' })
   @Idempotent({ scope: 'system:ops:retention' })
-  @ApiOperation({ summary: '保存审计留存天数（写 sys_config.audit.retentionDays）' })
+  @ApiOperation({
+    summary: '保存审计留存天数（写 sys_config.audit.retentionDays）',
+  })
   async saveRetention(
     @Body({ schema: saveRetentionSchema }) body: { retentionDays: number },
   ) {

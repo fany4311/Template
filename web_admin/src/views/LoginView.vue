@@ -93,7 +93,11 @@ onMounted(refreshCaptcha);
         @keyup.enter="handleSubmit"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名" clearable />
+          <el-input
+            v-model="form.username"
+            placeholder="请输入用户名"
+            clearable
+          />
         </el-form-item>
 
         <el-form-item label="密码" prop="password">

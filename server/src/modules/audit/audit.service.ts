@@ -87,7 +87,9 @@ export class AuditService {
           // 最终失败：完整条目进日志，作为可重建的兜底记录
           this.logger.error(
             { err, entry },
-            '审计写入失败（已重试 ' + PERSIST_ATTEMPTS + ' 次），条目以下方 entry 为准，可从日志重建',
+            '审计写入失败（已重试 ' +
+              PERSIST_ATTEMPTS +
+              ' 次），条目以下方 entry 为准，可从日志重建',
           );
           return;
         }

@@ -1,5 +1,10 @@
 import { request } from './http';
-import type { DictDataItem, DictOption, DictTypeItem, PageResult } from './types';
+import type {
+  DictDataItem,
+  DictOption,
+  DictTypeItem,
+  PageResult,
+} from './types';
 
 export interface DictTypeCreateBody {
   dictName: string;
@@ -23,7 +28,10 @@ export const dictApi = {
     request.get<PageResult<DictTypeItem>>('/dict/type', params),
   createType: (body: DictTypeCreateBody): Promise<DictTypeItem> =>
     request.post<DictTypeItem>('/dict/type', body),
-  updateType: (id: number, body: Partial<DictTypeCreateBody>): Promise<DictTypeItem> =>
+  updateType: (
+    id: number,
+    body: Partial<DictTypeCreateBody>,
+  ): Promise<DictTypeItem> =>
     request.put<DictTypeItem>(`/dict/type/${id}`, body),
   removeType: (id: number): Promise<boolean> =>
     request.delete<boolean>(`/dict/type/${id}`),
@@ -32,7 +40,10 @@ export const dictApi = {
     request.get<PageResult<DictDataItem>>('/dict/data', params),
   createData: (body: DictDataCreateBody): Promise<DictDataItem> =>
     request.post<DictDataItem>('/dict/data', body),
-  updateData: (id: number, body: Partial<DictDataCreateBody>): Promise<DictDataItem> =>
+  updateData: (
+    id: number,
+    body: Partial<DictDataCreateBody>,
+  ): Promise<DictDataItem> =>
     request.put<DictDataItem>(`/dict/data/${id}`, body),
   removeData: (id: number): Promise<boolean> =>
     request.delete<boolean>(`/dict/data/${id}`),

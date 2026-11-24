@@ -117,7 +117,10 @@ export const HAZARD_TRANSITIONS: Record<HazardAction, HazardTransition> = {
 };
 
 /** 终态：不可再流转 */
-export const HAZARD_TERMINAL: readonly HazardStatus[] = ['ARCHIVED', 'REJECTED'];
+export const HAZARD_TERMINAL: readonly HazardStatus[] = [
+  'ARCHIVED',
+  'REJECTED',
+];
 
 export function isTerminal(status: HazardStatus): boolean {
   return HAZARD_TERMINAL.includes(status);

@@ -1,10 +1,5 @@
 import { request } from './http';
-import type {
-  DeptItem,
-  DeptTreeNode,
-  JsonBody,
-  QueryOf,
-} from './types';
+import type { DeptItem, DeptTreeNode, JsonBody, QueryOf } from './types';
 
 export type DeptQuery = QueryOf<'DeptController_tree_v1'>;
 export type DeptCreateBody = JsonBody<'DeptController_create_v1'>;

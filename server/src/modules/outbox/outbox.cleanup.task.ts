@@ -51,7 +51,9 @@ export class OutboxCleanupTask {
       const sent = await this.purge('sent', this.sentRetentionDays);
       const failed = await this.purge('failed', this.failedRetentionDays);
       if (sent > 0 || failed > 0) {
-        this.logger.log(`本轮回收 outbox：sent ${sent} 条，failed ${failed} 条`);
+        this.logger.log(
+          `本轮回收 outbox：sent ${sent} 条，failed ${failed} 条`,
+        );
       }
     } catch (err) {
       this.logger.error(`Outbox 回收失败：${(err as Error).message}`);
@@ -61,7 +63,10 @@ export class OutboxCleanupTask {
   }
 
   private get sentRetentionDays(): number {
-    return this.daysOf('app.outboxSentRetentionDays', DEFAULT_SENT_RETENTION_DAYS);
+    return this.daysOf(
+      'app.outboxSentRetentionDays',
+      DEFAULT_SENT_RETENTION_DAYS,
+    );
   }
 
   private get failedRetentionDays(): number {

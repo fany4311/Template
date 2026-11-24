@@ -77,7 +77,9 @@ export class PermissionService {
     // 防呆：扫描结果为空一定是采集逻辑坏了（模块没注册/路径不对），
     // 此时若照常执行会把整张清单停用，界面瞬间空白 —— 宁可报错。
     if (!entries.length) {
-      throw new ApiException('权限清单采集结果为空，已中止同步（避免误停用全部权限）');
+      throw new ApiException(
+        '权限清单采集结果为空，已中止同步（避免误停用全部权限）',
+      );
     }
 
     const existing = await this.repo.find();

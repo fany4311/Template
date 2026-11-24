@@ -44,7 +44,10 @@ import {
   type QueryConfigInput,
   type UpdateConfigInput,
 } from './dto/config.dto.js';
-import { configResponseSchema, configValueResponseSchema } from './dto/config.response.js';
+import {
+  configResponseSchema,
+  configValueResponseSchema,
+} from './dto/config.response.js';
 import { ConfigService } from './config.service.js';
 
 const idParamSchema = z.coerce.number().int().positive();
@@ -74,7 +77,11 @@ export class ConfigController {
   @Get()
   @RequiresPermissions('system:config:list')
   @ApiOperation({ summary: '分页查询参数配置' })
-  @ApiOkZod('SysConfigPage', pageOf(configResponseSchema), '参数分页结果 { list, total }')
+  @ApiOkZod(
+    'SysConfigPage',
+    pageOf(configResponseSchema),
+    '参数分页结果 { list, total }',
+  )
   page(@Query({ schema: queryConfigSchema }) query: QueryConfigInput) {
     return this.configService.page(query);
   }
@@ -82,10 +89,12 @@ export class ConfigController {
   // 必须放在 @Get(':id') 之前，避免被 :id 路由吞掉
   @Get('key/:configKey')
   @ApiOperation({ summary: '按参数键取值（登录即可）' })
-  @ApiOkZod('SysConfigValue', configValueResponseSchema, '返回 { configKey, configValue }')
-  getByKey(
-    @Param('configKey', { schema: keyParamSchema }) configKey: string,
-  ) {
+  @ApiOkZod(
+    'SysConfigValue',
+    configValueResponseSchema,
+    '返回 { configKey, configValue }',
+  )
+  getByKey(@Param('configKey', { schema: keyParamSchema }) configKey: string) {
     return this.configService.getValue(configKey);
   }
 
@@ -111,7 +120,9 @@ export class ConfigController {
       'Content-Disposition',
       'attachment; filename="config-' + date + '.csv"',
     );
-    return new StreamableFile(Buffer.from(rowsToCsv(rows, CONFIG_CSV_COLUMNS), 'utf8'));
+    return new StreamableFile(
+      Buffer.from(rowsToCsv(rows, CONFIG_CSV_COLUMNS), 'utf8'),
+    );
   }
 
   @Post('import')
@@ -120,14 +131,21 @@ export class ConfigController {
   @Auditable({ action: 'system:config:import', resourceType: 'config' })
   // 导入是重操作：限制文件大小（multer 在入内存前就拒），行数上限在 readRows 里
   @UseInterceptors(
-    FileInterceptor('file', { limits: { files: 1, fileSize: 2 * 1024 * 1024 } }),
+    FileInterceptor('file', {
+      limits: { files: 1, fileSize: 2 * 1024 * 1024 },
+    }),
   )
-  @ApiOperation({ summary: '导入参数配置（CSV，最多 5000 行，逐行返回失败原因）' })
+  @ApiOperation({
+    summary: '导入参数配置（CSV，最多 5000 行，逐行返回失败原因）',
+  })
   @ApiOkZod('ConfigImportResult', importResultSchema, '导入结果')
   importCsv(@UploadedFile() file?: Express.Multer.File) {
     if (!file) throw new ApiException('请选择要导入的 CSV 文件', 400);
     if (!file.originalname.toLowerCase().endsWith('.csv')) {
-      throw new ApiException('只支持 .csv 文件（Excel 请另存为 CSV UTF-8）', 400);
+      throw new ApiException(
+        '只支持 .csv 文件（Excel 请另存为 CSV UTF-8）',
+        400,
+      );
     }
     const records = readRows(file.buffer.toString('utf8'), CONFIG_CSV_COLUMNS);
     return this.configService.importRows(records);

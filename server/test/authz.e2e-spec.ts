@@ -82,8 +82,18 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
     // 部门树：root → child → grand
     const grandParentName = `e2e_authz_root_${stamp}`;
     rootDeptId = (await createDept({ name: grandParentName })).id;
-    childDeptId = (await createDept({ name: `e2e_authz_child_${stamp}`, parentId: rootDeptId })).id;
-    grandDeptId = (await createDept({ name: `e2e_authz_grand_${stamp}`, parentId: childDeptId })).id;
+    childDeptId = (
+      await createDept({
+        name: `e2e_authz_child_${stamp}`,
+        parentId: rootDeptId,
+      })
+    ).id;
+    grandDeptId = (
+      await createDept({
+        name: `e2e_authz_grand_${stamp}`,
+        parentId: childDeptId,
+      })
+    ).id;
     // 部门角色（只给 dept 列表权限，验证 system:dept:* 通配）
     const deptRole = await createE2ERole(ds, {
       roleName: deptRoleName,
@@ -98,7 +108,11 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: deptUser.id, roleId: deptRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: deptUser.id,
+        roleId: deptRole.id,
+        source: 'direct',
+      }),
     );
 
     // 业务角色：dataScope = 本部门及以下
@@ -126,7 +140,11 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: denyUser.id, roleId: denyRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: denyUser.id,
+        roleId: denyRole.id,
+        source: 'direct',
+      }),
     );
 
     // 只持系统域权限（system:*）：验证 system 域可进
@@ -144,7 +162,11 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: sysUser.id, roleId: sysRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: sysUser.id,
+        roleId: sysRole.id,
+        source: 'direct',
+      }),
     );
 
     childUserId = await createUser(childUserName, childDeptId);
@@ -232,10 +254,7 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
   });
 
   it('部门树：创建后 tree 返回嵌套结构', async () => {
-    const flat = await api()
-      .get(`${prefix}/dept`)
-      .set(adminAuth())
-      .expect(200);
+    const flat = await api().get(`${prefix}/dept`).set(adminAuth()).expect(200);
     const all = flat.body.data as Dept[];
     expect(all.find((d) => d.id === rootDeptId)).toBeDefined();
     expect(all.find((d) => d.id === childDeptId)?.parentId).toBe(rootDeptId);
@@ -301,7 +320,11 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
   });
 
   it('临时授权已过期：登录后无有效角色 → 403', async () => {
-    await grant(grandUserId, [scopedRoleId], new Date(Date.now() - 60_000).toISOString());
+    await grant(
+      grandUserId,
+      [scopedRoleId],
+      new Date(Date.now() - 60_000).toISOString(),
+    );
     const token = await login(grandUserName);
     const res = await api()
       .get(`${prefix}/user`)
@@ -311,7 +334,11 @@ describe('Dept & Authorization & DataScope (e2e)', () => {
   });
 
   it('临时授权未到期：可访问', async () => {
-    await grant(grandUserId, [scopedRoleId], new Date(Date.now() + 3_600_000).toISOString());
+    await grant(
+      grandUserId,
+      [scopedRoleId],
+      new Date(Date.now() + 3_600_000).toISOString(),
+    );
     const token = await login(grandUserName);
     const res = await api()
       .get(`${prefix}/user?pageSize=100`)

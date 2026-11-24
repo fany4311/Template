@@ -27,7 +27,9 @@ import { z } from 'zod';
  * - 不引入 `nullish`：显式传 `null` 依旧按 schema 自身规则处理，
  *   避免"传 null 就等于清空"这种隐式约定扩散。
  */
-export function updateSchemaOf<T extends z.ZodObject<z.ZodRawShape>>(schema: T) {
+export function updateSchemaOf<T extends z.ZodObject<z.ZodRawShape>>(
+  schema: T,
+) {
   const shape = Object.fromEntries(
     Object.entries(schema.shape).map(([key, field]) => [
       key,

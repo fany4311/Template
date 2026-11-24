@@ -161,7 +161,10 @@ describe('Response contract (e2e)', () => {
     const captcha = await api().get(`${prefix}/auth/captcha`).expect(200);
     expectContract(captcha, 'CaptchaResult');
 
-    const profile = await api().get(`${prefix}/auth/profile`).set(auth()).expect(200);
+    const profile = await api()
+      .get(`${prefix}/auth/profile`)
+      .set(auth())
+      .expect(200);
     expectContract(profile, 'Profile');
   });
 
@@ -189,8 +192,11 @@ describe('Response contract (e2e)', () => {
       .set(idem())
       .send({
         roleIds: [
-          (await ds.getRepository(Role).findOneByOrFail({ roleName: `${tag}_契约` }))
-            .id,
+          (
+            await ds
+              .getRepository(Role)
+              .findOneByOrFail({ roleName: `${tag}_契约` })
+          ).id,
         ],
       })
       .expect(200);
@@ -205,21 +211,33 @@ describe('Response contract (e2e)', () => {
     const rolePage = await api().get(`${prefix}/role`).set(auth()).expect(200);
     expectContract(rolePage, 'SysRolePage');
 
-    const deptTree = await api().get(`${prefix}/dept/tree`).set(auth()).expect(200);
+    const deptTree = await api()
+      .get(`${prefix}/dept/tree`)
+      .set(auth())
+      .expect(200);
     expectContract(deptTree, 'SysDeptTree');
 
     const deptList = await api().get(`${prefix}/dept`).set(auth()).expect(200);
     expectContract(deptList, 'SysDeptList');
 
-    const menuTree = await api().get(`${prefix}/menu/tree`).set(auth()).expect(200);
+    const menuTree = await api()
+      .get(`${prefix}/menu/tree`)
+      .set(auth())
+      .expect(200);
     expectContract(menuTree, 'SysMenuTree');
 
-    const routes = await api().get(`${prefix}/menu/routes`).set(auth()).expect(200);
+    const routes = await api()
+      .get(`${prefix}/menu/routes`)
+      .set(auth())
+      .expect(200);
     expectContract(routes, 'SysMenuTree');
   });
 
   it('字典：类型 / 数据 / 选项', async () => {
-    const typePage = await api().get(`${prefix}/dict/type`).set(auth()).expect(200);
+    const typePage = await api()
+      .get(`${prefix}/dict/type`)
+      .set(auth())
+      .expect(200);
     expectContract(typePage, 'SysDictTypePage');
 
     const created = await api()
@@ -359,7 +377,10 @@ describe('Response contract (e2e)', () => {
       expectContract(detail, 'SysAuditLog');
     }
 
-    const loginlog = await api().get(`${prefix}/loginlog`).set(auth()).expect(200);
+    const loginlog = await api()
+      .get(`${prefix}/loginlog`)
+      .set(auth())
+      .expect(200);
     expectContract(loginlog, 'SysLoginLogPage');
   });
 

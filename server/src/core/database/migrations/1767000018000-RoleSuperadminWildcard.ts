@@ -34,9 +34,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * `WHERE level = 0 AND permissions <> '*:*:*'` —— 重复执行是 no-op。
  * 已应用的 `1767000012000` 不改（迁移是一本不可涂改的账），由本条覆盖其结果。
  */
-export class RoleSuperadminWildcard1767000018000
-  implements MigrationInterface
-{
+export class RoleSuperadminWildcard1767000018000 implements MigrationInterface {
   name = 'RoleSuperadminWildcard1767000018000';
 
   /** 历史值：本条迁移生效前，超管的权限串长这样（down 用） */

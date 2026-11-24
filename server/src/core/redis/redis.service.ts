@@ -40,7 +40,9 @@ export class RedisService implements OnModuleDestroy {
     try {
       await this.client.quit();
     } catch (err) {
-      this.logger.warn(`Redis 关闭出错，改为强制断开：${(err as Error).message}`);
+      this.logger.warn(
+        `Redis 关闭出错，改为强制断开：${(err as Error).message}`,
+      );
       this.client.disconnect();
     } finally {
       clearTimeout(forceTimer);

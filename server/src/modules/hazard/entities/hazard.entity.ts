@@ -48,7 +48,11 @@ export class Hazard extends BaseEntity {
   @Column({ length: 255, default: '', comment: '发生地点' })
   location: string;
 
-  @Column({ length: 32, default: '', comment: '隐患类别（字典 hazard_category）' })
+  @Column({
+    length: 32,
+    default: '',
+    comment: '隐患类别（字典 hazard_category）',
+  })
   category: string;
 
   @Column({
@@ -75,10 +79,20 @@ export class Hazard extends BaseEntity {
   @Column({ name: 'reporter_id', type: 'int', comment: '上报人' })
   reporterId: number;
 
-  @Column({ name: 'reporter_name', length: 50, default: '', comment: '上报人快照' })
+  @Column({
+    name: 'reporter_name',
+    length: 50,
+    default: '',
+    comment: '上报人快照',
+  })
   reporterName: string;
 
-  @Column({ name: 'reporter_dept_id', type: 'int', nullable: true, comment: '上报时部门快照' })
+  @Column({
+    name: 'reporter_dept_id',
+    type: 'int',
+    nullable: true,
+    comment: '上报时部门快照',
+  })
   reporterDeptId?: number | null;
 
   @Column({
@@ -98,10 +112,20 @@ export class Hazard extends BaseEntity {
   })
   cooperateDeptIds: number[] = [];
 
-  @Column({ name: 'handler_id', type: 'int', nullable: true, comment: '当前处理人' })
+  @Column({
+    name: 'handler_id',
+    type: 'int',
+    nullable: true,
+    comment: '当前处理人',
+  })
   handlerId?: number | null;
 
-  @Column({ name: 'handler_name', length: 50, default: '', comment: '当前处理人快照' })
+  @Column({
+    name: 'handler_name',
+    length: 50,
+    default: '',
+    comment: '当前处理人快照',
+  })
   handlerName: string;
 
   // ---------------- 时限（一单四制的"限时办结"） ----------------
@@ -124,36 +148,81 @@ export class Hazard extends BaseEntity {
 
   // ---------------- 整改 ----------------
 
-  @Column({ name: 'rectify_measure', type: 'text', nullable: true, comment: '整改措施' })
+  @Column({
+    name: 'rectify_measure',
+    type: 'text',
+    nullable: true,
+    comment: '整改措施',
+  })
   rectifyMeasure?: string | null;
 
-  @Column({ name: 'rectify_time', type: 'datetime', nullable: true, comment: '整改完成时间' })
+  @Column({
+    name: 'rectify_time',
+    type: 'datetime',
+    nullable: true,
+    comment: '整改完成时间',
+  })
   rectifyTime?: Date | null;
 
   // ---------------- 复查 ----------------
 
-  @Column({ name: 'review_opinion', length: 500, default: '', comment: '复查意见' })
+  @Column({
+    name: 'review_opinion',
+    length: 500,
+    default: '',
+    comment: '复查意见',
+  })
   reviewOpinion: string;
 
-  @Column({ name: 'reviewer_id', type: 'int', nullable: true, comment: '复查人' })
+  @Column({
+    name: 'reviewer_id',
+    type: 'int',
+    nullable: true,
+    comment: '复查人',
+  })
   reviewerId?: number | null;
 
-  @Column({ name: 'review_time', type: 'datetime', nullable: true, comment: '复查时间' })
+  @Column({
+    name: 'review_time',
+    type: 'datetime',
+    nullable: true,
+    comment: '复查时间',
+  })
   reviewTime?: Date | null;
 
   // ---------------- 归档 ----------------
 
-  @Column({ name: 'archive_opinion', length: 500, default: '', comment: '归档意见' })
+  @Column({
+    name: 'archive_opinion',
+    length: 500,
+    default: '',
+    comment: '归档意见',
+  })
   archiveOpinion: string;
 
-  @Column({ name: 'archiver_id', type: 'int', nullable: true, comment: '归档人' })
+  @Column({
+    name: 'archiver_id',
+    type: 'int',
+    nullable: true,
+    comment: '归档人',
+  })
   archiverId?: number | null;
 
-  @Column({ name: 'archive_time', type: 'datetime', nullable: true, comment: '归档时间' })
+  @Column({
+    name: 'archive_time',
+    type: 'datetime',
+    nullable: true,
+    comment: '归档时间',
+  })
   archiveTime?: Date | null;
 
   // ---------------- 驳回 ----------------
 
-  @Column({ name: 'reject_reason', length: 500, default: '', comment: '驳回原因' })
+  @Column({
+    name: 'reject_reason',
+    length: 500,
+    default: '',
+    comment: '驳回原因',
+  })
   rejectReason: string;
 }

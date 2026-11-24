@@ -10,11 +10,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { ApiOkZod } from '../../common/swagger/api-ok.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -48,14 +44,22 @@ export class MenuController {
   @Get('tree')
   @RequiresPermissions('system:menu:list')
   @ApiOperation({ summary: '全量菜单树（管理页）' })
-  @ApiOkZod('SysMenuTree', z.array(menuResponseSchema), '返回菜单树（含按钮与隐藏项）')
+  @ApiOkZod(
+    'SysMenuTree',
+    z.array(menuResponseSchema),
+    '返回菜单树（含按钮与隐藏项）',
+  )
   tree(@Query({ schema: queryMenuSchema }) query: QueryMenuInput) {
     return this.menuService.tree(query);
   }
 
   @Get('routes')
   @ApiOperation({ summary: '当前用户可见菜单树（前端动态菜单）' })
-  @ApiOkZod('SysMenuTree', z.array(menuResponseSchema), '返回当前用户可见的菜单树')
+  @ApiOkZod(
+    'SysMenuTree',
+    z.array(menuResponseSchema),
+    '返回当前用户可见的菜单树',
+  )
   routes(@User() user: JwtUser) {
     return this.menuService.routes(user);
   }

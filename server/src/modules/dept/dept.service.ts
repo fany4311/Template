@@ -72,10 +72,11 @@ export class DeptService {
     const rows = await this.deptRepo
       .createQueryBuilder('d')
       .select('d.id', 'id')
-      .where(
-        'd.id = :id OR d.ancestors LIKE :mid OR d.ancestors LIKE :end',
-        { id: deptId, mid: `%,${deptId},%`, end: `%,${deptId}` },
-      )
+      .where('d.id = :id OR d.ancestors LIKE :mid OR d.ancestors LIKE :end', {
+        id: deptId,
+        mid: `%,${deptId},%`,
+        end: `%,${deptId}`,
+      })
       .getRawMany<{ id: number }>();
     const ids = rows.map((r) => Number(r.id));
     return ids.length ? ids : [deptId];

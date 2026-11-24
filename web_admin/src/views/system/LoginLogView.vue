@@ -13,7 +13,12 @@ import { useCrud } from '../../composables/useCrud';
  * 用 useCrud + DataTable：日志页没有表单，正好是「列表抽象」最省事的落地场景。
  * 清空是模块特有动作，留在页面里，不硬塞进 useCrud。
  */
-type Query = { pageNum: number; pageSize: number; username: string; status?: number };
+type Query = {
+  pageNum: number;
+  pageSize: number;
+  username: string;
+  status?: number;
+};
 
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
@@ -33,7 +38,12 @@ const columns: TableColumn[] = [
   { label: '结果', width: 90, slot: 'status' },
   { prop: 'msg', label: '说明', minWidth: 160, showOverflowTooltip: true },
   { prop: 'ip', label: 'IP', width: 140 },
-  { prop: 'userAgent', label: 'User-Agent', minWidth: 220, showOverflowTooltip: true },
+  {
+    prop: 'userAgent',
+    label: 'User-Agent',
+    minWidth: 220,
+    showOverflowTooltip: true,
+  },
   { label: '登录时间', width: 170, slot: 'loginTime' },
 ];
 
@@ -41,7 +51,9 @@ const clearing = ref(false);
 
 async function handleClear(): Promise<void> {
   try {
-    await ElMessageBox.confirm('确认清空全部登录日志？不可恢复。', '警告', { type: 'warning' });
+    await ElMessageBox.confirm('确认清空全部登录日志？不可恢复。', '警告', {
+      type: 'warning',
+    });
   } catch {
     return;
   }
@@ -69,11 +81,18 @@ async function handleClear(): Promise<void> {
           style="width: 160px"
           @keyup.enter="search"
         />
-        <el-select v-model="query.status" placeholder="结果" clearable style="width: 120px">
+        <el-select
+          v-model="query.status"
+          placeholder="结果"
+          clearable
+          style="width: 120px"
+        >
           <el-option label="成功" :value="1" />
           <el-option label="失败" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
         <div class="page-toolbar-right">
           <el-button

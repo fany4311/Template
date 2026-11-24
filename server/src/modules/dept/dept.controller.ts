@@ -42,7 +42,11 @@ export class DeptController {
   @Get('tree')
   @RequiresPermissions('system:dept:list')
   @ApiOperation({ summary: '部门树' })
-  @ApiOkZod('SysDeptTree', z.array(deptResponseSchema), '返回部门树（含 children）')
+  @ApiOkZod(
+    'SysDeptTree',
+    z.array(deptResponseSchema),
+    '返回部门树（含 children）',
+  )
   tree(@Query({ schema: queryDeptSchema }) query: QueryDeptInput) {
     return this.deptService.tree(query);
   }

@@ -118,14 +118,20 @@ onUnmounted(() => {
               {{ overview?.db.up ? '正常' : '不可用' }}
             </el-tag>
           </div>
-          <div class="form-tip">延迟 {{ overview?.db.latencyMs ?? '-' }} ms</div>
+          <div class="form-tip">
+            延迟 {{ overview?.db.latencyMs ?? '-' }} ms
+          </div>
         </el-card>
       </el-col>
       <el-col :span="6">
         <el-card shadow="never" class="page-card ops-card">
           <div class="ops-card__label">Outbox 积压</div>
-          <div class="ops-card__value">{{ overview?.outbox.pending ?? '-' }}</div>
-          <div class="form-tip">失败 {{ overview?.outbox.failed ?? '-' }} 条</div>
+          <div class="ops-card__value">
+            {{ overview?.outbox.pending ?? '-' }}
+          </div>
+          <div class="form-tip">
+            失败 {{ overview?.outbox.failed ?? '-' }} 条
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -179,7 +185,8 @@ onUnmounted(() => {
           保存
         </el-button>
         <span class="form-tip">
-          每小时自动清理一次；写入 sys_config 的 audit.retentionDays（默认 180 天）
+          每小时自动清理一次；写入 sys_config 的 audit.retentionDays（默认 180
+          天）
         </span>
       </div>
     </el-card>
@@ -188,16 +195,32 @@ onUnmounted(() => {
       <template #header>接口指标（最近 12 个高频路由）</template>
       <el-table :data="overview?.http ?? []" border stripe size="small">
         <el-table-column prop="method" label="方法" width="80" />
-        <el-table-column prop="route" label="路由" min-width="280" show-overflow-tooltip />
+        <el-table-column
+          prop="route"
+          label="路由"
+          min-width="280"
+          show-overflow-tooltip
+        />
         <el-table-column prop="count" label="次数" width="90" align="right" />
         <el-table-column label="错误率" width="100" align="right">
           <template #default="{ row }">{{ errorRate(row) }}</template>
         </el-table-column>
-        <el-table-column prop="avgMs" label="平均(ms)" width="100" align="right" />
-        <el-table-column prop="p95Ms" label="P95(ms)" width="100" align="right" />
+        <el-table-column
+          prop="avgMs"
+          label="平均(ms)"
+          width="100"
+          align="right"
+        />
+        <el-table-column
+          prop="p95Ms"
+          label="P95(ms)"
+          width="100"
+          align="right"
+        />
       </el-table>
       <div class="form-tip ops-foot">
-        指标为进程内累计值（重启清零）；Prometheus 抓取：GET /api/v1/ops/metrics（默认仅本机，
+        指标为进程内累计值（重启清零）；Prometheus 抓取：GET
+        /api/v1/ops/metrics（默认仅本机，
         配置 METRICS_TOKEN 后需带 X-Metrics-Token）。
       </div>
     </el-card>

@@ -52,7 +52,12 @@ export class MetricsService {
     const key = method + ' ' + route;
     let stat = this.routes.get(key);
     if (!stat) {
-      stat = { count: 0, errors: 0, sumMs: 0, buckets: BUCKETS_MS.map(() => 0) };
+      stat = {
+        count: 0,
+        errors: 0,
+        sumMs: 0,
+        buckets: BUCKETS_MS.map(() => 0),
+      };
       this.routes.set(key, stat);
     }
     stat.count += 1;
@@ -121,10 +126,20 @@ export class MetricsService {
     for (const [key, stat] of this.routes) {
       const [method = '', route = ''] = key.split(' ');
       lines.push(
-        'http_requests_total{method="' + method + '",route="' + route + '"} ' + stat.count,
+        'http_requests_total{method="' +
+          method +
+          '",route="' +
+          route +
+          '"} ' +
+          stat.count,
       );
       lines.push(
-        'http_errors_total{method="' + method + '",route="' + route + '"} ' + stat.errors,
+        'http_errors_total{method="' +
+          method +
+          '",route="' +
+          route +
+          '"} ' +
+          stat.errors,
       );
     }
 
@@ -134,18 +149,39 @@ export class MetricsService {
       const [method = '', route = ''] = key.split(' ');
       BUCKETS_MS.forEach((le, index) => {
         lines.push(
-          'http_request_duration_ms_bucket{method="' + method + '",route="' + route + '",le="' + le + '"} ' +
+          'http_request_duration_ms_bucket{method="' +
+            method +
+            '",route="' +
+            route +
+            '",le="' +
+            le +
+            '"} ' +
             (stat.buckets[index] ?? 0),
         );
       });
       lines.push(
-        'http_request_duration_ms_bucket{method="' + method + '",route="' + route + '",le="+Inf"} ' + stat.count,
+        'http_request_duration_ms_bucket{method="' +
+          method +
+          '",route="' +
+          route +
+          '",le="+Inf"} ' +
+          stat.count,
       );
       lines.push(
-        'http_request_duration_ms_sum{method="' + method + '",route="' + route + '"} ' + Math.round(stat.sumMs),
+        'http_request_duration_ms_sum{method="' +
+          method +
+          '",route="' +
+          route +
+          '"} ' +
+          Math.round(stat.sumMs),
       );
       lines.push(
-        'http_request_duration_ms_count{method="' + method + '",route="' + route + '"} ' + stat.count,
+        'http_request_duration_ms_count{method="' +
+          method +
+          '",route="' +
+          route +
+          '"} ' +
+          stat.count,
       );
     }
 

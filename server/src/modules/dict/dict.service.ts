@@ -55,7 +55,10 @@ export class DictService {
    * 不缓存时一次页面切换能打出十几条同 SQL。
    * 多实例下靠 5 分钟 TTL 收敛，同一实例内靠写操作主动失效（见各写方法）。
    */
-  private readonly optionCache = new Map<string, { expires: number; value: DictOption[] }>();
+  private readonly optionCache = new Map<
+    string,
+    { expires: number; value: DictOption[] }
+  >();
   private static readonly OPTION_TTL_MS = 5 * 60 * 1000;
 
   private invalidateOptions(): void {

@@ -52,7 +52,11 @@ describe('Idempotency (e2e)', () => {
     const adminUser = await userRepo.findOneByOrFail({ username: adminName });
     const urRepo = ds.getRepository(UserRole);
     await urRepo.save(
-      urRepo.create({ userId: adminUser.id, roleId: role.id, source: 'direct' }),
+      urRepo.create({
+        userId: adminUser.id,
+        roleId: role.id,
+        source: 'direct',
+      }),
     );
 
     const login = await request(app.getHttpServer())

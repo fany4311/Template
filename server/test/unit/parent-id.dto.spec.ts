@@ -48,9 +48,15 @@ describe('parentId：null / 0 / 空串都表示「顶级」', () => {
 
   it('createMenuSchema：同一套归一规则（菜单也有同样的坑）', () => {
     const base = { name: 'm', type: 'M' as const };
-    expect(createMenuSchema.parse({ ...base, parentId: null }).parentId).toBeNull();
-    expect(createMenuSchema.parse({ ...base, parentId: 0 }).parentId).toBeNull();
-    expect(createMenuSchema.parse({ ...base, parentId: '' }).parentId).toBeNull();
+    expect(
+      createMenuSchema.parse({ ...base, parentId: null }).parentId,
+    ).toBeNull();
+    expect(
+      createMenuSchema.parse({ ...base, parentId: 0 }).parentId,
+    ).toBeNull();
+    expect(
+      createMenuSchema.parse({ ...base, parentId: '' }).parentId,
+    ).toBeNull();
     expect(createMenuSchema.parse({ ...base, parentId: 4 }).parentId).toBe(4);
     expect(createMenuSchema.parse(base).parentId).toBeUndefined();
   });

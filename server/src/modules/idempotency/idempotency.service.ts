@@ -69,7 +69,10 @@ export class IdempotencyService {
   }
 
   /** 标记完成并记录响应体（供重复请求回放） */
-  async complete(key: string, responseBody: Record<string, any>): Promise<void> {
+  async complete(
+    key: string,
+    responseBody: Record<string, any>,
+  ): Promise<void> {
     await this.repo.update({ key }, { status: 'done', responseBody });
   }
 

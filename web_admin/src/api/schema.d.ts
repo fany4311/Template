@@ -4,4317 +4,4395 @@
  */
 
 export interface paths {
-    "/api/v1/hello": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["AppController_getHello_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/api/v1/hello': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询操作日志 */
-        get: operations["AuditController_page_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations['AppController_getHello_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/audit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/audit/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 操作日志详情 */
-        get: operations["AuditController_detail_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询操作日志 */
+    get: operations['AuditController_page_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/audit/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/health/live": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 存活探针（liveness） */
-        get: operations["HealthController_live_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 操作日志详情 */
+    get: operations['AuditController_detail_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/health/live': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/health/ready": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 就绪探针（readiness，含数据库） */
-        get: operations["HealthController_ready_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 存活探针（liveness） */
+    get: operations['HealthController_live_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/health/ready': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/auth/captcha": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 获取图形验证码 */
-        get: operations["AuthController_captcha_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 就绪探针（readiness，含数据库） */
+    get: operations['HealthController_ready_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/captcha': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 登录 */
-        post: operations["AuthController_login_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 获取图形验证码 */
+    get: operations['AuthController_captcha_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/login': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 登出（token 立即失效） */
-        post: operations["AuthController_logout_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 登录 */
+    post: operations['AuthController_login_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/logout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/auth/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 当前登录用户信息（含角色/权限） */
-        get: operations["AuthController_profile_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 登出（token 立即失效） */
+    post: operations['AuthController_logout_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/profile': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/auth/password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 修改自己的密码（成功后当前会话失效） */
-        post: operations["AuthController_changePassword_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 当前登录用户信息（含角色/权限） */
+    get: operations['AuthController_profile_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/auth/password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询用户（受 dataScope 约束） */
-        get: operations["UserController_page_v1"];
-        put?: never;
-        /** 创建用户 */
-        post: operations["UserController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 修改自己的密码（成功后当前会话失效） */
+    post: operations['AuthController_changePassword_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/user/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 更新用户 */
-        put: operations["UserController_update_v1"];
-        post?: never;
-        /** 删除用户（软删除） */
-        delete: operations["UserController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询用户（受 dataScope 约束） */
+    get: operations['UserController_page_v1'];
+    put?: never;
+    /** 创建用户 */
+    post: operations['UserController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/user/{id}/password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 重置指定用户密码 */
-        put: operations["UserController_resetPassword_v1"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 更新用户 */
+    put: operations['UserController_update_v1'];
+    post?: never;
+    /** 删除用户（软删除） */
+    delete: operations['UserController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/{id}/password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/user/{id}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 用户角色授权列表 */
-        get: operations["UserController_listGrants_v1"];
-        put?: never;
-        /** 授予角色（expireAt 非空则为临时授权） */
-        post: operations["UserController_grantRoles_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 重置指定用户密码 */
+    put: operations['UserController_resetPassword_v1'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/{id}/roles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/user/{id}/roles/{roleId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** 撤销角色授权 */
-        delete: operations["UserController_revokeRole_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 用户角色授权列表 */
+    get: operations['UserController_listGrants_v1'];
+    put?: never;
+    /** 授予角色（expireAt 非空则为临时授权） */
+    post: operations['UserController_grantRoles_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/{id}/roles/{roleId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dept/tree": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 部门树 */
-        get: operations["DeptController_tree_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 撤销角色授权 */
+    delete: operations['UserController_revokeRole_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dept/tree': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 部门平铺列表 */
-        get: operations["DeptController_list_v1"];
-        put?: never;
-        /** 创建部门 */
-        post: operations["DeptController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 部门树 */
+    get: operations['DeptController_tree_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dept': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dept/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 部门详情 */
-        get: operations["DeptController_detail_v1"];
-        /** 更新部门 */
-        put: operations["DeptController_update_v1"];
-        post?: never;
-        /** 删除部门（软删除，有下级则拒绝） */
-        delete: operations["DeptController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 部门平铺列表 */
+    get: operations['DeptController_list_v1'];
+    put?: never;
+    /** 创建部门 */
+    post: operations['DeptController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dept/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/loginlog": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询登录日志 */
-        get: operations["LoginLogController_page_v1"];
-        put?: never;
-        post?: never;
-        /** 清空登录日志 */
-        delete: operations["LoginLogController_clear_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 部门详情 */
+    get: operations['DeptController_detail_v1'];
+    /** 更新部门 */
+    put: operations['DeptController_update_v1'];
+    post?: never;
+    /** 删除部门（软删除，有下级则拒绝） */
+    delete: operations['DeptController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/loginlog': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/loginlog/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** 删除登录日志（硬删） */
-        delete: operations["LoginLogController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询登录日志 */
+    get: operations['LoginLogController_page_v1'];
+    put?: never;
+    post?: never;
+    /** 清空登录日志 */
+    delete: operations['LoginLogController_clear_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/loginlog/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/menu/tree": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 全量菜单树（管理页） */
-        get: operations["MenuController_tree_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 删除登录日志（硬删） */
+    delete: operations['LoginLogController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/menu/tree': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/menu/routes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 当前用户可见菜单树（前端动态菜单） */
-        get: operations["MenuController_routes_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 全量菜单树（管理页） */
+    get: operations['MenuController_tree_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/menu/routes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/menu/pages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 全部可导航页面（注册路由用，不按权限过滤） */
-        get: operations["MenuController_pages_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 当前用户可见菜单树（前端动态菜单） */
+    get: operations['MenuController_routes_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/menu/pages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/menu": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 创建菜单 */
-        post: operations["MenuController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 全部可导航页面（注册路由用，不按权限过滤） */
+    get: operations['MenuController_pages_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/menu': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/menu/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 更新菜单 */
-        put: operations["MenuController_update_v1"];
-        post?: never;
-        /** 删除菜单（软删除，有下级则拒绝） */
-        delete: operations["MenuController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 创建菜单 */
+    post: operations['MenuController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/menu/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dict/type": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询字典类型 */
-        get: operations["DictController_pageType_v1"];
-        put?: never;
-        /** 创建字典类型 */
-        post: operations["DictController_createType_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 更新菜单 */
+    put: operations['MenuController_update_v1'];
+    post?: never;
+    /** 删除菜单（软删除，有下级则拒绝） */
+    delete: operations['MenuController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dict/type': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dict/type/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 更新字典类型（改标识时级联更新字典数据） */
-        put: operations["DictController_updateType_v1"];
-        post?: never;
-        /** 删除字典类型（软删除，级联软删字典数据） */
-        delete: operations["DictController_removeType_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询字典类型 */
+    get: operations['DictController_pageType_v1'];
+    put?: never;
+    /** 创建字典类型 */
+    post: operations['DictController_createType_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dict/type/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dict/data": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询字典数据 */
-        get: operations["DictController_pageData_v1"];
-        put?: never;
-        /** 创建字典数据 */
-        post: operations["DictController_createData_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 更新字典类型（改标识时级联更新字典数据） */
+    put: operations['DictController_updateType_v1'];
+    post?: never;
+    /** 删除字典类型（软删除，级联软删字典数据） */
+    delete: operations['DictController_removeType_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dict/data': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dict/data/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 更新字典数据 */
-        put: operations["DictController_updateData_v1"];
-        post?: never;
-        /** 删除字典数据（软删除） */
-        delete: operations["DictController_removeData_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询字典数据 */
+    get: operations['DictController_pageData_v1'];
+    put?: never;
+    /** 创建字典数据 */
+    post: operations['DictController_createData_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dict/data/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dict/options/{dictType}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 按类型查询字典选项（登录即可，前端下拉用） */
-        get: operations["DictController_options_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 更新字典数据 */
+    put: operations['DictController_updateData_v1'];
+    post?: never;
+    /** 删除字典数据（软删除） */
+    delete: operations['DictController_removeData_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/dict/options/{dictType}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/config": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询参数配置 */
-        get: operations["ConfigController_page_v1"];
-        put?: never;
-        /** 创建参数配置 */
-        post: operations["ConfigController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 按类型查询字典选项（登录即可，前端下拉用） */
+    get: operations['DictController_options_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/config': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/config/key/{configKey}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 按参数键取值（登录即可） */
-        get: operations["ConfigController_getByKey_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询参数配置 */
+    get: operations['ConfigController_page_v1'];
+    put?: never;
+    /** 创建参数配置 */
+    post: operations['ConfigController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/config/key/{configKey}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/config/export": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 导出参数配置（CSV，最多 5000 行） */
-        get: operations["ConfigController_exportCsv_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 按参数键取值（登录即可） */
+    get: operations['ConfigController_getByKey_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/config/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/config/import": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 导入参数配置（CSV，最多 5000 行，逐行返回失败原因） */
-        post: operations["ConfigController_importCsv_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 导出参数配置（CSV，最多 5000 行） */
+    get: operations['ConfigController_exportCsv_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/config/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/config/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 参数配置详情 */
-        get: operations["ConfigController_detail_v1"];
-        /** 更新参数配置 */
-        put: operations["ConfigController_update_v1"];
-        post?: never;
-        /** 删除参数配置（软删除，系统内置不可删） */
-        delete: operations["ConfigController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 导入参数配置（CSV，最多 5000 行，逐行返回失败原因） */
+    post: operations['ConfigController_importCsv_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/config/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询文件（管理端） */
-        get: operations["FileController_page_v1"];
-        put?: never;
-        /** 上传文件（服务端判定类型、内容寻址去重、可选立即绑定） */
-        post: operations["FileController_upload_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 参数配置详情 */
+    get: operations['ConfigController_detail_v1'];
+    /** 更新参数配置 */
+    put: operations['ConfigController_update_v1'];
+    post?: never;
+    /** 删除参数配置（软删除，系统内置不可删） */
+    delete: operations['ConfigController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file/biz/{bizType}/{bizId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 查询业务对象下的附件（鉴权由业务模块判定） */
-        get: operations["FileController_listByBiz_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询文件（管理端） */
+    get: operations['FileController_page_v1'];
+    put?: never;
+    /** 上传文件（服务端判定类型、内容寻址去重、可选立即绑定） */
+    post: operations['FileController_upload_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file/biz/{bizType}/{bizId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file/bind": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 把已上传文件绑定到业务对象（重复绑定幂等） */
-        post: operations["FileController_bind_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 查询业务对象下的附件（鉴权由业务模块判定） */
+    get: operations['FileController_listByBiz_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file/bind': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file/unbind": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 从业务对象解绑文件（不删文件本体） */
-        post: operations["FileController_unbind_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 把已上传文件绑定到业务对象（重复绑定幂等） */
+    post: operations['FileController_bind_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file/unbind': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 文件详情（含绑定关系） */
-        get: operations["FileController_detail_v1"];
-        put?: never;
-        post?: never;
-        /** 删除文件（上传人本人或文件管理员；软删） */
-        delete: operations["FileController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 从业务对象解绑文件（不删文件本体） */
+    post: operations['FileController_unbind_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/file/{id}/download": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 下载文件（服务端代理：鉴权 + 审计 + 防盗链，流式返回） */
-        get: operations["FileController_download_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 文件详情（含绑定关系） */
+    get: operations['FileController_detail_v1'];
+    put?: never;
+    post?: never;
+    /** 删除文件（上传人本人或文件管理员；软删） */
+    delete: operations['FileController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/file/{id}/download': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询隐患（按角色数据范围 + 协办部门过滤） */
-        get: operations["HazardController_page_v1"];
-        put?: never;
-        /** 上报隐患 */
-        post: operations["HazardController_report_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 下载文件（服务端代理：鉴权 + 审计 + 防盗链，流式返回） */
+    get: operations['FileController_download_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 隐患详情（含流转轨迹与省平台同步记录） */
-        get: operations["HazardController_detail_v1"];
-        put?: never;
-        post?: never;
-        /** 删除隐患（软删除；仅已归档/已驳回可删） */
-        delete: operations["HazardController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询隐患（按角色数据范围 + 协办部门过滤） */
+    get: operations['HazardController_page_v1'];
+    put?: never;
+    /** 上报隐患 */
+    post: operations['HazardController_report_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 受理隐患（确定主责/协办部门、处理人、整改期限） */
-        post: operations["HazardController_accept_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 隐患详情（含流转轨迹与省平台同步记录） */
+    get: operations['HazardController_detail_v1'];
+    put?: never;
+    post?: never;
+    /** 删除隐患（软删除；仅已归档/已驳回可删） */
+    delete: operations['HazardController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}/accept': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 驳回隐患（单据终止） */
-        post: operations["HazardController_reject_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 受理隐患（确定主责/协办部门、处理人、整改期限） */
+    post: operations['HazardController_accept_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}/reject': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}/rectify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 提交整改措施（进入待复查） */
-        post: operations["HazardController_rectify_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 驳回隐患（单据终止） */
+    post: operations['HazardController_reject_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}/rectify': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}/review": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 复查隐患（passed=true 通过 → 待归档；false 退回整改） */
-        post: operations["HazardController_review_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 提交整改措施（进入待复查） */
+    post: operations['HazardController_rectify_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}/review': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/hazard/{id}/archive": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 归档隐患（终态；审计员执行，只归档不改内容） */
-        post: operations["HazardController_archive_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 复查隐患（passed=true 通过 → 待归档；false 退回整改） */
+    post: operations['HazardController_review_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/hazard/{id}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 分页查询角色 */
-        get: operations["RoleController_page_v1"];
-        put?: never;
-        /** 创建角色 */
-        post: operations["RoleController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** 归档隐患（终态；审计员执行，只归档不改内容） */
+    post: operations['HazardController_archive_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/role': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/role/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 角色详情 */
-        get: operations["RoleController_detail_v1"];
-        /** 更新角色 */
-        put: operations["RoleController_update_v1"];
-        post?: never;
-        /** 删除角色（软删除） */
-        delete: operations["RoleController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 分页查询角色 */
+    get: operations['RoleController_page_v1'];
+    put?: never;
+    /** 创建角色 */
+    post: operations['RoleController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/role/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/permission": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 按模块分组的权限清单 */
-        get: operations["PermissionController_list_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 角色详情 */
+    get: operations['RoleController_detail_v1'];
+    /** 更新角色 */
+    put: operations['RoleController_update_v1'];
+    post?: never;
+    /** 删除角色（软删除） */
+    delete: operations['RoleController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/permission': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ops/overview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 运行概览（HTTP / 数据库 / Outbox / 审计） */
-        get: operations["OpsController_overview_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 按模块分组的权限清单 */
+    get: operations['PermissionController_list_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ops/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ops/metrics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Prometheus 指标（默认仅本机；配置 METRICS_TOKEN 后需带请求头） */
-        get: operations["OpsController_prometheus_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** 运行概览（HTTP / 数据库 / Outbox / 审计） */
+    get: operations['OpsController_overview_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ops/metrics': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ops/audit-retention": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** 保存审计留存天数（写 sys_config.audit.retentionDays） */
-        put: operations["OpsController_saveRetention_v1"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Prometheus 指标（默认仅本机；配置 METRICS_TOKEN 后需带请求头） */
+    get: operations['OpsController_prometheus_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ops/audit-retention': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ops/audit-cleanup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 立即清理过期审计（分批，最多 20 万条/次） */
-        post: operations["OpsController_cleanup_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** 保存审计留存天数（写 sys_config.audit.retentionDays） */
+    put: operations['OpsController_saveRetention_v1'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/ops/audit-cleanup': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    /** 立即清理过期审计（分批，最多 20 万条/次） */
+    post: operations['OpsController_cleanup_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        SysLoginLogPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: string;
-                    username: string;
-                    ip?: string | null;
-                    userAgent?: string | null;
-                    /** @description 1 成功 / 0 失败 */
-                    status: number;
-                    msg?: string | null;
-                    /** Format: date-time */
-                    loginTime: string;
-                }[];
-                total: number;
-            };
-        };
-        BoolResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: boolean;
-        };
-        SysDeptTree: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysDeptTreeData"][];
-        };
-        SysDeptTreeData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @description 祖先路径，如 0,1,3 */
-            ancestors: string;
-            sort: number;
-            status: number;
-            children?: components["schemas"]["SysDeptTreeData"][];
-        };
-        SysDeptList: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysDeptListData"][];
-        };
-        SysDeptListData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @description 祖先路径，如 0,1,3 */
-            ancestors: string;
-            sort: number;
-            status: number;
-            children?: components["schemas"]["SysDeptListData"][];
-        };
-        SysDept: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysDeptData"];
-        };
-        SysDeptData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @description 祖先路径，如 0,1,3 */
-            ancestors: string;
-            sort: number;
-            status: number;
-            children?: components["schemas"]["SysDeptData"][];
-        };
-        SysUserPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    username: string;
-                    nickname: string;
-                    email: string;
-                    phone: string;
-                    /** @description 1 正常 / 0 禁用 */
-                    status: number;
-                    deptId?: number | null;
-                    post: string;
-                }[];
-                total: number;
-            };
-        };
-        SysUser: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                username: string;
-                nickname: string;
-                email: string;
-                phone: string;
-                /** @description 1 正常 / 0 禁用 */
-                status: number;
-                deptId?: number | null;
-                post: string;
-            };
-        };
-        VoidResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            /** @description 无返回体时为 null */
-            data?: unknown;
-        };
-        SysUserRoles: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                userId: number;
-                roleId: number;
-                /** Format: date-time */
-                expireAt?: string | null;
-                /** @description direct 永久 / temp 临时 */
-                source: string;
-                grantedBy?: number | null;
-            }[];
-        };
-        CaptchaResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                /** @description SVG 文本 */
-                img: string;
-                uuid: string;
-            };
-        };
-        LoginResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                token: string;
-                user: {
-                    userId: number;
-                    username: string;
-                    nickname: string;
-                };
-            };
-        };
-        Profile: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                userId: number;
-                username: string;
-                nickname: string;
-                email: string;
-                phone: string;
-                deptId?: number | null;
-                post: string;
-                roles: number[];
-                roleNames: string[];
-                permissions: string[];
-                rules: {
-                    action: string;
-                    subject: string;
-                    conditions?: {
-                        [key: string]: unknown;
-                    };
-                    fields?: string[];
-                    inverted?: boolean;
-                }[];
-                dataScopes: string[];
-            };
-        };
-        SysAuditLogPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: string;
-                    traceId?: string | null;
-                    actorId?: number | null;
-                    actorName?: string | null;
-                    action: string;
-                    resourceType?: string | null;
-                    resourceId?: string | null;
-                    /** @enum {string} */
-                    result: "success" | "fail";
-                    errorCode?: string | null;
-                    method: string;
-                    path: string;
-                    ip?: string | null;
-                    userAgent?: string | null;
-                    detail?: {
-                        [key: string]: unknown;
-                    } | null;
-                    durationMs?: number | null;
-                    /** Format: date-time */
-                    createTime: string;
-                }[];
-                total: number;
-            };
-        };
-        SysAuditLog: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: string;
-                traceId?: string | null;
-                actorId?: number | null;
-                actorName?: string | null;
-                action: string;
-                resourceType?: string | null;
-                resourceId?: string | null;
-                /** @enum {string} */
-                result: "success" | "fail";
-                errorCode?: string | null;
-                method: string;
-                path: string;
-                ip?: string | null;
-                userAgent?: string | null;
-                detail?: {
-                    [key: string]: unknown;
-                } | null;
-                durationMs?: number | null;
-                /** Format: date-time */
-                createTime: string;
-            };
-        };
-        SysConfigPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    configName: string;
-                    configKey: string;
-                    configValue: string;
-                    /**
-                     * @description Y 系统内置（不可删）/ N 自定义
-                     * @enum {string}
-                     */
-                    configType: "Y" | "N";
-                    status: number;
-                    remark: string;
-                }[];
-                total: number;
-            };
-        };
-        SysConfigValue: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                configKey: string;
-                configValue: string;
-            };
-        };
-        ConfigImportResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                total: number;
-                ok: number;
-                failed: {
-                    row: number;
-                    message: string;
-                }[];
-                failedTruncated: boolean;
-            };
-        };
-        SysConfig: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                configName: string;
-                configKey: string;
-                configValue: string;
-                /**
-                 * @description Y 系统内置（不可删）/ N 自定义
-                 * @enum {string}
-                 */
-                configType: "Y" | "N";
-                status: number;
-                remark: string;
-            };
-        };
-        SysDictTypePage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    dictName: string;
-                    dictType: string;
-                    status: number;
-                    remark: string;
-                }[];
-                total: number;
-            };
-        };
-        SysDictType: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                dictName: string;
-                dictType: string;
-                status: number;
-                remark: string;
-            };
-        };
-        SysDictDataPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    dictType: string;
-                    dictLabel: string;
-                    dictValue: string;
-                    dictSort: number;
-                    tagType: string;
-                    status: number;
-                    remark: string;
-                }[];
-                total: number;
-            };
-        };
-        SysDictData: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                dictType: string;
-                dictLabel: string;
-                dictValue: string;
-                dictSort: number;
-                tagType: string;
-                status: number;
-                remark: string;
-            };
-        };
-        SysDictOptions: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                label: string;
-                value: string;
-                tagType: string;
-            }[];
-        };
-        FileUploadResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                file: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    originalName: string;
-                    ext: string;
-                    mime: string;
-                    size: number;
-                    uploaderId: number;
-                    uploaderName: string;
-                    uploaderDeptId: number | null;
-                    /** @enum {string} */
-                    status: "TEMP" | "ACTIVE";
-                    refCount: number;
-                    /** Format: date-time */
-                    expireAt: string | null;
-                    /** @description 下载地址（需携带 Authorization） */
-                    downloadUrl: string;
-                };
-                /** @description 是否命中秒传（内容重复，未重复写入存储） */
-                deduped: boolean;
-            };
-        };
-        BizFileList: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                link: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    fileId: number;
-                    bizType: string;
-                    bizId: string;
-                    bizField: string;
-                    sort: number;
-                };
-                file: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    originalName: string;
-                    ext: string;
-                    mime: string;
-                    size: number;
-                    uploaderId: number;
-                    uploaderName: string;
-                    uploaderDeptId: number | null;
-                    /** @enum {string} */
-                    status: "TEMP" | "ACTIVE";
-                    refCount: number;
-                    /** Format: date-time */
-                    expireAt: string | null;
-                    /** @description 下载地址（需携带 Authorization） */
-                    downloadUrl: string;
-                };
-            }[];
-        };
-        FileBindResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                bound: number;
-                skipped: number;
-            };
-        };
-        FileUnbindResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                unbound: number;
-            };
-        };
-        FilePage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    originalName: string;
-                    ext: string;
-                    mime: string;
-                    size: number;
-                    uploaderId: number;
-                    uploaderName: string;
-                    uploaderDeptId: number | null;
-                    /** @enum {string} */
-                    status: "TEMP" | "ACTIVE";
-                    refCount: number;
-                    /** Format: date-time */
-                    expireAt: string | null;
-                    /** @description 下载地址（需携带 Authorization） */
-                    downloadUrl: string;
-                }[];
-                total: number;
-            };
-        };
-        FileDetail: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                file: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    originalName: string;
-                    ext: string;
-                    mime: string;
-                    size: number;
-                    uploaderId: number;
-                    uploaderName: string;
-                    uploaderDeptId: number | null;
-                    /** @enum {string} */
-                    status: "TEMP" | "ACTIVE";
-                    refCount: number;
-                    /** Format: date-time */
-                    expireAt: string | null;
-                    /** @description 下载地址（需携带 Authorization） */
-                    downloadUrl: string;
-                };
-                links: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    fileId: number;
-                    bizType: string;
-                    bizId: string;
-                    bizField: string;
-                    sort: number;
-                }[];
-            };
-        };
-        FileRemoveResult: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            /** @enum {string|null} */
-            data?: null;
-        };
-        HazardPage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    hazardNo: string;
-                    title: string;
-                    content: string;
-                    location: string;
-                    category: string;
-                    /** @enum {string} */
-                    level: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-                    /** @enum {string} */
-                    scope: "DEPT" | "OPEN" | "SCHOOL";
-                    /** @enum {string} */
-                    status: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                    /** @description 状态中文名 */
-                    statusLabel: string;
-                    reporterId: number;
-                    reporterName: string;
-                    reporterDeptId: number | null;
-                    assigneeDeptId: number | null;
-                    /** @description 主责部门名（联表补全） */
-                    assigneeDeptName: string;
-                    cooperateDeptIds: number[];
-                    /** @description 协办部门名（联表补全） */
-                    cooperateDeptNames: string[];
-                    handlerId: number | null;
-                    handlerName: string;
-                    /** Format: date-time */
-                    deadlineAt: string | null;
-                    /** Format: date-time */
-                    rectifyDeadline: string | null;
-                    /** @description 是否逾期未办结 */
-                    overdue: boolean;
-                    rectifyMeasure: string | null;
-                    /** Format: date-time */
-                    rectifyTime: string | null;
-                    reviewOpinion: string;
-                    reviewerId: number | null;
-                    /** Format: date-time */
-                    reviewTime: string | null;
-                    archiveOpinion: string;
-                    archiverId: number | null;
-                    /** Format: date-time */
-                    archiveTime: string | null;
-                    rejectReason: string;
-                    availableActions: ("REPORT" | "ACCEPT" | "REJECT" | "RECTIFY" | "REVIEW_PASS" | "REVIEW_BACK" | "ARCHIVE")[];
-                }[];
-                total: number;
-            };
-        };
-        HazardDetail: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                hazardNo: string;
-                title: string;
-                content: string;
-                location: string;
-                category: string;
-                /** @enum {string} */
-                level: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-                /** @enum {string} */
-                scope: "DEPT" | "OPEN" | "SCHOOL";
-                /** @enum {string} */
-                status: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                /** @description 状态中文名 */
-                statusLabel: string;
-                reporterId: number;
-                reporterName: string;
-                reporterDeptId: number | null;
-                assigneeDeptId: number | null;
-                /** @description 主责部门名（联表补全） */
-                assigneeDeptName: string;
-                cooperateDeptIds: number[];
-                /** @description 协办部门名（联表补全） */
-                cooperateDeptNames: string[];
-                handlerId: number | null;
-                handlerName: string;
-                /** Format: date-time */
-                deadlineAt: string | null;
-                /** Format: date-time */
-                rectifyDeadline: string | null;
-                /** @description 是否逾期未办结 */
-                overdue: boolean;
-                rectifyMeasure: string | null;
-                /** Format: date-time */
-                rectifyTime: string | null;
-                reviewOpinion: string;
-                reviewerId: number | null;
-                /** Format: date-time */
-                reviewTime: string | null;
-                archiveOpinion: string;
-                archiverId: number | null;
-                /** Format: date-time */
-                archiveTime: string | null;
-                rejectReason: string;
-                availableActions: ("REPORT" | "ACCEPT" | "REJECT" | "RECTIFY" | "REVIEW_PASS" | "REVIEW_BACK" | "ARCHIVE")[];
-                logs: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    hazardId: number;
-                    hazardNo: string;
-                    /** @enum {string} */
-                    action: "REPORT" | "ACCEPT" | "REJECT" | "RECTIFY" | "REVIEW_PASS" | "REVIEW_BACK" | "ARCHIVE";
-                    actionLabel: string;
-                    /** @enum {string|null} */
-                    fromStatus: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED" | null;
-                    /** @enum {string} */
-                    toStatus: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                    operatorId: number;
-                    operatorName: string;
-                    deptId: number | null;
-                    remark: string;
-                }[];
-                syncRecords: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    hazardId: number;
-                    hazardNo: string;
-                    eventId: string;
-                    eventType: string;
-                    /** @enum {string} */
-                    toStatus: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                    /** @enum {string} */
-                    direction: "PUSH" | "PULL";
-                    /** @enum {string} */
-                    status: "SUCCESS" | "FAILED";
-                    error: string;
-                    retryCount: number;
-                    target: string;
-                }[];
-            };
-        };
-        Hazard: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                hazardNo: string;
-                title: string;
-                content: string;
-                location: string;
-                category: string;
-                /** @enum {string} */
-                level: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-                /** @enum {string} */
-                scope: "DEPT" | "OPEN" | "SCHOOL";
-                /** @enum {string} */
-                status: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                /** @description 状态中文名 */
-                statusLabel: string;
-                reporterId: number;
-                reporterName: string;
-                reporterDeptId: number | null;
-                assigneeDeptId: number | null;
-                /** @description 主责部门名（联表补全） */
-                assigneeDeptName: string;
-                cooperateDeptIds: number[];
-                /** @description 协办部门名（联表补全） */
-                cooperateDeptNames: string[];
-                handlerId: number | null;
-                handlerName: string;
-                /** Format: date-time */
-                deadlineAt: string | null;
-                /** Format: date-time */
-                rectifyDeadline: string | null;
-                /** @description 是否逾期未办结 */
-                overdue: boolean;
-                rectifyMeasure: string | null;
-                /** Format: date-time */
-                rectifyTime: string | null;
-                reviewOpinion: string;
-                reviewerId: number | null;
-                /** Format: date-time */
-                reviewTime: string | null;
-                archiveOpinion: string;
-                archiverId: number | null;
-                /** Format: date-time */
-                archiveTime: string | null;
-                rejectReason: string;
-                availableActions: ("REPORT" | "ACCEPT" | "REJECT" | "RECTIFY" | "REVIEW_PASS" | "REVIEW_BACK" | "ARCHIVE")[];
-            };
-        };
-        SysMenuTree: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysMenuTreeData"][];
-        };
-        SysMenuTreeData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @enum {string} */
-            type: "M" | "C" | "F";
-            path: string;
-            component: string;
-            perms: string;
-            icon: string;
-            sort: number;
-            /** @description 1 显示 / 0 隐藏 */
-            visible: number;
-            status: number;
-            ancestors: string;
-            children?: components["schemas"]["SysMenuTreeData"][];
-        };
-        SysMenuPages: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysMenuPagesData"][];
-        };
-        SysMenuPagesData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @enum {string} */
-            type: "M" | "C" | "F";
-            path: string;
-            component: string;
-            perms: string;
-            icon: string;
-            sort: number;
-            /** @description 1 显示 / 0 隐藏 */
-            visible: number;
-            status: number;
-            ancestors: string;
-            children?: components["schemas"]["SysMenuPagesData"][];
-        };
-        SysMenu: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: components["schemas"]["SysMenuData"];
-        };
-        SysMenuData: {
-            id: number;
-            /** Format: date-time */
-            createTime: string;
-            /** Format: date-time */
-            updateTime: string;
-            parentId?: number | null;
-            name: string;
-            /** @enum {string} */
-            type: "M" | "C" | "F";
-            path: string;
-            component: string;
-            perms: string;
-            icon: string;
-            sort: number;
-            /** @description 1 显示 / 0 隐藏 */
-            visible: number;
-            status: number;
-            ancestors: string;
-            children?: components["schemas"]["SysMenuData"][];
-        };
-        SysPermissionGroups: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                module: string;
-                moduleLabel: string;
-                permissions: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    /** @description 权限码，如 system:role:list */
-                    code: string;
-                    /** @description 权限名称（取自接口 summary） */
-                    name: string;
-                    /** @description 模块键（权限码第一段） */
-                    module: string;
-                    /** @description 模块显示名（取自 @ApiTags） */
-                    moduleLabel: string;
-                    /** @description 1 有效 / 0 已停用（代码中已不存在） */
-                    status: number;
-                }[];
-            }[];
-        };
-        SysRolePage: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                list: {
-                    id: number;
-                    /** Format: date-time */
-                    createTime: string;
-                    /** Format: date-time */
-                    updateTime: string;
-                    roleName: string;
-                    level: number;
-                    isBuiltin: number;
-                    permissions: string[];
-                    rules?: {
-                        action: string;
-                        subject: string;
-                        conditions?: {
-                            [key: string]: unknown;
-                        };
-                        fields?: string[];
-                        inverted?: boolean;
-                    }[] | null;
-                    dataScope: string;
-                    status: number;
-                }[];
-                total: number;
-            };
-        };
-        SysRole: {
-            /**
-             * @description 业务码，200 表示成功
-             * @example 200
-             */
-            code: number;
-            /**
-             * @description 提示信息
-             * @example 操作成功
-             */
-            msg: string;
-            data?: {
-                id: number;
-                /** Format: date-time */
-                createTime: string;
-                /** Format: date-time */
-                updateTime: string;
-                roleName: string;
-                level: number;
-                isBuiltin: number;
-                permissions: string[];
-                rules?: {
-                    action: string;
-                    subject: string;
-                    conditions?: {
-                        [key: string]: unknown;
-                    };
-                    fields?: string[];
-                    inverted?: boolean;
-                }[] | null;
-                dataScope: string;
-                status: number;
-            };
-        };
+  schemas: {
+    SysLoginLogPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: string;
+          username: string;
+          ip?: string | null;
+          userAgent?: string | null;
+          /** @description 1 成功 / 0 失败 */
+          status: number;
+          msg?: string | null;
+          /** Format: date-time */
+          loginTime: string;
+        }[];
+        total: number;
+      };
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    BoolResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: boolean;
+    };
+    SysDeptTree: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysDeptTreeData'][];
+    };
+    SysDeptTreeData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @description 祖先路径，如 0,1,3 */
+      ancestors: string;
+      sort: number;
+      status: number;
+      children?: components['schemas']['SysDeptTreeData'][];
+    };
+    SysDeptList: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysDeptListData'][];
+    };
+    SysDeptListData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @description 祖先路径，如 0,1,3 */
+      ancestors: string;
+      sort: number;
+      status: number;
+      children?: components['schemas']['SysDeptListData'][];
+    };
+    SysDept: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysDeptData'];
+    };
+    SysDeptData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @description 祖先路径，如 0,1,3 */
+      ancestors: string;
+      sort: number;
+      status: number;
+      children?: components['schemas']['SysDeptData'][];
+    };
+    SysUserPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          username: string;
+          nickname: string;
+          email: string;
+          phone: string;
+          /** @description 1 正常 / 0 禁用 */
+          status: number;
+          deptId?: number | null;
+          post: string;
+        }[];
+        total: number;
+      };
+    };
+    SysUser: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        username: string;
+        nickname: string;
+        email: string;
+        phone: string;
+        /** @description 1 正常 / 0 禁用 */
+        status: number;
+        deptId?: number | null;
+        post: string;
+      };
+    };
+    VoidResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      /** @description 无返回体时为 null */
+      data?: unknown;
+    };
+    SysUserRoles: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        userId: number;
+        roleId: number;
+        /** Format: date-time */
+        expireAt?: string | null;
+        /** @description direct 永久 / temp 临时 */
+        source: string;
+        grantedBy?: number | null;
+      }[];
+    };
+    CaptchaResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        /** @description SVG 文本 */
+        img: string;
+        uuid: string;
+      };
+    };
+    LoginResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        token: string;
+        user: {
+          userId: number;
+          username: string;
+          nickname: string;
+        };
+      };
+    };
+    Profile: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        userId: number;
+        username: string;
+        nickname: string;
+        email: string;
+        phone: string;
+        deptId?: number | null;
+        post: string;
+        roles: number[];
+        roleNames: string[];
+        permissions: string[];
+        rules: {
+          action: string;
+          subject: string;
+          conditions?: {
+            [key: string]: unknown;
+          };
+          fields?: string[];
+          inverted?: boolean;
+        }[];
+        dataScopes: string[];
+      };
+    };
+    SysAuditLogPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: string;
+          traceId?: string | null;
+          actorId?: number | null;
+          actorName?: string | null;
+          action: string;
+          resourceType?: string | null;
+          resourceId?: string | null;
+          /** @enum {string} */
+          result: 'success' | 'fail';
+          errorCode?: string | null;
+          method: string;
+          path: string;
+          ip?: string | null;
+          userAgent?: string | null;
+          detail?: {
+            [key: string]: unknown;
+          } | null;
+          durationMs?: number | null;
+          /** Format: date-time */
+          createTime: string;
+        }[];
+        total: number;
+      };
+    };
+    SysAuditLog: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: string;
+        traceId?: string | null;
+        actorId?: number | null;
+        actorName?: string | null;
+        action: string;
+        resourceType?: string | null;
+        resourceId?: string | null;
+        /** @enum {string} */
+        result: 'success' | 'fail';
+        errorCode?: string | null;
+        method: string;
+        path: string;
+        ip?: string | null;
+        userAgent?: string | null;
+        detail?: {
+          [key: string]: unknown;
+        } | null;
+        durationMs?: number | null;
+        /** Format: date-time */
+        createTime: string;
+      };
+    };
+    SysConfigPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          configName: string;
+          configKey: string;
+          configValue: string;
+          /**
+           * @description Y 系统内置（不可删）/ N 自定义
+           * @enum {string}
+           */
+          configType: 'Y' | 'N';
+          status: number;
+          remark: string;
+        }[];
+        total: number;
+      };
+    };
+    SysConfigValue: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        configKey: string;
+        configValue: string;
+      };
+    };
+    ConfigImportResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        total: number;
+        ok: number;
+        failed: {
+          row: number;
+          message: string;
+        }[];
+        failedTruncated: boolean;
+      };
+    };
+    SysConfig: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        configName: string;
+        configKey: string;
+        configValue: string;
+        /**
+         * @description Y 系统内置（不可删）/ N 自定义
+         * @enum {string}
+         */
+        configType: 'Y' | 'N';
+        status: number;
+        remark: string;
+      };
+    };
+    SysDictTypePage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          dictName: string;
+          dictType: string;
+          status: number;
+          remark: string;
+        }[];
+        total: number;
+      };
+    };
+    SysDictType: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        dictName: string;
+        dictType: string;
+        status: number;
+        remark: string;
+      };
+    };
+    SysDictDataPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          dictType: string;
+          dictLabel: string;
+          dictValue: string;
+          dictSort: number;
+          tagType: string;
+          status: number;
+          remark: string;
+        }[];
+        total: number;
+      };
+    };
+    SysDictData: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        dictType: string;
+        dictLabel: string;
+        dictValue: string;
+        dictSort: number;
+        tagType: string;
+        status: number;
+        remark: string;
+      };
+    };
+    SysDictOptions: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        label: string;
+        value: string;
+        tagType: string;
+      }[];
+    };
+    FileUploadResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        file: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          originalName: string;
+          ext: string;
+          mime: string;
+          size: number;
+          uploaderId: number;
+          uploaderName: string;
+          uploaderDeptId: number | null;
+          /** @enum {string} */
+          status: 'TEMP' | 'ACTIVE';
+          refCount: number;
+          /** Format: date-time */
+          expireAt: string | null;
+          /** @description 下载地址（需携带 Authorization） */
+          downloadUrl: string;
+        };
+        /** @description 是否命中秒传（内容重复，未重复写入存储） */
+        deduped: boolean;
+      };
+    };
+    BizFileList: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        link: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          fileId: number;
+          bizType: string;
+          bizId: string;
+          bizField: string;
+          sort: number;
+        };
+        file: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          originalName: string;
+          ext: string;
+          mime: string;
+          size: number;
+          uploaderId: number;
+          uploaderName: string;
+          uploaderDeptId: number | null;
+          /** @enum {string} */
+          status: 'TEMP' | 'ACTIVE';
+          refCount: number;
+          /** Format: date-time */
+          expireAt: string | null;
+          /** @description 下载地址（需携带 Authorization） */
+          downloadUrl: string;
+        };
+      }[];
+    };
+    FileBindResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        bound: number;
+        skipped: number;
+      };
+    };
+    FileUnbindResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        unbound: number;
+      };
+    };
+    FilePage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          originalName: string;
+          ext: string;
+          mime: string;
+          size: number;
+          uploaderId: number;
+          uploaderName: string;
+          uploaderDeptId: number | null;
+          /** @enum {string} */
+          status: 'TEMP' | 'ACTIVE';
+          refCount: number;
+          /** Format: date-time */
+          expireAt: string | null;
+          /** @description 下载地址（需携带 Authorization） */
+          downloadUrl: string;
+        }[];
+        total: number;
+      };
+    };
+    FileDetail: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        file: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          originalName: string;
+          ext: string;
+          mime: string;
+          size: number;
+          uploaderId: number;
+          uploaderName: string;
+          uploaderDeptId: number | null;
+          /** @enum {string} */
+          status: 'TEMP' | 'ACTIVE';
+          refCount: number;
+          /** Format: date-time */
+          expireAt: string | null;
+          /** @description 下载地址（需携带 Authorization） */
+          downloadUrl: string;
+        };
+        links: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          fileId: number;
+          bizType: string;
+          bizId: string;
+          bizField: string;
+          sort: number;
+        }[];
+      };
+    };
+    FileRemoveResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      /** @enum {string|null} */
+      data?: null;
+    };
+    HazardPage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          hazardNo: string;
+          title: string;
+          content: string;
+          location: string;
+          category: string;
+          /** @enum {string} */
+          level: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+          /** @enum {string} */
+          scope: 'DEPT' | 'OPEN' | 'SCHOOL';
+          /** @enum {string} */
+          status:
+            | 'REPORTED'
+            | 'PROCESSING'
+            | 'RECTIFIED'
+            | 'REVIEWED'
+            | 'ARCHIVED'
+            | 'REJECTED';
+          /** @description 状态中文名 */
+          statusLabel: string;
+          reporterId: number;
+          reporterName: string;
+          reporterDeptId: number | null;
+          assigneeDeptId: number | null;
+          /** @description 主责部门名（联表补全） */
+          assigneeDeptName: string;
+          cooperateDeptIds: number[];
+          /** @description 协办部门名（联表补全） */
+          cooperateDeptNames: string[];
+          handlerId: number | null;
+          handlerName: string;
+          /** Format: date-time */
+          deadlineAt: string | null;
+          /** Format: date-time */
+          rectifyDeadline: string | null;
+          /** @description 是否逾期未办结 */
+          overdue: boolean;
+          rectifyMeasure: string | null;
+          /** Format: date-time */
+          rectifyTime: string | null;
+          reviewOpinion: string;
+          reviewerId: number | null;
+          /** Format: date-time */
+          reviewTime: string | null;
+          archiveOpinion: string;
+          archiverId: number | null;
+          /** Format: date-time */
+          archiveTime: string | null;
+          rejectReason: string;
+          availableActions: (
+            | 'REPORT'
+            | 'ACCEPT'
+            | 'REJECT'
+            | 'RECTIFY'
+            | 'REVIEW_PASS'
+            | 'REVIEW_BACK'
+            | 'ARCHIVE'
+          )[];
+        }[];
+        total: number;
+      };
+    };
+    HazardDetail: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        hazardNo: string;
+        title: string;
+        content: string;
+        location: string;
+        category: string;
+        /** @enum {string} */
+        level: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+        /** @enum {string} */
+        scope: 'DEPT' | 'OPEN' | 'SCHOOL';
+        /** @enum {string} */
+        status:
+          | 'REPORTED'
+          | 'PROCESSING'
+          | 'RECTIFIED'
+          | 'REVIEWED'
+          | 'ARCHIVED'
+          | 'REJECTED';
+        /** @description 状态中文名 */
+        statusLabel: string;
+        reporterId: number;
+        reporterName: string;
+        reporterDeptId: number | null;
+        assigneeDeptId: number | null;
+        /** @description 主责部门名（联表补全） */
+        assigneeDeptName: string;
+        cooperateDeptIds: number[];
+        /** @description 协办部门名（联表补全） */
+        cooperateDeptNames: string[];
+        handlerId: number | null;
+        handlerName: string;
+        /** Format: date-time */
+        deadlineAt: string | null;
+        /** Format: date-time */
+        rectifyDeadline: string | null;
+        /** @description 是否逾期未办结 */
+        overdue: boolean;
+        rectifyMeasure: string | null;
+        /** Format: date-time */
+        rectifyTime: string | null;
+        reviewOpinion: string;
+        reviewerId: number | null;
+        /** Format: date-time */
+        reviewTime: string | null;
+        archiveOpinion: string;
+        archiverId: number | null;
+        /** Format: date-time */
+        archiveTime: string | null;
+        rejectReason: string;
+        availableActions: (
+          | 'REPORT'
+          | 'ACCEPT'
+          | 'REJECT'
+          | 'RECTIFY'
+          | 'REVIEW_PASS'
+          | 'REVIEW_BACK'
+          | 'ARCHIVE'
+        )[];
+        logs: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          hazardId: number;
+          hazardNo: string;
+          /** @enum {string} */
+          action:
+            | 'REPORT'
+            | 'ACCEPT'
+            | 'REJECT'
+            | 'RECTIFY'
+            | 'REVIEW_PASS'
+            | 'REVIEW_BACK'
+            | 'ARCHIVE';
+          actionLabel: string;
+          /** @enum {string|null} */
+          fromStatus:
+            | 'REPORTED'
+            | 'PROCESSING'
+            | 'RECTIFIED'
+            | 'REVIEWED'
+            | 'ARCHIVED'
+            | 'REJECTED'
+            | null;
+          /** @enum {string} */
+          toStatus:
+            | 'REPORTED'
+            | 'PROCESSING'
+            | 'RECTIFIED'
+            | 'REVIEWED'
+            | 'ARCHIVED'
+            | 'REJECTED';
+          operatorId: number;
+          operatorName: string;
+          deptId: number | null;
+          remark: string;
+        }[];
+        syncRecords: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          hazardId: number;
+          hazardNo: string;
+          eventId: string;
+          eventType: string;
+          /** @enum {string} */
+          toStatus:
+            | 'REPORTED'
+            | 'PROCESSING'
+            | 'RECTIFIED'
+            | 'REVIEWED'
+            | 'ARCHIVED'
+            | 'REJECTED';
+          /** @enum {string} */
+          direction: 'PUSH' | 'PULL';
+          /** @enum {string} */
+          status: 'SUCCESS' | 'FAILED';
+          error: string;
+          retryCount: number;
+          target: string;
+        }[];
+      };
+    };
+    Hazard: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        hazardNo: string;
+        title: string;
+        content: string;
+        location: string;
+        category: string;
+        /** @enum {string} */
+        level: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+        /** @enum {string} */
+        scope: 'DEPT' | 'OPEN' | 'SCHOOL';
+        /** @enum {string} */
+        status:
+          | 'REPORTED'
+          | 'PROCESSING'
+          | 'RECTIFIED'
+          | 'REVIEWED'
+          | 'ARCHIVED'
+          | 'REJECTED';
+        /** @description 状态中文名 */
+        statusLabel: string;
+        reporterId: number;
+        reporterName: string;
+        reporterDeptId: number | null;
+        assigneeDeptId: number | null;
+        /** @description 主责部门名（联表补全） */
+        assigneeDeptName: string;
+        cooperateDeptIds: number[];
+        /** @description 协办部门名（联表补全） */
+        cooperateDeptNames: string[];
+        handlerId: number | null;
+        handlerName: string;
+        /** Format: date-time */
+        deadlineAt: string | null;
+        /** Format: date-time */
+        rectifyDeadline: string | null;
+        /** @description 是否逾期未办结 */
+        overdue: boolean;
+        rectifyMeasure: string | null;
+        /** Format: date-time */
+        rectifyTime: string | null;
+        reviewOpinion: string;
+        reviewerId: number | null;
+        /** Format: date-time */
+        reviewTime: string | null;
+        archiveOpinion: string;
+        archiverId: number | null;
+        /** Format: date-time */
+        archiveTime: string | null;
+        rejectReason: string;
+        availableActions: (
+          | 'REPORT'
+          | 'ACCEPT'
+          | 'REJECT'
+          | 'RECTIFY'
+          | 'REVIEW_PASS'
+          | 'REVIEW_BACK'
+          | 'ARCHIVE'
+        )[];
+      };
+    };
+    SysMenuTree: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysMenuTreeData'][];
+    };
+    SysMenuTreeData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @enum {string} */
+      type: 'M' | 'C' | 'F';
+      path: string;
+      component: string;
+      perms: string;
+      icon: string;
+      sort: number;
+      /** @description 1 显示 / 0 隐藏 */
+      visible: number;
+      status: number;
+      ancestors: string;
+      children?: components['schemas']['SysMenuTreeData'][];
+    };
+    SysMenuPages: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysMenuPagesData'][];
+    };
+    SysMenuPagesData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @enum {string} */
+      type: 'M' | 'C' | 'F';
+      path: string;
+      component: string;
+      perms: string;
+      icon: string;
+      sort: number;
+      /** @description 1 显示 / 0 隐藏 */
+      visible: number;
+      status: number;
+      ancestors: string;
+      children?: components['schemas']['SysMenuPagesData'][];
+    };
+    SysMenu: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: components['schemas']['SysMenuData'];
+    };
+    SysMenuData: {
+      id: number;
+      /** Format: date-time */
+      createTime: string;
+      /** Format: date-time */
+      updateTime: string;
+      parentId?: number | null;
+      name: string;
+      /** @enum {string} */
+      type: 'M' | 'C' | 'F';
+      path: string;
+      component: string;
+      perms: string;
+      icon: string;
+      sort: number;
+      /** @description 1 显示 / 0 隐藏 */
+      visible: number;
+      status: number;
+      ancestors: string;
+      children?: components['schemas']['SysMenuData'][];
+    };
+    SysPermissionGroups: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        module: string;
+        moduleLabel: string;
+        permissions: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          /** @description 权限码，如 system:role:list */
+          code: string;
+          /** @description 权限名称（取自接口 summary） */
+          name: string;
+          /** @description 模块键（权限码第一段） */
+          module: string;
+          /** @description 模块显示名（取自 @ApiTags） */
+          moduleLabel: string;
+          /** @description 1 有效 / 0 已停用（代码中已不存在） */
+          status: number;
+        }[];
+      }[];
+    };
+    SysRolePage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          roleName: string;
+          level: number;
+          isBuiltin: number;
+          permissions: string[];
+          rules?:
+            | {
+                action: string;
+                subject: string;
+                conditions?: {
+                  [key: string]: unknown;
+                };
+                fields?: string[];
+                inverted?: boolean;
+              }[]
+            | null;
+          dataScope: string;
+          status: number;
+        }[];
+        total: number;
+      };
+    };
+    SysRole: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        roleName: string;
+        level: number;
+        isBuiltin: number;
+        permissions: string[];
+        rules?:
+          | {
+              action: string;
+              subject: string;
+              conditions?: {
+                [key: string]: unknown;
+              };
+              fields?: string[];
+              inverted?: boolean;
+            }[]
+          | null;
+        dataScope: string;
+        status: number;
+      };
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    AppController_getHello_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    AuditController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                actorName?: string;
-                action?: string;
-                result?: "success" | "fail";
-                startTime?: string;
-                endTime?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 操作日志分页结果 { list, total }，按时间倒序 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysAuditLogPage"];
-                };
-            };
-        };
-    };
-    AuditController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回单条审计记录，不存在则 404 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysAuditLog"];
-                };
-            };
-        };
-    };
-    HealthController_live_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    HealthController_ready_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The Health Check is successful */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @example ok
-                         * @enum {string}
-                         */
-                        status?: "ok" | "degraded";
-                        /**
-                         * @example {
-                         *       "database": {
-                         *         "status": "up",
-                         *         "responseTime": 12
-                         *       }
-                         *     }
-                         */
-                        info?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        } | null;
-                        /** @example {} */
-                        error?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        } | null;
-                        /**
-                         * @example {
-                         *       "database": {
-                         *         "status": "up",
-                         *         "responseTime": 12
-                         *       }
-                         *     }
-                         */
-                        details?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description The Health Check is not successful */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * @example error
-                         * @enum {string}
-                         */
-                        status?: "error" | "shutting_down";
-                        /**
-                         * @example {
-                         *       "database": {
-                         *         "status": "up",
-                         *         "responseTime": 12
-                         *       }
-                         *     }
-                         */
-                        info?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        } | null;
-                        /**
-                         * @example {
-                         *       "redis": {
-                         *         "status": "down",
-                         *         "message": "Could not connect",
-                         *         "responseTime": 3005
-                         *       }
-                         *     }
-                         */
-                        error?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        } | null;
-                        /**
-                         * @example {
-                         *       "database": {
-                         *         "status": "up",
-                         *         "responseTime": 12
-                         *       },
-                         *       "redis": {
-                         *         "status": "down",
-                         *         "message": "Could not connect",
-                         *         "responseTime": 3005
-                         *       }
-                         *     }
-                         */
-                        details?: {
-                            [key: string]: {
-                                /** @enum {string} */
-                                status: "up" | "degraded" | "down";
-                                /** @description Time the health indicator took to respond, in ms */
-                                responseTime?: number;
-                            } & {
-                                [key: string]: unknown;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-    };
-    AuthController_captcha_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 { img: svg, uuid }，登录时回传 uuid+code */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CaptchaResult"];
-                };
-            };
-        };
-    };
-    AuthController_login_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    username: string;
-                    password: string;
-                    captchaUuid?: string;
-                    captchaCode?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回 { token, user } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LoginResult"];
-                };
-            };
-        };
-    };
-    AuthController_logout_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 登出成功，无返回体 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoidResult"];
-                };
-            };
-        };
-    };
-    AuthController_profile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 当前用户信息（含角色/权限/数据范围） */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Profile"];
-                };
-            };
-        };
-    };
-    AuthController_changePassword_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    oldPassword: string;
-                    newPassword: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 改密成功，无返回体；需重新登录 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoidResult"];
-                };
-            };
-        };
-    };
-    UserController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-                deptId?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysUserPage"];
-                };
-            };
-        };
-    };
-    UserController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    username: string;
-                    password: string;
-                    nickname?: string;
-                    /** Format: email */
-                    email?: string;
-                    phone?: string;
-                    deptId?: number;
-                    post?: string;
-                    status?: number;
-                    roleIds?: number[];
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的用户 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysUser"];
-                };
-            };
-        };
-    };
-    UserController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    username?: string;
-                    nickname?: string;
-                    /** Format: email */
-                    email?: string;
-                    phone?: string;
-                    deptId?: number;
-                    post?: string;
-                    status?: number;
-                    roleIds?: number[];
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的用户 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysUser"];
-                };
-            };
-        };
-    };
-    UserController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    UserController_resetPassword_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    newPassword: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 重置成功，无返回体；目标用户需重新登录 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoidResult"];
-                };
-            };
-        };
-    };
-    UserController_listGrants_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 授权记录列表（含临时授权到期时间） */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysUserRoles"];
-                };
-            };
-        };
-    };
-    UserController_grantRoles_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    roleIds: number[];
-                    /** Format: date-time */
-                    expireAt?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 授权成功，无返回体 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoidResult"];
-                };
-            };
-        };
-    };
-    UserController_revokeRole_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-                roleId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 撤销成功，无返回体 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoidResult"];
-                };
-            };
-        };
-    };
-    DeptController_tree_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回部门树（含 children） */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDeptTree"];
-                };
-            };
-        };
-    };
-    DeptController_list_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回部门平铺列表 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDeptList"];
-                };
-            };
-        };
-    };
-    DeptController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parentId?: number | null;
-                    name: string;
-                    sort?: number;
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的部门 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDept"];
-                };
-            };
-        };
-    };
-    DeptController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回部门详情 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDept"];
-                };
-            };
-        };
-    };
-    DeptController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parentId?: number | null;
-                    name?: string;
-                    sort?: number;
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的部门 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDept"];
-                };
-            };
-        };
-    };
-    DeptController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    LoginLogController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                username?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 登录日志分页结果 { list, total }，按时间倒序 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysLoginLogPage"];
-                };
-            };
-        };
-    };
-    LoginLogController_clear_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示清空成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    LoginLogController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    MenuController_tree_v1: {
-        parameters: {
-            query?: {
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回菜单树（含按钮与隐藏项） */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysMenuTree"];
-                };
-            };
-        };
-    };
-    MenuController_routes_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回当前用户可见的菜单树 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysMenuTree"];
-                };
-            };
-        };
-    };
-    MenuController_pages_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回全部 C 型菜单（含当前用户无权限的） */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysMenuPages"];
-                };
-            };
-        };
-    };
-    MenuController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parentId?: number | null;
-                    name: string;
-                    /** @enum {string} */
-                    type: "M" | "C" | "F";
-                    /** @default  */
-                    path?: string;
-                    /** @default  */
-                    component?: string;
-                    /** @default  */
-                    perms?: string;
-                    /** @default  */
-                    icon?: string;
-                    sort?: number;
-                    /** @default 1 */
-                    visible?: number;
-                    /** @default 1 */
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的菜单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysMenu"];
-                };
-            };
-        };
-    };
-    MenuController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    parentId?: number | null;
-                    name?: string;
-                    /** @enum {string} */
-                    type?: "M" | "C" | "F";
-                    path?: string;
-                    component?: string;
-                    perms?: string;
-                    icon?: string;
-                    sort?: number;
-                    visible?: number;
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的菜单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysMenu"];
-                };
-            };
-        };
-    };
-    MenuController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    DictController_pageType_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 字典类型分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictTypePage"];
-                };
-            };
-        };
-    };
-    DictController_createType_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    dictName: string;
-                    dictType: string;
-                    /** @default 1 */
-                    status?: number;
-                    /** @default  */
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的字典类型 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictType"];
-                };
-            };
-        };
-    };
-    DictController_updateType_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    dictName?: string;
-                    dictType?: string;
-                    status?: number;
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的字典类型 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictType"];
-                };
-            };
-        };
-    };
-    DictController_removeType_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    DictController_pageData_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                dictType?: string;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 字典数据分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictDataPage"];
-                };
-            };
-        };
-    };
-    DictController_createData_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    dictType: string;
-                    dictLabel: string;
-                    dictValue: string;
-                    dictSort?: number;
-                    /** @default  */
-                    tagType?: string;
-                    /** @default 1 */
-                    status?: number;
-                    /** @default  */
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的字典数据 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictData"];
-                };
-            };
-        };
-    };
-    DictController_updateData_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    dictType?: string;
-                    dictLabel?: string;
-                    dictValue?: string;
-                    dictSort?: number;
-                    tagType?: string;
-                    status?: number;
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的字典数据 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictData"];
-                };
-            };
-        };
-    };
-    DictController_removeData_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    DictController_options_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dictType: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 [{ label, value, tagType }] */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysDictOptions"];
-                };
-            };
-        };
-    };
-    ConfigController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 参数分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysConfigPage"];
-                };
-            };
-        };
-    };
-    ConfigController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    configName: string;
-                    configKey: string;
-                    configValue: string;
-                    /**
-                     * @default N
-                     * @enum {string}
-                     */
-                    configType?: "Y" | "N";
-                    /** @default 1 */
-                    status?: number;
-                    /** @default  */
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的参数配置 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysConfig"];
-                };
-            };
-        };
-    };
-    ConfigController_getByKey_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                configKey: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 { configKey, configValue } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysConfigValue"];
-                };
-            };
-        };
-    };
-    ConfigController_exportCsv_v1: {
-        parameters: {
-            query?: {
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ConfigController_importCsv_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 导入结果 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConfigImportResult"];
-                };
-            };
-        };
-    };
-    ConfigController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回参数配置详情 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysConfig"];
-                };
-            };
-        };
-    };
-    ConfigController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    configName?: string;
-                    configKey?: string;
-                    configValue?: string;
-                    /** @enum {string} */
-                    configType?: "Y" | "N";
-                    status?: number;
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的参数配置 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysConfig"];
-                };
-            };
-        };
-    };
-    ConfigController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    FileController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                ext?: string;
-                status?: "TEMP" | "ACTIVE";
-                uploaderId?: number;
-                bizType?: string;
-                bizId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 文件分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FilePage"];
-                };
-            };
-        };
-    };
-    FileController_upload_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": {
-                    bizType?: string;
-                    bizId?: string;
-                    bizField?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 上传结果 { file, deduped } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileUploadResult"];
-                };
-            };
-        };
-    };
-    FileController_listByBiz_v1: {
-        parameters: {
-            query?: {
-                bizField?: string;
-            };
-            header?: never;
-            path: {
-                bizType: string;
-                bizId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 附件列表 [{ link, file }] */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BizFileList"];
-                };
-            };
-        };
-    };
-    FileController_bind_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    fileIds: number[];
-                    bizType: string;
-                    bizId: string;
-                    /** @default  */
-                    bizField?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 绑定结果 { bound, skipped } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileBindResult"];
-                };
-            };
-        };
-    };
-    FileController_unbind_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    fileIds: number[];
-                    bizType: string;
-                    bizId: string;
-                    /** @default  */
-                    bizField?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 解绑结果 { unbound } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileUnbindResult"];
-                };
-            };
-        };
-    };
-    FileController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 文件详情 { file, links } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileDetail"];
-                };
-            };
-        };
-    };
-    FileController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 删除结果 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileRemoveResult"];
-                };
-            };
-        };
-    };
-    FileController_download_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    HazardController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: "REPORTED" | "PROCESSING" | "RECTIFIED" | "REVIEWED" | "ARCHIVED" | "REJECTED";
-                level?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-                scope?: "DEPT" | "OPEN" | "SCHOOL";
-                category?: string;
-                onlyMine?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 隐患分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HazardPage"];
-                };
-            };
-        };
-    };
-    HazardController_report_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    title: string;
-                    content: string;
-                    /** @default  */
-                    location?: string;
-                    /** @default  */
-                    category?: string;
-                    /**
-                     * @default LOW
-                     * @enum {string}
-                     */
-                    level?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-                    /**
-                     * @default DEPT
-                     * @enum {string}
-                     */
-                    scope?: "DEPT" | "OPEN" | "SCHOOL";
-                    assigneeDeptId?: number;
-                    cooperateDeptIds?: number[];
-                    /** Format: date-time */
-                    rectifyDeadline?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回上报后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    HazardController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 隐患详情 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HazardDetail"];
-                };
-            };
-        };
-    };
-    HazardController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    HazardController_accept_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    assigneeDeptId?: number;
-                    cooperateDeptIds?: number[];
-                    handlerId?: number;
-                    /** Format: date-time */
-                    rectifyDeadline?: string;
-                    /** @default  */
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回受理后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    HazardController_reject_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    reason: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回驳回后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    HazardController_rectify_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    rectifyMeasure: string;
-                    /** @default  */
-                    remark?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回整改后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    HazardController_review_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    passed: boolean;
-                    opinion: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回复查后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    HazardController_archive_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @default  */
-                    opinion?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回归档后的隐患单 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Hazard"];
-                };
-            };
-        };
-    };
-    RoleController_page_v1: {
-        parameters: {
-            query?: {
-                pageNum?: number;
-                pageSize?: number;
-                keyword?: string;
-                status?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 分页结果 { list, total } */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysRolePage"];
-                };
-            };
-        };
-    };
-    RoleController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    roleName: string;
-                    /** @default [] */
-                    permissions?: string[];
-                    rules?: {
-                        action: string;
-                        subject: string;
-                        conditions?: {
-                            [key: string]: unknown;
-                        };
-                        fields?: string[];
-                        inverted?: boolean;
-                    }[];
-                    /**
-                     * @default SELF
-                     * @enum {string}
-                     */
-                    dataScope?: "ALL" | "DEPT_AND_CHILD" | "DEPT" | "SELF" | "CUSTOM";
-                    /** @default 1 */
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回创建后的角色 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysRole"];
-                };
-            };
-        };
-    };
-    RoleController_detail_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回角色详情 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysRole"];
-                };
-            };
-        };
-    };
-    RoleController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    roleName?: string;
-                    permissions?: string[];
-                    rules?: {
-                        action: string;
-                        subject: string;
-                        conditions?: {
-                            [key: string]: unknown;
-                        };
-                        fields?: string[];
-                        inverted?: boolean;
-                    }[];
-                    /** @enum {string} */
-                    dataScope?: "ALL" | "DEPT_AND_CHILD" | "DEPT" | "SELF" | "CUSTOM";
-                    status?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description 返回更新后的角色 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysRole"];
-                };
-            };
-        };
-    };
-    RoleController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 返回 true 表示删除成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BoolResult"];
-                };
-            };
-        };
-    };
-    PermissionController_list_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 模块分组：[{ module, moduleLabel, permissions[] }] */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SysPermissionGroups"];
-                };
-            };
-        };
-    };
-    OpsController_overview_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OpsController_prometheus_v1: {
-        parameters: {
-            query?: never;
-            header: {
-                "x-metrics-token": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OpsController_saveRetention_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    retentionDays: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OpsController_cleanup_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    retentionDays?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
+  AppController_getHello_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AuditController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        actorName?: string;
+        action?: string;
+        result?: 'success' | 'fail';
+        startTime?: string;
+        endTime?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 操作日志分页结果 { list, total }，按时间倒序 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysAuditLogPage'];
+        };
+      };
+    };
+  };
+  AuditController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回单条审计记录，不存在则 404 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysAuditLog'];
+        };
+      };
+    };
+  };
+  HealthController_live_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  HealthController_ready_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The Health Check is successful */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /**
+             * @example ok
+             * @enum {string}
+             */
+            status?: 'ok' | 'degraded';
+            /**
+             * @example {
+             *       "database": {
+             *         "status": "up",
+             *         "responseTime": 12
+             *       }
+             *     }
+             */
+            info?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            } | null;
+            /** @example {} */
+            error?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            } | null;
+            /**
+             * @example {
+             *       "database": {
+             *         "status": "up",
+             *         "responseTime": 12
+             *       }
+             *     }
+             */
+            details?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            };
+          };
+        };
+      };
+      /** @description The Health Check is not successful */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            status?: 'error' | 'shutting_down';
+            /**
+             * @example {
+             *       "database": {
+             *         "status": "up",
+             *         "responseTime": 12
+             *       }
+             *     }
+             */
+            info?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            } | null;
+            /**
+             * @example {
+             *       "redis": {
+             *         "status": "down",
+             *         "message": "Could not connect",
+             *         "responseTime": 3005
+             *       }
+             *     }
+             */
+            error?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            } | null;
+            /**
+             * @example {
+             *       "database": {
+             *         "status": "up",
+             *         "responseTime": 12
+             *       },
+             *       "redis": {
+             *         "status": "down",
+             *         "message": "Could not connect",
+             *         "responseTime": 3005
+             *       }
+             *     }
+             */
+            details?: {
+              [key: string]: {
+                /** @enum {string} */
+                status: 'up' | 'degraded' | 'down';
+                /** @description Time the health indicator took to respond, in ms */
+                responseTime?: number;
+              } & {
+                [key: string]: unknown;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  AuthController_captcha_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 { img: svg, uuid }，登录时回传 uuid+code */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CaptchaResult'];
+        };
+      };
+    };
+  };
+  AuthController_login_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          username: string;
+          password: string;
+          captchaUuid?: string;
+          captchaCode?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回 { token, user } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['LoginResult'];
+        };
+      };
+    };
+  };
+  AuthController_logout_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 登出成功，无返回体 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VoidResult'];
+        };
+      };
+    };
+  };
+  AuthController_profile_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 当前用户信息（含角色/权限/数据范围） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Profile'];
+        };
+      };
+    };
+  };
+  AuthController_changePassword_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          oldPassword: string;
+          newPassword: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 改密成功，无返回体；需重新登录 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VoidResult'];
+        };
+      };
+    };
+  };
+  UserController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+        deptId?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysUserPage'];
+        };
+      };
+    };
+  };
+  UserController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          username: string;
+          password: string;
+          nickname?: string;
+          /** Format: email */
+          email?: string;
+          phone?: string;
+          deptId?: number;
+          post?: string;
+          status?: number;
+          roleIds?: number[];
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的用户 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysUser'];
+        };
+      };
+    };
+  };
+  UserController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          username?: string;
+          nickname?: string;
+          /** Format: email */
+          email?: string;
+          phone?: string;
+          deptId?: number;
+          post?: string;
+          status?: number;
+          roleIds?: number[];
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的用户 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysUser'];
+        };
+      };
+    };
+  };
+  UserController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  UserController_resetPassword_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          newPassword: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 重置成功，无返回体；目标用户需重新登录 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VoidResult'];
+        };
+      };
+    };
+  };
+  UserController_listGrants_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 授权记录列表（含临时授权到期时间） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysUserRoles'];
+        };
+      };
+    };
+  };
+  UserController_grantRoles_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          roleIds: number[];
+          /** Format: date-time */
+          expireAt?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 授权成功，无返回体 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VoidResult'];
+        };
+      };
+    };
+  };
+  UserController_revokeRole_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        roleId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 撤销成功，无返回体 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['VoidResult'];
+        };
+      };
+    };
+  };
+  DeptController_tree_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回部门树（含 children） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDeptTree'];
+        };
+      };
+    };
+  };
+  DeptController_list_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回部门平铺列表 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDeptList'];
+        };
+      };
+    };
+  };
+  DeptController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          parentId?: number | null;
+          name: string;
+          sort?: number;
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的部门 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDept'];
+        };
+      };
+    };
+  };
+  DeptController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回部门详情 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDept'];
+        };
+      };
+    };
+  };
+  DeptController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          parentId?: number | null;
+          name?: string;
+          sort?: number;
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的部门 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDept'];
+        };
+      };
+    };
+  };
+  DeptController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  LoginLogController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        username?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 登录日志分页结果 { list, total }，按时间倒序 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysLoginLogPage'];
+        };
+      };
+    };
+  };
+  LoginLogController_clear_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示清空成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  LoginLogController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  MenuController_tree_v1: {
+    parameters: {
+      query?: {
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回菜单树（含按钮与隐藏项） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysMenuTree'];
+        };
+      };
+    };
+  };
+  MenuController_routes_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回当前用户可见的菜单树 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysMenuTree'];
+        };
+      };
+    };
+  };
+  MenuController_pages_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回全部 C 型菜单（含当前用户无权限的） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysMenuPages'];
+        };
+      };
+    };
+  };
+  MenuController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          parentId?: number | null;
+          name: string;
+          /** @enum {string} */
+          type: 'M' | 'C' | 'F';
+          /** @default  */
+          path?: string;
+          /** @default  */
+          component?: string;
+          /** @default  */
+          perms?: string;
+          /** @default  */
+          icon?: string;
+          sort?: number;
+          /** @default 1 */
+          visible?: number;
+          /** @default 1 */
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的菜单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysMenu'];
+        };
+      };
+    };
+  };
+  MenuController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          parentId?: number | null;
+          name?: string;
+          /** @enum {string} */
+          type?: 'M' | 'C' | 'F';
+          path?: string;
+          component?: string;
+          perms?: string;
+          icon?: string;
+          sort?: number;
+          visible?: number;
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的菜单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysMenu'];
+        };
+      };
+    };
+  };
+  MenuController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  DictController_pageType_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 字典类型分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictTypePage'];
+        };
+      };
+    };
+  };
+  DictController_createType_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          dictName: string;
+          dictType: string;
+          /** @default 1 */
+          status?: number;
+          /** @default  */
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的字典类型 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictType'];
+        };
+      };
+    };
+  };
+  DictController_updateType_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          dictName?: string;
+          dictType?: string;
+          status?: number;
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的字典类型 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictType'];
+        };
+      };
+    };
+  };
+  DictController_removeType_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  DictController_pageData_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        dictType?: string;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 字典数据分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictDataPage'];
+        };
+      };
+    };
+  };
+  DictController_createData_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          dictType: string;
+          dictLabel: string;
+          dictValue: string;
+          dictSort?: number;
+          /** @default  */
+          tagType?: string;
+          /** @default 1 */
+          status?: number;
+          /** @default  */
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的字典数据 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictData'];
+        };
+      };
+    };
+  };
+  DictController_updateData_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          dictType?: string;
+          dictLabel?: string;
+          dictValue?: string;
+          dictSort?: number;
+          tagType?: string;
+          status?: number;
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的字典数据 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictData'];
+        };
+      };
+    };
+  };
+  DictController_removeData_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  DictController_options_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        dictType: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 [{ label, value, tagType }] */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysDictOptions'];
+        };
+      };
+    };
+  };
+  ConfigController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 参数分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysConfigPage'];
+        };
+      };
+    };
+  };
+  ConfigController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          configName: string;
+          configKey: string;
+          configValue: string;
+          /**
+           * @default N
+           * @enum {string}
+           */
+          configType?: 'Y' | 'N';
+          /** @default 1 */
+          status?: number;
+          /** @default  */
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的参数配置 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysConfig'];
+        };
+      };
+    };
+  };
+  ConfigController_getByKey_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        configKey: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 { configKey, configValue } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysConfigValue'];
+        };
+      };
+    };
+  };
+  ConfigController_exportCsv_v1: {
+    parameters: {
+      query?: {
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ConfigController_importCsv_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 导入结果 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ConfigImportResult'];
+        };
+      };
+    };
+  };
+  ConfigController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回参数配置详情 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysConfig'];
+        };
+      };
+    };
+  };
+  ConfigController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          configName?: string;
+          configKey?: string;
+          configValue?: string;
+          /** @enum {string} */
+          configType?: 'Y' | 'N';
+          status?: number;
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的参数配置 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysConfig'];
+        };
+      };
+    };
+  };
+  ConfigController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  FileController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        ext?: string;
+        status?: 'TEMP' | 'ACTIVE';
+        uploaderId?: number;
+        bizType?: string;
+        bizId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 文件分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FilePage'];
+        };
+      };
+    };
+  };
+  FileController_upload_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          bizType?: string;
+          bizId?: string;
+          bizField?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 上传结果 { file, deduped } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FileUploadResult'];
+        };
+      };
+    };
+  };
+  FileController_listByBiz_v1: {
+    parameters: {
+      query?: {
+        bizField?: string;
+      };
+      header?: never;
+      path: {
+        bizType: string;
+        bizId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 附件列表 [{ link, file }] */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BizFileList'];
+        };
+      };
+    };
+  };
+  FileController_bind_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          fileIds: number[];
+          bizType: string;
+          bizId: string;
+          /** @default  */
+          bizField?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 绑定结果 { bound, skipped } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FileBindResult'];
+        };
+      };
+    };
+  };
+  FileController_unbind_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          fileIds: number[];
+          bizType: string;
+          bizId: string;
+          /** @default  */
+          bizField?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 解绑结果 { unbound } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FileUnbindResult'];
+        };
+      };
+    };
+  };
+  FileController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 文件详情 { file, links } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FileDetail'];
+        };
+      };
+    };
+  };
+  FileController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 删除结果 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FileRemoveResult'];
+        };
+      };
+    };
+  };
+  FileController_download_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  HazardController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?:
+          | 'REPORTED'
+          | 'PROCESSING'
+          | 'RECTIFIED'
+          | 'REVIEWED'
+          | 'ARCHIVED'
+          | 'REJECTED';
+        level?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+        scope?: 'DEPT' | 'OPEN' | 'SCHOOL';
+        category?: string;
+        onlyMine?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 隐患分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HazardPage'];
+        };
+      };
+    };
+  };
+  HazardController_report_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          title: string;
+          content: string;
+          /** @default  */
+          location?: string;
+          /** @default  */
+          category?: string;
+          /**
+           * @default LOW
+           * @enum {string}
+           */
+          level?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+          /**
+           * @default DEPT
+           * @enum {string}
+           */
+          scope?: 'DEPT' | 'OPEN' | 'SCHOOL';
+          assigneeDeptId?: number;
+          cooperateDeptIds?: number[];
+          /** Format: date-time */
+          rectifyDeadline?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回上报后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  HazardController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 隐患详情 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HazardDetail'];
+        };
+      };
+    };
+  };
+  HazardController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  HazardController_accept_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          assigneeDeptId?: number;
+          cooperateDeptIds?: number[];
+          handlerId?: number;
+          /** Format: date-time */
+          rectifyDeadline?: string;
+          /** @default  */
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回受理后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  HazardController_reject_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          reason: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回驳回后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  HazardController_rectify_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          rectifyMeasure: string;
+          /** @default  */
+          remark?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回整改后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  HazardController_review_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          passed: boolean;
+          opinion: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回复查后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  HazardController_archive_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default  */
+          opinion?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回归档后的隐患单 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Hazard'];
+        };
+      };
+    };
+  };
+  RoleController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRolePage'];
+        };
+      };
+    };
+  };
+  RoleController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          roleName: string;
+          /** @default [] */
+          permissions?: string[];
+          rules?: {
+            action: string;
+            subject: string;
+            conditions?: {
+              [key: string]: unknown;
+            };
+            fields?: string[];
+            inverted?: boolean;
+          }[];
+          /**
+           * @default SELF
+           * @enum {string}
+           */
+          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
+          /** @default 1 */
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的角色 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回角色详情 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          roleName?: string;
+          permissions?: string[];
+          rules?: {
+            action: string;
+            subject: string;
+            conditions?: {
+              [key: string]: unknown;
+            };
+            fields?: string[];
+            inverted?: boolean;
+          }[];
+          /** @enum {string} */
+          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的角色 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  PermissionController_list_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 模块分组：[{ module, moduleLabel, permissions[] }] */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysPermissionGroups'];
+        };
+      };
+    };
+  };
+  OpsController_overview_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  OpsController_prometheus_v1: {
+    parameters: {
+      query?: never;
+      header: {
+        'x-metrics-token': string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  OpsController_saveRetention_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          retentionDays: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  OpsController_cleanup_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          retentionDays?: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
 }

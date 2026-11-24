@@ -42,7 +42,11 @@ export class RoleController {
   @Get()
   @RequiresPermissions('system:role:list')
   @ApiOperation({ summary: '分页查询角色' })
-  @ApiOkZod('SysRolePage', pageOf(roleResponseSchema), '分页结果 { list, total }')
+  @ApiOkZod(
+    'SysRolePage',
+    pageOf(roleResponseSchema),
+    '分页结果 { list, total }',
+  )
   page(@Query({ schema: queryRoleSchema }) query: QueryRoleInput) {
     return this.roleService.page(query);
   }

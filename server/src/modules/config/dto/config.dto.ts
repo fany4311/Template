@@ -17,7 +17,10 @@ const configKeySchema = z
   .string()
   .min(1, '参数键不能为空')
   .max(100)
-  .regex(/^[a-zA-Z0-9_.:-]+$/, '参数键只能包含字母、数字、下划线、点、冒号、短横线');
+  .regex(
+    /^[a-zA-Z0-9_.:-]+$/,
+    '参数键只能包含字母、数字、下划线、点、冒号、短横线',
+  );
 
 /** 创建参数配置 */
 export const createConfigSchema = z.object({

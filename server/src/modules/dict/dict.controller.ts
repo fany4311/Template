@@ -10,11 +10,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { ApiOkZod, pageOf } from '../../common/swagger/api-ok.js';
 import { Auditable } from '../../common/decorators/auditable.decorator.js';
@@ -60,7 +56,11 @@ export class DictController {
   @Get('type')
   @RequiresPermissions('system:dict:list')
   @ApiOperation({ summary: '分页查询字典类型' })
-  @ApiOkZod('SysDictTypePage', pageOf(dictTypeResponseSchema), '字典类型分页结果 { list, total }')
+  @ApiOkZod(
+    'SysDictTypePage',
+    pageOf(dictTypeResponseSchema),
+    '字典类型分页结果 { list, total }',
+  )
   pageType(@Query({ schema: queryDictTypeSchema }) query: QueryDictTypeInput) {
     return this.dictService.pageType(query);
   }
@@ -72,9 +72,7 @@ export class DictController {
   @Idempotent({ scope: 'system:dict:type:add' })
   @ApiOperation({ summary: '创建字典类型' })
   @ApiOkZod('SysDictType', dictTypeResponseSchema, '返回创建后的字典类型')
-  createType(
-    @Body({ schema: createDictTypeSchema }) dto: CreateDictTypeInput,
-  ) {
+  createType(@Body({ schema: createDictTypeSchema }) dto: CreateDictTypeInput) {
     return this.dictService.createType(dto);
   }
 
@@ -112,7 +110,11 @@ export class DictController {
   @Get('data')
   @RequiresPermissions('system:dict:list')
   @ApiOperation({ summary: '分页查询字典数据' })
-  @ApiOkZod('SysDictDataPage', pageOf(dictDataResponseSchema), '字典数据分页结果 { list, total }')
+  @ApiOkZod(
+    'SysDictDataPage',
+    pageOf(dictDataResponseSchema),
+    '字典数据分页结果 { list, total }',
+  )
   pageData(@Query({ schema: queryDictDataSchema }) query: QueryDictDataInput) {
     return this.dictService.pageData(query);
   }
@@ -161,7 +163,11 @@ export class DictController {
 
   @Get('options/:dictType')
   @ApiOperation({ summary: '按类型查询字典选项（登录即可，前端下拉用）' })
-  @ApiOkZod('SysDictOptions', z.array(dictOptionResponseSchema), '返回 [{ label, value, tagType }]')
+  @ApiOkZod(
+    'SysDictOptions',
+    z.array(dictOptionResponseSchema),
+    '返回 [{ label, value, tagType }]',
+  )
   options(
     @Param('dictType', { schema: dictTypeParamSchema }) dictType: string,
   ) {

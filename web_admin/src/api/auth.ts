@@ -1,10 +1,5 @@
 import { request } from './http';
-import type {
-  CaptchaResult,
-  JsonBody,
-  LoginResult,
-  Profile,
-} from './types';
+import type { CaptchaResult, JsonBody, LoginResult, Profile } from './types';
 
 /** 登录请求体（codegen 生成） */
 export type LoginBody = JsonBody<'AuthController_login_v1'>;

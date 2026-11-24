@@ -41,16 +41,19 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * 生产库同理。此时裸 `ALTER TABLE ADD COLUMN` 会 `Duplicate column name` 直接失败，
  * 而 DDL 是隐式提交，失败会留下半成品。故所有 DDL 先查 `information_schema` 再决定。
  */
-export class RoleBuiltinAndDropSort1767000017000
-  implements MigrationInterface
-{
+export class RoleBuiltinAndDropSort1767000017000 implements MigrationInterface {
   name = 'RoleBuiltinAndDropSort1767000017000';
 
   private static readonly TABLE = 'sys_role';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1) 内置标记（0/1），与 sys_menu.visible、sys_role.status 的写法保持一致
-    if (!(await queryRunner.hasColumn(RoleBuiltinAndDropSort1767000017000.TABLE, 'is_builtin'))) {
+    if (
+      !(await queryRunner.hasColumn(
+        RoleBuiltinAndDropSort1767000017000.TABLE,
+        'is_builtin',
+      ))
+    ) {
       await queryRunner.query(
         `ALTER TABLE sys_role
            ADD COLUMN is_builtin tinyint(1) NOT NULL DEFAULT 0
@@ -59,22 +62,39 @@ export class RoleBuiltinAndDropSort1767000017000
     }
 
     // 2) 回填基线：内置角色即 level 0-4（理由见类注释，幂等安全）
-    await queryRunner.query(`UPDATE sys_role SET is_builtin = 1 WHERE level <= 4`);
+    await queryRunner.query(
+      `UPDATE sys_role SET is_builtin = 1 WHERE level <= 4`,
+    );
 
     // 3) 排序字段下线：顺序语义由 level 独家承担
-    if (await queryRunner.hasColumn(RoleBuiltinAndDropSort1767000017000.TABLE, 'sort')) {
+    if (
+      await queryRunner.hasColumn(
+        RoleBuiltinAndDropSort1767000017000.TABLE,
+        'sort',
+      )
+    ) {
       await queryRunner.query(`ALTER TABLE sys_role DROP COLUMN sort`);
     }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    if (!(await queryRunner.hasColumn(RoleBuiltinAndDropSort1767000017000.TABLE, 'sort'))) {
+    if (
+      !(await queryRunner.hasColumn(
+        RoleBuiltinAndDropSort1767000017000.TABLE,
+        'sort',
+      ))
+    ) {
       await queryRunner.query(
         `ALTER TABLE sys_role
            ADD COLUMN sort int NOT NULL DEFAULT 0 COMMENT '排序'`,
       );
     }
-    if (await queryRunner.hasColumn(RoleBuiltinAndDropSort1767000017000.TABLE, 'is_builtin')) {
+    if (
+      await queryRunner.hasColumn(
+        RoleBuiltinAndDropSort1767000017000.TABLE,
+        'is_builtin',
+      )
+    ) {
       await queryRunner.query(`ALTER TABLE sys_role DROP COLUMN is_builtin`);
     }
   }

@@ -21,18 +21,63 @@ const CASES: Array<{
   expected: boolean;
 }> = [
   // 超管
-  { name: '超管通配匹配一切', granted: ['*:*:*'], required: 'x:y:z', expected: true },
-  { name: '超管也匹配 2 段码', granted: ['*:*:*'], required: 'console:access', expected: true },
+  {
+    name: '超管通配匹配一切',
+    granted: ['*:*:*'],
+    required: 'x:y:z',
+    expected: true,
+  },
+  {
+    name: '超管也匹配 2 段码',
+    granted: ['*:*:*'],
+    required: 'console:access',
+    expected: true,
+  },
   // 精确
-  { name: '精确相等', granted: ['system:user:list'], required: 'system:user:list', expected: true },
-  { name: '不同码不放行', granted: ['system:user:list'], required: 'system:user:add', expected: false },
+  {
+    name: '精确相等',
+    granted: ['system:user:list'],
+    required: 'system:user:list',
+    expected: true,
+  },
+  {
+    name: '不同码不放行',
+    granted: ['system:user:list'],
+    required: 'system:user:add',
+    expected: false,
+  },
   // given 侧段末通配
-  { name: 'given 通配匹配子码', granted: ['system:*'], required: 'system:user:list', expected: true },
-  { name: 'given 两段通配', granted: ['system:user:*'], required: 'system:user:add', expected: true },
-  { name: 'given 通配不跨模块', granted: ['system:*'], required: 'hazard:report:list', expected: false },
+  {
+    name: 'given 通配匹配子码',
+    granted: ['system:*'],
+    required: 'system:user:list',
+    expected: true,
+  },
+  {
+    name: 'given 两段通配',
+    granted: ['system:user:*'],
+    required: 'system:user:add',
+    expected: true,
+  },
+  {
+    name: 'given 通配不跨模块',
+    granted: ['system:*'],
+    required: 'hazard:report:list',
+    expected: false,
+  },
   // required 侧段末通配（web 副本曾经缺这一支）
-  { name: 'required 通配（反向）', granted: ['system:user:list'], required: 'system:user:*', expected: true },
-  { name: 'required 两段通配（反向）', granted: ['system:user:add'], required: 'system:*', expected: true },
+  {
+    name: 'required 通配（反向）',
+    granted: ['system:user:list'],
+    required: 'system:user:*',
+    expected: true,
+  },
+  {
+    name: 'required 两段通配（反向）',
+    granted: ['system:user:add'],
+    required: 'system:*',
+    expected: true,
+  },
   {
     name: 'required 通配但不匹配（反向）',
     granted: ['hazard:report:list'],
@@ -65,9 +110,24 @@ const CASES: Array<{
     expected: false,
   },
   // 边界
-  { name: '空列表不放行', granted: [], required: 'system:user:list', expected: false },
-  { name: '只有 deny 不放行', granted: ['!system:*'], required: 'system:user:list', expected: false },
-  { name: '前缀不是段边界', granted: ['system:user'], required: 'system:username:list', expected: false },
+  {
+    name: '空列表不放行',
+    granted: [],
+    required: 'system:user:list',
+    expected: false,
+  },
+  {
+    name: '只有 deny 不放行',
+    granted: ['!system:*'],
+    required: 'system:user:list',
+    expected: false,
+  },
+  {
+    name: '前缀不是段边界',
+    granted: ['system:user'],
+    required: 'system:username:list',
+    expected: false,
+  },
 ];
 
 describe('权限匹配 · 后端语义', () => {
@@ -86,7 +146,9 @@ describe('权限匹配 · 后端语义', () => {
 
   it('matchPermission 容忍 null/undefined 授权列表', () => {
     // 后端可能拿到未绑定角色的用户（permissions 为 null）
-    expect(matchPermission(undefined as unknown as string[], 'a:b:c')).toBe(false);
+    expect(matchPermission(undefined as unknown as string[], 'a:b:c')).toBe(
+      false,
+    );
     expect(matchPermission(null as unknown as string[], 'a:b:c')).toBe(false);
   });
 });

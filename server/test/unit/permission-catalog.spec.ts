@@ -151,7 +151,9 @@ describe('权限清单采集器', () => {
     });
 
     const { entries, shared } = collectPermissionCatalog([Ctl]);
-    expect(entries.filter((e) => e.code === 'system:role:list')).toHaveLength(1);
+    expect(entries.filter((e) => e.code === 'system:role:list')).toHaveLength(
+      1,
+    );
     expect(shared).toEqual([
       { code: 'system:role:list', names: ['分页查询角色', '角色详情'] },
     ]);

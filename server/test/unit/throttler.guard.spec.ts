@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, type ExecutionContext } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  type ExecutionContext,
+} from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 import { AppThrottlerGuard } from '../../src/common/guards/throttler.guard.js';
 
@@ -38,14 +42,22 @@ describe('AppThrottlerGuard', () => {
   it('THROTTLE_ENABLED=true 时不跳过', async () => {
     const guard = buildGuard(true);
     await expect(
-      (guard as unknown as { shouldSkip(c: ExecutionContext): Promise<boolean> }).shouldSkip(ctx),
+      (
+        guard as unknown as {
+          shouldSkip(c: ExecutionContext): Promise<boolean>;
+        }
+      ).shouldSkip(ctx),
     ).resolves.toBe(false);
   });
 
   it('THROTTLE_ENABLED=false 时跳过限流', async () => {
     const guard = buildGuard(false);
     await expect(
-      (guard as unknown as { shouldSkip(c: ExecutionContext): Promise<boolean> }).shouldSkip(ctx),
+      (
+        guard as unknown as {
+          shouldSkip(c: ExecutionContext): Promise<boolean>;
+        }
+      ).shouldSkip(ctx),
     ).resolves.toBe(true);
   });
 });

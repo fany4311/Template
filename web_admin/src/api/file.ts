@@ -55,7 +55,11 @@ export const fileApi = {
     }) as unknown as Promise<FileUploadResult>;
   },
 
-  listByBiz: (bizType: string, bizId: string | number, bizField?: string): Promise<FileBizItem[]> =>
+  listByBiz: (
+    bizType: string,
+    bizId: string | number,
+    bizField?: string,
+  ): Promise<FileBizItem[]> =>
     request.get<FileBizItem[]>(
       `/file/biz/${encodeURIComponent(bizType)}/${encodeURIComponent(String(bizId))}`,
       bizField ? { bizField } : undefined,

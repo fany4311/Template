@@ -2,7 +2,11 @@
 import { Plus, Refresh, Search } from '@element-plus/icons-vue';
 import { ElMessage, type FormRules } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
-import { dictApi, type DictDataCreateBody, type DictTypeCreateBody } from '../../api/dict';
+import {
+  dictApi,
+  type DictDataCreateBody,
+  type DictTypeCreateBody,
+} from '../../api/dict';
 import type { DictDataItem, DictTypeItem } from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 import FormDialog, { type FormColumn } from '../../components/FormDialog.vue';
@@ -42,7 +46,8 @@ const {
     remove: dictApi.removeType,
   },
   query: { pageNum: 1, pageSize: 10, keyword: '', status: undefined },
-  removeText: (row) => '确认删除字典「' + row.dictName + '」？其下字典数据会一并删除。',
+  removeText: (row) =>
+    '确认删除字典「' + row.dictName + '」？其下字典数据会一并删除。',
 });
 
 const currentType = ref<DictTypeItem | null>(null);
@@ -119,7 +124,12 @@ const typeDialogMode = ref<'create' | 'edit'>('create');
 const editingTypeId = ref<number | null>(null);
 const typeSubmitting = ref(false);
 
-const EMPTY_TYPE: DictTypeCreateBody = { dictName: '', dictType: '', status: 1, remark: '' };
+const EMPTY_TYPE: DictTypeCreateBody = {
+  dictName: '',
+  dictType: '',
+  status: 1,
+  remark: '',
+};
 const typeForm = reactive<DictTypeCreateBody>({ ...EMPTY_TYPE });
 
 const typeFormColumns: FormColumn[] = [
@@ -141,7 +151,11 @@ const typeRules: FormRules = {
   dictName: [{ required: true, message: '请输入字典名称', trigger: 'blur' }],
   dictType: [
     { required: true, message: '请输入字典类型标识', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '只允许字母、数字、下划线', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9_]+$/,
+      message: '只允许字母、数字、下划线',
+      trigger: 'blur',
+    },
   ],
 };
 
@@ -171,8 +185,11 @@ async function submitType(): Promise<void> {
       await dictApi.createType({ ...typeForm });
       ElMessage.success('创建成功');
     } else if (editingTypeId.value !== null) {
-      const updated = await dictApi.updateType(editingTypeId.value, { ...typeForm });
-      if (currentType.value?.id === editingTypeId.value) currentType.value = updated;
+      const updated = await dictApi.updateType(editingTypeId.value, {
+        ...typeForm,
+      });
+      if (currentType.value?.id === editingTypeId.value)
+        currentType.value = updated;
       ElMessage.success('更新成功');
     }
     typeDialogVisible.value = false;
@@ -244,7 +261,10 @@ function openDataCreate(): void {
   }
   dataDialogMode.value = 'create';
   editingDataId.value = null;
-  Object.assign(dataForm, { ...EMPTY_DATA, dictType: currentType.value.dictType });
+  Object.assign(dataForm, {
+    ...EMPTY_DATA,
+    dictType: currentType.value.dictType,
+  });
   dataDialogVisible.value = true;
 }
 
@@ -295,7 +315,12 @@ async function submitData(): Promise<void> {
           style="width: 160px"
           @keyup.enter="searchTypes"
         />
-        <el-button :icon="Search" size="small" type="primary" @click="searchTypes">
+        <el-button
+          :icon="Search"
+          size="small"
+          type="primary"
+          @click="searchTypes"
+        >
           查询
         </el-button>
         <div class="page-toolbar-right">
@@ -320,7 +345,12 @@ async function submitData(): Promise<void> {
         @current-change="(row: DictTypeItem | null) => row && selectType(row)"
       >
         <el-table-column prop="dictName" label="名称" min-width="110" />
-        <el-table-column prop="dictType" label="类型标识" min-width="130" show-overflow-tooltip />
+        <el-table-column
+          prop="dictType"
+          label="类型标识"
+          min-width="130"
+          show-overflow-tooltip
+        />
         <el-table-column label="状态" width="70">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
@@ -365,9 +395,13 @@ async function submitData(): Promise<void> {
 
     <el-card shadow="never" class="page-card dict-data-panel">
       <div class="page-toolbar page-toolbar--compact">
-        <span class="dict-current">当前字典：<b>{{ currentTypeLabel }}</b></span>
+        <span class="dict-current"
+          >当前字典：<b>{{ currentTypeLabel }}</b></span
+        >
         <div class="page-toolbar-right">
-          <el-button :icon="Refresh" size="small" @click="reloadData">刷新</el-button>
+          <el-button :icon="Refresh" size="small" @click="reloadData"
+            >刷新</el-button
+          >
           <el-button
             v-perm="'system:dict:add'"
             :icon="Plus"
@@ -392,7 +426,11 @@ async function submitData(): Promise<void> {
         @change="reloadData"
       >
         <template #tagType="{ row }">
-          <el-tag v-if="row.tagType" :type="asTagType(row.tagType)" size="small">
+          <el-tag
+            v-if="row.tagType"
+            :type="asTagType(row.tagType)"
+            size="small"
+          >
             {{ row.tagType }}
           </el-tag>
           <span v-else>-</span>

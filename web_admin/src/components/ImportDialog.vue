@@ -103,7 +103,14 @@ watch(visible, (open) => {
       <el-alert
         :type="result.failed.length ? 'warning' : 'success'"
         :closable="false"
-        :title="'共 ' + result.total + ' 行：成功 ' + result.ok + '，失败 ' + result.failed.length"
+        :title="
+          '共 ' +
+          result.total +
+          ' 行：成功 ' +
+          result.ok +
+          '，失败 ' +
+          result.failed.length
+        "
       />
       <el-table
         v-if="result.failed.length"
@@ -114,16 +121,27 @@ watch(visible, (open) => {
         class="import-pick__table"
       >
         <el-table-column prop="row" label="行号" width="80" />
-        <el-table-column prop="message" label="失败原因" min-width="300" show-overflow-tooltip />
+        <el-table-column
+          prop="message"
+          label="失败原因"
+          min-width="300"
+          show-overflow-tooltip
+        />
       </el-table>
       <div v-if="result.failedTruncated" class="form-tip import-pick__tip">
-        失败行较多，仅展示前 200 条；修正后重新导入即可（已成功的行不会重复写入）。
+        失败行较多，仅展示前 200
+        条；修正后重新导入即可（已成功的行不会重复写入）。
       </div>
     </template>
 
     <template #footer>
       <el-button @click="visible = false">关闭</el-button>
-      <el-button type="primary" :loading="importing" :disabled="!picked" @click="submit">
+      <el-button
+        type="primary"
+        :loading="importing"
+        :disabled="!picked"
+        @click="submit"
+      >
         开始导入
       </el-button>
     </template>

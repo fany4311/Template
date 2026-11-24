@@ -44,10 +44,14 @@ onMounted(async () => {
     <div class="home-meta">
       <div>你好，<strong>{{ auth.displayName || '未命名用户' }}</strong></div>
       <div>
-        角色：<code>{{ auth.roleNames.length ? auth.roleNames.join('、') : '无' }}</code>
+        角色：<code>{{
+          auth.roleNames.length ? auth.roleNames.join('、') : '无'
+        }}</code>
       </div>
       <div>
-        权限码：<code>{{ auth.permissions.length ? auth.permissions.length + ' 条' : '无' }}</code>
+        权限码：<code>{{
+          auth.permissions.length ? auth.permissions.length + ' 条' : '无'
+        }}</code>
       </div>
     </div>
 

@@ -2,7 +2,10 @@ import { Logger } from '@nestjs/common';
 import { ModulesContainer, NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../app.module.js';
-import { EXTRA_PERMISSIONS, collectPermissionCatalog } from '../common/authz/permission-catalog.js';
+import {
+  EXTRA_PERMISSIONS,
+  collectPermissionCatalog,
+} from '../common/authz/permission-catalog.js';
 
 /**
  * 权限一致性检查（pnpm authz:check）。
@@ -27,7 +30,9 @@ interface MenuRow {
 
 async function main(): Promise<void> {
   const logger = new Logger('authz:check');
-  const app = await NestFactory.createApplicationContext(AppModule, { logger: ['error', 'warn'] });
+  const app = await NestFactory.createApplicationContext(AppModule, {
+    logger: ['error', 'warn'],
+  });
 
   try {
     const modules = app.get(ModulesContainer);
@@ -62,7 +67,10 @@ async function main(): Promise<void> {
 
     const missingInDb = [...codeSet].filter((code) => !dbCodes.has(code));
     if (missingInDb.length) {
-      errors.push('代码里有、sys_permission 没有（先跑 pnpm authz:sync）：' + missingInDb.join(', '));
+      errors.push(
+        '代码里有、sys_permission 没有（先跑 pnpm authz:sync）：' +
+          missingInDb.join(', '),
+      );
     }
 
     const orphanMenu = menuRows.filter((row) => !codeSet.has(row.perms));
@@ -76,21 +84,32 @@ async function main(): Promise<void> {
     // 只对「列表/查看」类码要求有入口：add/edit/remove 天然没有独立菜单
     // 例外：由其它页面内部调用、本就不需要独立菜单的码
     const noMenuAllowed = new Set(['system:permission:list']);
-    const entryCodes = [...codeSet].filter((code) => /:(list|view)$/.test(code));
-    const noMenu = entryCodes.filter((code) => !menuCodes.has(code) && !noMenuAllowed.has(code));
+    const entryCodes = [...codeSet].filter((code) =>
+      /:(list|view)$/.test(code),
+    );
+    const noMenu = entryCodes.filter(
+      (code) => !menuCodes.has(code) && !noMenuAllowed.has(code),
+    );
     if (noMenu.length) {
       warnings.push('有权限码但没有任何菜单入口：' + noMenu.join(', '));
     }
 
     console.log(
-      '==> 代码权限码 ' + codeSet.size + ' · 权限表 ' + dbCodes.size + ' · 菜单 ' + menuRows.length,
+      '==> 代码权限码 ' +
+        codeSet.size +
+        ' · 权限表 ' +
+        dbCodes.size +
+        ' · 菜单 ' +
+        menuRows.length,
     );
 
     for (const message of warnings) logger.warn(message);
     for (const message of errors) logger.error(message);
 
     if (!errors.length) {
-      console.log('✓ 权限一致性检查通过' + (warnings.length ? '（含告警）' : ''));
+      console.log(
+        '✓ 权限一致性检查通过' + (warnings.length ? '（含告警）' : ''),
+      );
     }
     process.exitCode = errors.length ? 1 : 0;
   } finally {

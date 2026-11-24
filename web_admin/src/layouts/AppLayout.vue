@@ -29,7 +29,9 @@ onMounted(() => {
 });
 
 const menus = computed(() => menu.tree);
-const currentTitle = computed(() => (route.meta.title as string | undefined) ?? '');
+const currentTitle = computed(
+  () => (route.meta.title as string | undefined) ?? '',
+);
 
 async function handleLogout(): Promise<void> {
   try {
@@ -56,7 +58,11 @@ async function goLogin(): Promise<void> {
 const pwdVisible = ref(false);
 const pwdSubmitting = ref(false);
 const pwdFormRef = ref<{ validate: () => Promise<boolean> } | null>(null);
-const pwdForm = reactive({ oldPassword: '', newPassword: '', confirmPassword: '' });
+const pwdForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+});
 
 const pwdRules = {
   oldPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
@@ -136,7 +142,9 @@ async function submitPwd(): Promise<void> {
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="openPwdDialog">修改密码</el-dropdown-item>
+                <el-dropdown-item @click="openPwdDialog"
+                  >修改密码</el-dropdown-item
+                >
                 <el-dropdown-item :icon="SwitchButton" @click="handleLogout">
                   退出登录
                 </el-dropdown-item>
@@ -159,10 +167,18 @@ async function submitPwd(): Promise<void> {
         label-width="90px"
       >
         <el-form-item label="原密码" prop="oldPassword">
-          <el-input v-model="pwdForm.oldPassword" type="password" show-password />
+          <el-input
+            v-model="pwdForm.oldPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="pwdForm.newPassword" type="password" show-password />
+          <el-input
+            v-model="pwdForm.newPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
           <el-input

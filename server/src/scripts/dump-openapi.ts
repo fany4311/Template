@@ -23,10 +23,7 @@ async function main() {
 
   const document = buildOpenApiDocument(app);
   // dist/scripts/*.js → ../../../web_admin = trunk/web_admin
-  const out = resolve(
-    import.meta.dirname,
-    '../../../web_admin/openapi.json',
-  );
+  const out = resolve(import.meta.dirname, '../../../web_admin/openapi.json');
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 

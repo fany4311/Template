@@ -122,7 +122,10 @@ export function decodeCsv(input: string): string[][] {
 }
 
 /** 按列定义把实体数组编成 CSV */
-export function exportRows<T extends object>(rows: T[], columns: CsvColumn<T>[]): string {
+export function exportRows<T extends object>(
+  rows: T[],
+  columns: CsvColumn<T>[],
+): string {
   const header = columns.map((col) => col.header);
   const body = rows.map((row) =>
     columns.map((col) => {
@@ -151,7 +154,9 @@ export function readRows<T>(
     if (name && !indexOf.has(name)) indexOf.set(name, index);
   });
 
-  const missing = columns.filter((col) => !indexOf.has(col.header)).map((col) => col.header);
+  const missing = columns
+    .filter((col) => !indexOf.has(col.header))
+    .map((col) => col.header);
   if (missing.length > 0) {
     throw new ApiException('CSV 缺少表头：' + missing.join('、'), 400);
   }
@@ -169,7 +174,10 @@ export function readRows<T>(
   }
 
   if (records.length > CSV_MAX_ROWS) {
-    throw new ApiException('一次最多导入 ' + CSV_MAX_ROWS + ' 行，请拆分文件', 400);
+    throw new ApiException(
+      '一次最多导入 ' + CSV_MAX_ROWS + ' 行，请拆分文件',
+      400,
+    );
   }
   return records;
 }

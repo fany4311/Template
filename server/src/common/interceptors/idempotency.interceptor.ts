@@ -7,14 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { createHash } from 'node:crypto';
 import type { Request } from 'express';
-import {
-  Observable,
-  catchError,
-  defer,
-  mergeMap,
-  of,
-  throwError,
-} from 'rxjs';
+import { Observable, catchError, defer, mergeMap, of, throwError } from 'rxjs';
 import { IDEMPOTENT_KEY } from '../constants/decorator.constant.js';
 import type { IdempotentOptions } from '../decorators/idempotent.decorator.js';
 import { ApiException } from '../exceptions/api.exception.js';
@@ -48,10 +41,9 @@ export class IdempotencyInterceptor implements NestInterceptor {
   ): Promise<Observable<unknown>> {
     if (context.getType() !== 'http') return next.handle();
 
-    const meta = this.reflector.getAllAndOverride<IdempotentOptions | undefined>(
-      IDEMPOTENT_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const meta = this.reflector.getAllAndOverride<
+      IdempotentOptions | undefined
+    >(IDEMPOTENT_KEY, [context.getHandler(), context.getClass()]);
     if (!meta) return next.handle();
 
     const req = context.switchToHttp().getRequest<AuthedRequest>();

@@ -86,7 +86,11 @@ describe('Dept tree (e2e)', () => {
       }),
     );
     await urRepo.save(
-      urRepo.create({ userId: adminUser.id, roleId: adminRole.id, source: 'direct' }),
+      urRepo.create({
+        userId: adminUser.id,
+        roleId: adminRole.id,
+        source: 'direct',
+      }),
     );
     const loginRes = await api()
       .post(`${prefix}/auth/login`)
@@ -97,7 +101,8 @@ describe('Dept tree (e2e)', () => {
     // 树：topRoot ─┬─ targetRoot
     //             └─ moved ─ child
     topId = (await createDept({ name: `${P}top`, parentId: null })).id;
-    targetRootId = (await createDept({ name: `${P}target`, parentId: topId })).id;
+    targetRootId = (await createDept({ name: `${P}target`, parentId: topId }))
+      .id;
     const moved = await createDept({ name: `${P}moved`, parentId: topId });
     movedId = moved.id;
     childId = (await createDept({ name: `${P}child`, parentId: movedId })).id;
@@ -141,8 +146,7 @@ describe('Dept tree (e2e)', () => {
       .delete()
       .where('username LIKE :p', { p: `${P}%` })
       .execute();
-    await ds
-      .query('DELETE FROM sys_role WHERE role_name LIKE ?', [`${P}%`]);
+    await ds.query('DELETE FROM sys_role WHERE role_name LIKE ?', [`${P}%`]);
     await purgeE2ELogs(ds);
     await app.close();
   });

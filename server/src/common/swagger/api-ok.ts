@@ -70,7 +70,11 @@ function buildEnvelope(dataJson: JsonSchema | null): JsonSchema {
   return {
     type: 'object',
     properties: {
-      code: { type: 'integer', example: 200, description: '业务码，200 表示成功' },
+      code: {
+        type: 'integer',
+        example: 200,
+        description: '业务码，200 表示成功',
+      },
       msg: { type: 'string', example: '操作成功', description: '提示信息' },
       data: dataJson ?? { nullable: true, description: '无返回体时为 null' },
     },
@@ -96,7 +100,9 @@ function extractBody(
   extra: Array<[string, JsonSchema]>,
 ): JsonSchema {
   const defsKey = raw.$defs ? '$defs' : raw.definitions ? 'definitions' : null;
-  const defs = defsKey ? ((raw[defsKey] ?? {}) as Record<string, JsonSchema>) : {};
+  const defs = defsKey
+    ? ((raw[defsKey] ?? {}) as Record<string, JsonSchema>)
+    : {};
   const keys = Object.keys(defs);
   const selfRef = hasSelfRef(raw);
 
@@ -226,5 +232,7 @@ export function getResponseSchemas(): Array<[string, JsonSchema]> {
 
 /** 供 e2e 契约测试校验真实响应 */
 export function getResponseZodSchemas(): ReadonlyMap<string, z.ZodType> {
-  return new Map([...registry.entries()].map(([name, entry]) => [name, entry.zod]));
+  return new Map(
+    [...registry.entries()].map(([name, entry]) => [name, entry.zod]),
+  );
 }

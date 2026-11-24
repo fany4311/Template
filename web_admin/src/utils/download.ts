@@ -11,7 +11,10 @@ import { http } from '../api/http';
  * 文件名由调用方传入（来自接口返回的 `originalName`，UTF-8 正常）：
  * 走 axios 拦截器后拿到的是 Blob 本身，拿不到响应头。
  */
-export async function downloadFile(url: string, filename = 'download'): Promise<void> {
+export async function downloadFile(
+  url: string,
+  filename = 'download',
+): Promise<void> {
   try {
     const blob = await http.get(url, { responseType: 'blob' });
     saveBlob(blob as unknown as Blob, filename);

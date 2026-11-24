@@ -168,8 +168,7 @@ export class MenuService {
 
       const nextParentId =
         dto.parentId !== undefined ? dto.parentId : menu.parentId;
-      const parentChanged =
-        (nextParentId ?? null) !== (menu.parentId ?? null);
+      const parentChanged = (nextParentId ?? null) !== (menu.parentId ?? null);
 
       let ancestors = menu.ancestors;
       if (parentChanged) {

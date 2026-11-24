@@ -11,11 +11,18 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 export class GroupMenus1767000022000 implements MigrationInterface {
   name = 'GroupMenus1767000022000';
 
-  private async idOf(queryRunner: QueryRunner, path: string, type?: string): Promise<number | null> {
+  private async idOf(
+    queryRunner: QueryRunner,
+    path: string,
+    type?: string,
+  ): Promise<number | null> {
     const sql = type
       ? 'SELECT id FROM sys_menu WHERE path = ? AND type = ? LIMIT 1'
       : 'SELECT id FROM sys_menu WHERE path = ? LIMIT 1';
-    const rows: Array<{ id: number }> = await queryRunner.query(sql, type ? [path, type] : [path]);
+    const rows: Array<{ id: number }> = await queryRunner.query(
+      sql,
+      type ? [path, type] : [path],
+    );
     return rows[0]?.id ?? null;
   }
 
@@ -50,10 +57,10 @@ export class GroupMenus1767000022000 implements MigrationInterface {
     );
     const fileId = await this.idOf(queryRunner, '/file', 'M');
     if (fileId) {
-      await queryRunner.query('UPDATE sys_menu SET ancestors = ? WHERE parent_id = ?', [
-        '0,' + fileId,
-        fileId,
-      ]);
+      await queryRunner.query(
+        'UPDATE sys_menu SET ancestors = ? WHERE parent_id = ?',
+        ['0,' + fileId, fileId],
+      );
     }
   }
 
@@ -80,10 +87,10 @@ export class GroupMenus1767000022000 implements MigrationInterface {
       );
       const fileId = await this.idOf(queryRunner, '/file', 'M');
       if (fileId) {
-        await queryRunner.query('UPDATE sys_menu SET ancestors = ? WHERE parent_id = ?', [
-          '0,' + systemId + ',' + fileId,
-          fileId,
-        ]);
+        await queryRunner.query(
+          'UPDATE sys_menu SET ancestors = ? WHERE parent_id = ?',
+          ['0,' + systemId + ',' + fileId, fileId],
+        );
       }
     }
 

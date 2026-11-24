@@ -26,7 +26,9 @@ function make(keep: boolean) {
   const interceptor = new TransformInterceptor(reflector);
   return async (data: unknown) =>
     firstValueFrom(
-      interceptor.intercept(ctxFor(), { handle: () => of(data) } as CallHandler),
+      interceptor.intercept(ctxFor(), {
+        handle: () => of(data),
+      } as CallHandler),
     );
 }
 

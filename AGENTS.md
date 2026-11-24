@@ -38,6 +38,8 @@
 - **库与账号**：三类角色 `<项目>`(dev) / `<项目>_prod` / `<项目>_tmp`；定义在 `server/sql/databases.sql`，
   台账在 `docs/库台账.md`。**一库一账号，禁止跨库 GRANT** —— dev 凭据必须读写不了 prod 库。
 - **TypeORM**：联合类型字段必须显式 `type`。
+- **工具链**：`oxlint` 检查 + `oxfmt` 格式化（**prettier 已移除，别加回来**）；
+  前端也必须过 lint —— `verify.sh` 已包含，前端再也不能只有 `vue-tsc`。
 - **权限码**：接口（DTO）只收具体码（2–3 段小写，不含 `*` / `!`）；`*:*:*` 必须独占。
 - **同机共存**：绝不 `pm2 kill` / 停 nginx；端口 / PM2 名 / 站点名 / 目录 / token key 全局唯一；库 / Redis 索引 / bucket 独立。
 - **依赖**：严禁自改版本；新增依赖先问。

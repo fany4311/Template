@@ -9,33 +9,26 @@
 
 ## 现在做什么
 
-- **库与账号三角色化已收口**（详见 `log/20261124_库与账号三角色化.md`）：
-  `server/sql/databases.sql` 为单一真源、一库一账号、`db-apply.sh` / `db-reset.sh` 落地、
-  恢复演练改为固定名 `_tmp_restore` 且剥掉 dump 里的 `USE` / `CREATE DATABASE`。
-- 工作区干净，`main` 与 `origin/main` 已同步（本轮 3 个提交已推送）。
-- Template 副本已接入本地 MySQL / Redis：迁移已跑、48 条权限码已同步，超管可登录后台（5183）。
-- P0 / P1 / P2 全部落地：主题与暗色、列表抽象、CSV 导入导出、`gen:module`、
-  监控与审计留存、备份恢复、权限一致性门禁、字典缓存、用户导入导出。
-- 系统域全部列表页 + 两个日志页已统一到 `useCrud` / `DataTable`；树表只换表格。
+- **工具链已铺平**（2026-11-24）：`oxlint` + `oxfmt` 覆盖三个子项目，**prettier 已移除**；
+  全仓按 oxfmt 重排（server 77 文件 / web_admin 41 / web 7，纯换行与引号，无逻辑改动）；
+  `verify.sh` 增加「前端 lint」与「格式检查」两步。
+- **E2E 骨架已就位**：`web_admin/e2e/`（认证 4 条）+ `playwright.config.ts`；
+  **浏览器未安装**（本机到 `cdn.playwright.dev` 不通），所以**尚未真正跑过**。
+- **数据变更按标签失效**：`composables/useRefetch.ts`（等价 TanStack `queryKey` 的 1%），
+  `useCrud` 支持 `tags`；已接线 用户 / 角色 / 部门 三处。
+- 库与账号三角色化已收口（详见 `log/20261124_库与账号三角色化.md`）。
 
 ## 下一步
 
-> 选型复核（对照一份外部多项目栈）结论已落到 `整体方案与选型.md` §4.1：运行时不换，只补工具链。
-> 复核中纠正一处误判：**会话撤销已实现**（`core/session` + `JwtStrategy` 比对 Redis token），
-> 不需用 Redis 黑名单或换 Better Auth 重做。
+> 选型复核结论见 `整体方案与选型.md` §4.1：运行时不换，只补工具链。
 
-- [ ] **P1 权限缺口（建议下一件做）**：`dataScope=CUSTOM` 现在界面禁用、后端
-      「暂按无权限处理」——枚举与接口都接受 CUSTOM，一旦被传进来就是**静默查不到数据**，
-      不报错。补 `sys_role_dept` + `DataScopeService` 的 CUSTOM 分支 + 角色编辑页部门树多选；
-      同批做角色 CASL `rules` 编辑 UI（`权限设计-CASL.md` §12）。
-- [ ] **P1 E2E 金链路**：现状只有静态检查 + 单测，没有一条验证流程真能跑通。
-      Playwright 只写 3 条：登录→建角色→建用户并授权 / 隐患流转到销号 / 附件上传-下载-回收。
-      建议排在权限缺口之后（用测试钉住刚做的行为）。
-- [ ] **P1 前端工具链铺平**：`web_admin` / `web` 目前无 lint 无 format（只有 `vue-tsc`）。
-      用已有依赖补齐并进 `verify.sh`；**不引入 oxfmt**。
-- [ ] **P2 部署端巡检**：`deploy/check.sh`（MySQL / Redis / MinIO 连通、磁盘余量、
-      备份文件时效 + sha256 复校）。`backup.sh` 有 gzip 校验但没人定期跑 —— 等于没备份。
-      注：本机没有 `mysqldump`/`mysql` 客户端，`backup.sh` 目前只能在部署端跑（restore.sh 已做容器回退）。
+- [ ] **P1 权限缺口**：`dataScope=CUSTOM` 界面禁用、后端「暂按无权限处理」，
+      被传进来就是静默查不到数据（不报错）。补 `sys_role_dept` + `DataScopeService` 分支 +
+      角色编辑页部门树多选。**CASL `rules` 编辑 UI 不做**（用户决定）。
+- [ ] **P1 E2E 跑通并补链路**：先在有网的机器 `npx playwright install chromium`，
+      把认证 4 条跑绿；再补「建角色→建用户并授权」「隐患流转到销号」「附件上传-下载-回收」。
+- [ ] **P2 部署端巡检**：`deploy/check.sh`（连通性、磁盘、备份时效 + sha256 复校）。
+      注：本机无 `mysqldump`/`mysql` 客户端，`backup.sh` 只能在部署端跑（`restore.sh` 已有容器回退）。
 - [ ] 派生新项目时按 `docs/init.md` 替换身份与环境；本副本不再改身份。
 
 ## 阻塞
@@ -44,6 +37,10 @@
 
 ## 验证台账
 
+- 2026-11-24 工具链改造后 `scripts/verify.sh` 全绿（新增前端 lint / 格式检查两步）：
+  后端 tsc + oxlint + 权限一致性（48 码）+ 单测 16 文件 113 用例；前端 lint ×2 +
+  `oxfmt --check` ×3 + `vue-tsc` + `vite build` ×2。
+- **E2E 未执行**：用例与配置已提交，浏览器装不上（CDN 不可达）。不许写成"已验证"。
 - 2026-11-24 恢复演练脚本改造后实测：dump(16K) → `template_tmp_restore` 19 表 / 5 用户 / 5 角色，
   源库 `template` 19 表 5 用户未受影响，演练库已删；`--db template_prod` 被拒（exit 1）。
   同时修掉一个真 bug：`--databases` 型 dump 含 `USE`，原样灌会写回源库（目标库 0 表）。

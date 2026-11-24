@@ -9,42 +9,33 @@
 
 ## 现在做什么
 
-- **库与账号改造已落文件、等执行 DDL**（本轮新增）：`server/sql/databases.sql` 成为库/账号/授权的
-  单一真源，台账在 `docs/库台账.md`；三类角色 `<项目>`(dev) / `_prod` / `_tmp`；
-  **一库一账号**（`template_dev` / `template_prod` / `template_tmp`，各自只授本库）。
-  `template_test` 已改名 `template_tmp`（`.env.test` / 台账 / vitest 注释已同步）。
-  新增 `scripts/db-reset.sh`（tmp 库 DROP→CREATE→授权→迁移 一条命令，默认只敢动 `*_tmp`）。
-  顺手修了两处隐患：`backup.sh` 默认备份的是 **dev 库**（`DB_NAME` 现在必填）；
-  `restore.sh` 只认 `DB_USER`、而 `.env.prod` 给的是 `DB_USERNAME` → 会静默退回旧共享账号。
-- Template 副本已接入本地 MySQL / Redis：20 个迁移已跑、48 条权限码已同步，超管可登录后台（5183）。
+- **库与账号三角色化已收口**（详见 `log/20261124_库与账号三角色化.md`）：
+  `server/sql/databases.sql` 为单一真源、一库一账号、`db-apply.sh` / `db-reset.sh` 落地、
+  恢复演练改为固定名 `_tmp_restore` 且剥掉 dump 里的 `USE` / `CREATE DATABASE`。
+- 工作区干净，`main` 与 `origin/main` 已同步（本轮 3 个提交已推送）。
+- Template 副本已接入本地 MySQL / Redis：迁移已跑、48 条权限码已同步，超管可登录后台（5183）。
 - P0 / P1 / P2 全部落地：主题与暗色、列表抽象、CSV 导入导出、`gen:module`、
   监控与审计留存、备份恢复、权限一致性门禁、字典缓存、用户导入导出。
 - 系统域全部列表页 + 两个日志页已统一到 `useCrud` / `DataTable`；树表只换表格。
-- 生成器补齐：`--menu-parent`（挂父菜单）、`--unique`（唯一键 + 前置查重）、`file` 字段
-  （不建列，自动生成 `FileBizHandler` + 前端 `BizFiles` 附件抽屉）。
-- **工作区有未提交改动**：后端 `gen-module.ts`、前端 8 个视图/组件 + `BizFiles.vue`、四份文档。
 
 ## 下一步
 
 > 选型复核（对照一份外部多项目栈）结论已落到 `整体方案与选型.md` §4.1：运行时不换，只补工具链。
-> 复核中纠正一处误判：**会话撤销已实现**（`core/session` + `JwtStrategy` 比对 Redis token，
-> 登出 / 踢人 / 权限变更即失效），不需要用 Redis 黑名单或换 Better Auth 重做。
+> 复核中纠正一处误判：**会话撤销已实现**（`core/session` + `JwtStrategy` 比对 Redis token），
+> 不需用 Redis 黑名单或换 Better Auth 重做。
 
-- [ ] **执行库与账号 DDL**（在托管 MySQL 的机器上，顺序不能反）：
-      **✅ 已完成（2026-11-24）**：`bash scripts/db-apply.sh` 建库建号（幂等）、
-      `db-reset.sh` 重建 `template_tmp`、`verify.sh` 全绿、dev 三进程 online、health/ready 数据库 up。
-      遗留：`'template'@'%'` **尚未 DROP**（旧共享账号），需先确认部署端无其它项目复用。
-      注：本机还有 `csmu0_db`（用 root 账号，不属本项目身份，不在本次改动范围）。
-- [ ] **P1 E2E 金链路**：现状只有静态检查 + 单测，**没有一条验证流程真能跑通**
-      （`验证台账` 里「隐患全流程 —— 用户已确认」是手工证据）。Playwright 只写 3 条：
-      登录→建角色→建用户并授权 / 隐患流转到销号 / 附件上传-下载-回收。
-- [ ] **P1 前端工具链铺平**：`web_admin` / `web` 目前**无 lint 无 format**（只有 `vue-tsc`），
-      与后端 `oxlint + prettier` 不对称。用已有依赖补齐并进 `verify.sh`；**不引入 oxfmt**。
-- [ ] **P2 部署端巡检**：新增 `deploy/check.sh`（MySQL / Redis / MinIO 连通、磁盘余量、
-      备份文件时效 + sha256 复校）。`backup.sh` 做了 gzip 校验，但**没人定期跑**——等于没备份。
-- [ ] 提交并推送：`main` 已领先 `origin/main` 6 个提交，加上本轮改动；
-      建议拆两个提交（视图迁移 / 平台级授权锁定），推送前先跑全量 `scripts/verify.sh`。
-- [ ] 角色 CASL `rules` 编辑 UI 与 `dataScope=CUSTOM` 部门集合（见 `权限设计-CASL.md` §12）。
+- [ ] **P1 权限缺口（建议下一件做）**：`dataScope=CUSTOM` 现在界面禁用、后端
+      「暂按无权限处理」——枚举与接口都接受 CUSTOM，一旦被传进来就是**静默查不到数据**，
+      不报错。补 `sys_role_dept` + `DataScopeService` 的 CUSTOM 分支 + 角色编辑页部门树多选；
+      同批做角色 CASL `rules` 编辑 UI（`权限设计-CASL.md` §12）。
+- [ ] **P1 E2E 金链路**：现状只有静态检查 + 单测，没有一条验证流程真能跑通。
+      Playwright 只写 3 条：登录→建角色→建用户并授权 / 隐患流转到销号 / 附件上传-下载-回收。
+      建议排在权限缺口之后（用测试钉住刚做的行为）。
+- [ ] **P1 前端工具链铺平**：`web_admin` / `web` 目前无 lint 无 format（只有 `vue-tsc`）。
+      用已有依赖补齐并进 `verify.sh`；**不引入 oxfmt**。
+- [ ] **P2 部署端巡检**：`deploy/check.sh`（MySQL / Redis / MinIO 连通、磁盘余量、
+      备份文件时效 + sha256 复校）。`backup.sh` 有 gzip 校验但没人定期跑 —— 等于没备份。
+      注：本机没有 `mysqldump`/`mysql` 客户端，`backup.sh` 目前只能在部署端跑（restore.sh 已做容器回退）。
 - [ ] 派生新项目时按 `docs/init.md` 替换身份与环境；本副本不再改身份。
 
 ## 阻塞
@@ -53,6 +44,9 @@
 
 ## 验证台账
 
+- 2026-11-24 恢复演练脚本改造后实测：dump(16K) → `template_tmp_restore` 19 表 / 5 用户 / 5 角色，
+  源库 `template` 19 表 5 用户未受影响，演练库已删；`--db template_prod` 被拒（exit 1）。
+  同时修掉一个真 bug：`--databases` 型 dump 含 `USE`，原样灌会写回源库（目标库 0 表）。
 - 2026-11-24 库与账号改造执行完毕：`db-apply.sh` 建库建号（三段密码互不相同、每账号只授本库）、
   `db-reset.sh --yes` 重建 `template_tmp` 并跑完迁移、`scripts/verify.sh` **全绿**、
   dev 三进程 online、`/health/ready` 数据库 up、admin 200 / web 200。

@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { Plus, Refresh, Search } from '@element-plus/icons-vue';
-import { ElMessage, ElTree, type FormInstance, type FormRules } from 'element-plus';
+import {
+  ElMessage,
+  ElTree,
+  type FormInstance,
+  type FormRules,
+} from 'element-plus';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { permissionApi } from '../../api/permission';
 import { roleApi, type RoleCreateBody } from '../../api/role';
 import type { DataScope, PermissionGroup, RoleItem } from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 import { useCrud } from '../../composables/useCrud';
+import { invalidate } from '../../composables/useRefetch';
 
 /**
  * 内置超管的编号（`sys_role.level`）。
@@ -57,6 +63,7 @@ const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
   api: { page: (q) => roleApi.page(q), remove: roleApi.remove },
   query: { pageNum: 1, pageSize: 10, keyword: '', status: undefined },
   removeText: (row) => '确认删除角色「' + row.roleName + '」？',
+  tags: ['role'],
 });
 
 const columns: TableColumn[] = [
@@ -107,7 +114,9 @@ const hasPlatformPermissions = computed(() =>
 );
 
 /** 权限区是否只读：超管锁 或 含平台级授权 */
-const permLocked = computed(() => superadminLock.value || hasPlatformPermissions.value);
+const permLocked = computed(
+  () => superadminLock.value || hasPlatformPermissions.value,
+);
 
 // ---------------------------------------------------------------------------
 // 权限清单树
@@ -227,7 +236,9 @@ const rules = computed<FormRules>(() => ({
       // 平台级授权（含 * / !）不经此处校验 —— 它们本就不是普通码，也不由界面写入
       validator: (_rule, value, cb) => {
         const bad = ((value as string[] | undefined) ?? []).filter(
-          (p) => !PLATFORM_PERMISSION_REGEX.test(p) && !PERMISSION_CODE_REGEX.test(p),
+          (p) =>
+            !PLATFORM_PERMISSION_REGEX.test(p) &&
+            !PERMISSION_CODE_REGEX.test(p),
         );
         if (bad.length) {
           cb(
@@ -305,7 +316,8 @@ async function submitForm(): Promise<void> {
       ElMessage.success('更新成功');
     }
     dialogVisible.value = false;
-    await reload();
+    // 用户页的「分配角色」下拉订阅了 role：角色名/状态改了要跟着变
+    await invalidate('role');
   } catch {
     // 已提示
   } finally {
@@ -334,7 +346,9 @@ async function submitForm(): Promise<void> {
           <el-option label="正常" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
 
         <div class="page-toolbar-right">
@@ -359,20 +373,31 @@ async function submitForm(): Promise<void> {
         @change="reload"
       >
         <template #level="{ row }">
-          <el-tag :type="row.level <= 4 ? 'warning' : 'info'" size="small" effect="plain">
+          <el-tag
+            :type="row.level <= 4 ? 'warning' : 'info'"
+            size="small"
+            effect="plain"
+          >
             {{ row.level }}
           </el-tag>
         </template>
 
         <template #roleName="{ row }">
           {{ row.roleName }}
-          <el-tag v-if="row.isBuiltin === 1" size="small" type="warning" effect="plain">
+          <el-tag
+            v-if="row.isBuiltin === 1"
+            size="small"
+            type="warning"
+            effect="plain"
+          >
             内置
           </el-tag>
         </template>
 
         <template #dataScope="{ row }">
-          <el-tag size="small" type="info">{{ dataScopeLabel(row.dataScope) }}</el-tag>
+          <el-tag size="small" type="info">{{
+            dataScopeLabel(row.dataScope)
+          }}</el-tag>
         </template>
 
         <template #permissions="{ row }">
@@ -459,7 +484,8 @@ async function submitForm(): Promise<void> {
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="form.roleName" placeholder="如：部门管理员" />
           <div class="form-tip">
-            编号（level）由系统自动分配：内置角色 0-4，自建角色从 5 起，分配后不可修改。
+            编号（level）由系统自动分配：内置角色 0-4，自建角色从 5
+            起，分配后不可修改。
           </div>
         </el-form-item>
         <el-form-item label="数据范围" prop="dataScope">
@@ -519,11 +545,13 @@ async function submitForm(): Promise<void> {
             </el-tree>
           </div>
           <div class="form-tip">
-            按模块勾选。清单由 <code>pnpm authz:sync</code> 从接口装饰器反射生成，
+            按模块勾选。清单由
+            <code>pnpm authz:sync</code> 从接口装饰器反射生成，
             此处只能选、不能编 —— 要新增权限码，去写
             <code>@RequiresPermissions</code> 再同步一次。
             <template v-if="hasPlatformPermissions">
-              含通配 / 否定的平台级授权不经接口下发，勾选已锁定，保存时保持原值。
+              含通配 /
+              否定的平台级授权不经接口下发，勾选已锁定，保存时保持原值。
             </template>
           </div>
         </el-form-item>

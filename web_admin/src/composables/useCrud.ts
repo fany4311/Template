@@ -1,5 +1,6 @@
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { onMounted, reactive, ref, type Ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref, type Ref } from 'vue';
+import { invalidate, subscribe } from './useRefetch';
 
 /**
  * 列表页的「状态机」：分页 / 加载 / 查询 / 重置 / 删除。
@@ -41,6 +42,11 @@ export interface UseCrudOptions<T extends { id: RowId }, Q extends PagedQuery> {
   removeText?: (row: T) => string;
   /** 是否在 onMounted 自动加载，默认 true */
   autoLoad?: boolean;
+  /**
+   * 数据标签。别人 `invalidate('user')` 时，本列表自动重新加载。
+   * 例：用户列表 `['user']`，部门树型表 `['dept']`。
+   */
+  tags?: string[];
 }
 
 export interface UseCrudResult<T extends { id: RowId }, Q extends PagedQuery> {
@@ -94,7 +100,9 @@ export function useCrud<T extends { id: RowId }, Q extends PagedQuery>(
 
   async function remove(row: T): Promise<void> {
     if (!options.api.remove) return;
-    const text = options.removeText ? options.removeText(row) : '确认删除该记录？';
+    const text = options.removeText
+      ? options.removeText(row)
+      : '确认删除该记录？';
     try {
       await ElMessageBox.confirm(text, '提示', { type: 'warning' });
     } catch {
@@ -107,7 +115,12 @@ export function useCrud<T extends { id: RowId }, Q extends PagedQuery>(
       if (rows.value.length === 1 && query.pageNum > 1) {
         query.pageNum -= 1;
       }
-      await reload();
+      // 有标签就让所有订阅者（含本列表）一起刷新；没有标签只能自己刷新
+      if (options.tags?.length) {
+        await invalidate(...options.tags);
+      } else {
+        await reload();
+      }
     } catch {
       // 已提示
     }
@@ -117,6 +130,11 @@ export function useCrud<T extends { id: RowId }, Q extends PagedQuery>(
     onMounted(() => {
       void reload();
     });
+  }
+
+  // 订阅数据标签：别人改完数据调 invalidate(tag)，本列表自己重拉
+  if (options.tags?.length) {
+    onUnmounted(subscribe(options.tags, reload));
   }
 
   return { query, rows, total, loading, reload, search, reset, remove };

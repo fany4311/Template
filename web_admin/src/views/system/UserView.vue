@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Download, Plus, Refresh, Search, Upload } from '@element-plus/icons-vue';
+import {
+  Download,
+  Plus,
+  Refresh,
+  Search,
+  Upload,
+} from '@element-plus/icons-vue';
 import {
   ElMessage,
   ElMessageBox,
@@ -10,10 +16,16 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { deptApi } from '../../api/dept';
 import { roleApi } from '../../api/role';
 import { userApi, type UserCreateBody } from '../../api/user';
-import type { DeptTreeNode, RoleItem, UserItem, UserRoleGrant } from '../../api/types';
+import type {
+  DeptTreeNode,
+  RoleItem,
+  UserItem,
+  UserRoleGrant,
+} from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 import ImportDialog from '../../components/ImportDialog.vue';
 import { useCrud } from '../../composables/useCrud';
+import { useRefetch } from '../../composables/useRefetch';
 
 // ---------------------------------------------------------------------------
 // 列表
@@ -32,8 +44,15 @@ const { query, rows, total, loading, reload, search, reset, remove } = useCrud<
   UserListQuery
 >({
   api: { page: (q) => userApi.page(q), remove: userApi.remove },
-  query: { pageNum: 1, pageSize: 10, keyword: '', status: undefined, deptId: undefined },
+  query: {
+    pageNum: 1,
+    pageSize: 10,
+    keyword: '',
+    status: undefined,
+    deptId: undefined,
+  },
   removeText: (row) => '确认删除用户「' + row.username + '」？',
+  tags: ['user'],
 });
 
 const columns: TableColumn[] = [
@@ -66,7 +85,9 @@ const deptMap = computed(() => new Map(flatDepts.value.map((d) => [d.id, d])));
 const deptLabel = (id?: number | null): string =>
   id ? (deptMap.value.get(id)?.name ?? `#${id}`) : '-';
 
-const roleMap = computed(() => new Map(roleOptions.value.map((r) => [r.id, r])));
+const roleMap = computed(
+  () => new Map(roleOptions.value.map((r) => [r.id, r])),
+);
 
 const fmtTime = (value?: string | null): string =>
   value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '-';
@@ -87,7 +108,6 @@ async function loadRoles(): Promise<void> {
     // ignore
   }
 }
-
 
 // ---------------------------------------------------------------------------
 // 新建 / 编辑
@@ -287,7 +307,9 @@ async function submitGrant(): Promise<void> {
     await userApi.grant(grantUser.value.id, {
       roleIds: grantForm.roleIds,
       // 后端 z.iso.datetime() 要求 ISO 8601（UTC，带 Z）
-      expireAt: grantForm.expireAt ? grantForm.expireAt.toISOString() : undefined,
+      expireAt: grantForm.expireAt
+        ? grantForm.expireAt.toISOString()
+        : undefined,
     });
     ElMessage.success('授权成功');
     grantForm.roleIds = [];
@@ -302,7 +324,8 @@ async function submitGrant(): Promise<void> {
 
 async function revokeGrant(grant: UserRoleGrant): Promise<void> {
   if (!grantUser.value) return;
-  const roleName = roleMap.value.get(grant.roleId)?.roleName ?? `#${grant.roleId}`;
+  const roleName =
+    roleMap.value.get(grant.roleId)?.roleName ?? `#${grant.roleId}`;
   try {
     await ElMessageBox.confirm(`确认撤销角色「${roleName}」？`, '提示', {
       type: 'warning',
@@ -346,6 +369,11 @@ onMounted(() => {
   void loadDeptTree();
   void loadRoles();
 });
+
+// 部门树 / 角色列表是"别人家的数据"：在部门页或角色页改完，
+// 这里要跟着刷新，否则下拉里还是旧的（用户反馈最多的就是"改了没生效"）。
+useRefetch(['dept'], loadDeptTree);
+useRefetch(['role'], loadRoles);
 </script>
 
 <template>
@@ -379,7 +407,9 @@ onMounted(() => {
           <el-option label="正常" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
-        <el-button :icon="Search" type="primary" @click="search">查询</el-button>
+        <el-button :icon="Search" type="primary" @click="search"
+          >查询</el-button
+        >
         <el-button :icon="Refresh" @click="reset">重置</el-button>
 
         <div class="page-toolbar-right">
@@ -479,7 +509,11 @@ onMounted(() => {
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" :disabled="dialogMode === 'edit'" />
         </el-form-item>
-        <el-form-item v-if="dialogMode === 'create'" label="密码" prop="password">
+        <el-form-item
+          v-if="dialogMode === 'create'"
+          label="密码"
+          prop="password"
+        >
           <el-input v-model="form.password" type="password" show-password />
         </el-form-item>
         <el-form-item label="昵称" prop="nickname">
@@ -490,7 +524,7 @@ onMounted(() => {
             v-model="form.deptId"
             :data="deptTree"
             node-key="id"
-          :props="{ label: 'name', children: 'children' }"
+            :props="{ label: 'name', children: 'children' }"
             check-strictly
             clearable
             placeholder="请选择部门"
@@ -560,7 +594,11 @@ onMounted(() => {
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="grantSubmitting" @click="submitGrant">
+          <el-button
+            type="primary"
+            :loading="grantSubmitting"
+            @click="submitGrant"
+          >
             确认授予
           </el-button>
         </el-form-item>
@@ -575,7 +613,10 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="类型" width="90">
           <template #default="{ row }">
-            <el-tag :type="row.source === 'temp' ? 'warning' : 'success'" size="small">
+            <el-tag
+              :type="row.source === 'temp' ? 'warning' : 'success'"
+              size="small"
+            >
               {{ row.source === 'temp' ? '临时' : '永久' }}
             </el-tag>
           </template>
@@ -587,7 +628,12 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="90">
           <template #default="{ row }">
-            <el-button link type="danger" @click="revokeGrant(row as UserRoleGrant)">撤销</el-button>
+            <el-button
+              link
+              type="danger"
+              @click="revokeGrant(row as UserRoleGrant)"
+              >撤销</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -611,7 +657,11 @@ onMounted(() => {
           <span>{{ pwdTarget?.username }}</span>
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="pwdForm.newPassword" type="password" show-password />
+          <el-input
+            v-model="pwdForm.newPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
           <el-input
@@ -623,7 +673,11 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="pwdVisible = false">取消</el-button>
-        <el-button type="primary" :loading="pwdSubmitting" @click="submitResetPwd">
+        <el-button
+          type="primary"
+          :loading="pwdSubmitting"
+          @click="submitResetPwd"
+        >
           确定重置
         </el-button>
       </template>

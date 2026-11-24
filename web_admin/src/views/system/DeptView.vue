@@ -8,6 +8,7 @@ import {
 } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { deptApi, type DeptCreateBody } from '../../api/dept';
+import { invalidate } from '../../composables/useRefetch';
 import type { DeptTreeNode } from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 
@@ -62,7 +63,8 @@ const rules = computed<FormRules>(() => ({
 
 /** 编辑时禁止把父级选成自己或自己的子孙（后端也会校验） */
 const parentTreeData = computed<DeptTreeNode[]>(() => {
-  if (dialogMode.value !== 'edit' || editingId.value === null) return tree.value;
+  if (dialogMode.value !== 'edit' || editingId.value === null)
+    return tree.value;
   const excluded = editingId.value;
   const filter = (nodes: DeptTreeNode[]): DeptTreeNode[] =>
     nodes
@@ -112,6 +114,7 @@ async function submitForm(): Promise<void> {
     }
     dialogVisible.value = false;
     await fetchTree();
+    await invalidate('dept'); // 用户页的「所属部门」树要跟着变
   } catch {
     // 已提示
   } finally {
@@ -135,6 +138,7 @@ async function handleDelete(row: DeptTreeNode): Promise<void> {
     await deptApi.remove(row.id);
     ElMessage.success('删除成功');
     await fetchTree();
+    await invalidate('dept');
   } catch {
     // 已提示
   }
@@ -219,7 +223,7 @@ onMounted(fetchTree);
             v-model="form.parentId"
             :data="parentTreeData"
             node-key="id"
-          :props="{ label: 'name', children: 'children' }"
+            :props="{ label: 'name', children: 'children' }"
             check-strictly
             clearable
             placeholder="不选 = 顶级部门"

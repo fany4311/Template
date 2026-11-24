@@ -27,6 +27,12 @@
       角色编辑页部门树多选。**CASL `rules` 编辑 UI 不做**（用户决定）。
 - [ ] **P1 E2E 跑通并补链路**：先在有网的机器 `npx playwright install chromium`，
       把认证 4 条跑绿；再补「建角色→建用户并授权」「隐患流转到销号」「附件上传-下载-回收」。
+- [ ] **P2 迁移一致性门禁**：`verify.sh` 现在只查权限码，不查"代码里的迁移是否都跑过"。
+      派生项目最常见的翻车就是少跑一个迁移 → 上线 500。做法：`migration:show` 输出里出现
+      未执行项就失败（可选：只对 `NODE_ENV=prod` 严格）。
+- [ ] **P2 `@nestjs/storage@0.0.4`**：0.0.x 随时可改 API。当前用法极浅（
+      `storage.disk()` / `defaultDisk` / `put` / `get` / `delete` 五个），
+      替换成本约半天（S3 兼容用一个适配器即可）。**现在只 pin 版本，等文件模块要加密/多桶时一起换。**
 - [ ] **P2 部署端巡检**：`deploy/check.sh`（连通性、磁盘、备份时效 + sha256 复校）。
       注：本机无 `mysqldump`/`mysql` 客户端，`backup.sh` 只能在部署端跑（`restore.sh` 已有容器回退）。
 - [ ] 派生新项目时按 `docs/init.md` 替换身份与环境；本副本不再改身份。

@@ -6,13 +6,19 @@ import {
   type FormInstance,
   type FormRules,
 } from 'element-plus';
-import { computed, nextTick, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { deptApi } from '../../api/dept';
 import { permissionApi } from '../../api/permission';
 import { roleApi, type RoleCreateBody } from '../../api/role';
-import type { DataScope, PermissionGroup, RoleItem } from '../../api/types';
+import type {
+  DataScope,
+  DeptTreeNode,
+  PermissionGroup,
+  RoleItem,
+} from '../../api/types';
 import DataTable, { type TableColumn } from '../../components/DataTable.vue';
 import { useCrud } from '../../composables/useCrud';
-import { invalidate } from '../../composables/useRefetch';
+import { invalidate, useRefetch } from '../../composables/useRefetch';
 
 /**
  * 内置超管的编号（`sys_role.level`）。
@@ -36,7 +42,7 @@ const DATA_SCOPE_OPTIONS: { value: DataScope; label: string }[] = [
   { value: 'DEPT_AND_CHILD', label: '本部门及以下' },
   { value: 'DEPT', label: '本部门' },
   { value: 'SELF', label: '仅本人' },
-  { value: 'CUSTOM', label: '自定义（暂未启用）' },
+  { value: 'CUSTOM', label: '自定义部门' },
 ];
 
 const dataScopeLabel = (value: string): string =>
@@ -96,8 +102,24 @@ const form = reactive<RoleCreateBody>({
   roleName: '',
   permissions: [],
   dataScope: 'SELF',
+  deptIds: [],
   status: 1,
 });
+
+/** 数据范围 = 自定义时要选部门；部门树在选择器里展开，和用户页共用同一份数据 */
+const deptTree = ref<DeptTreeNode[]>([]);
+const isCustomScope = computed(() => form.dataScope === 'CUSTOM');
+
+async function loadDeptTree(): Promise<void> {
+  try {
+    deptTree.value = await deptApi.tree();
+  } catch {
+    // 已提示
+  }
+}
+onMounted(loadDeptTree);
+// 部门页增删部门后，这里的选择器要跟着变
+useRefetch(['dept'], loadDeptTree);
 
 /**
  * 角色身上是否有**平台级授权**（通配 `*` 或否定 `!`，如校级管理员的 `*:*:*,!system:*`）。
@@ -263,6 +285,7 @@ function openCreate(): void {
     roleName: '',
     permissions: [],
     dataScope: 'SELF',
+    deptIds: [],
     status: 1,
   });
   formRef.value?.clearValidate();
@@ -279,6 +302,8 @@ function openEdit(row: RoleItem): void {
     roleName: row.roleName,
     permissions: [...(row.permissions ?? [])],
     dataScope: row.dataScope,
+    // 列表接口已带上 deptIds（服务端 attach 出来的派生字段）
+    deptIds: [...(row.deptIds ?? [])],
     status: row.status,
   });
   formRef.value?.clearValidate();
@@ -307,6 +332,11 @@ async function submitForm(): Promise<void> {
     // 含平台级授权时不能回传 permissions（后端 DTO 拒收 * / !），其它字段照常可改
     if (hasPlatformPermissions.value) {
       delete (payload as { permissions?: string[] }).permissions;
+    }
+    // 只在「自定义」时提交部门集合：切到别的范围时保留库里的配置，
+    // 免得用户临时改一下范围再改回来，选择就丢了
+    if (!isCustomScope.value) {
+      delete (payload as { deptIds?: number[] }).deptIds;
     }
     if (dialogMode.value === 'create') {
       await roleApi.create(payload);
@@ -499,11 +529,43 @@ async function submitForm(): Promise<void> {
               :key="opt.value"
               :label="opt.label"
               :value="opt.value"
-              :disabled="opt.value === 'CUSTOM'"
             />
           </el-select>
           <div class="form-tip">
             多角色取并集；无可用范围时按「不可见」处理（fail-closed）。
+          </div>
+        </el-form-item>
+        <el-form-item
+          v-if="isCustomScope"
+          label="可见部门"
+          prop="deptIds"
+          :rules="[
+            {
+              required: true,
+              type: 'array',
+              min: 1,
+              message: '自定义范围至少要选一个部门',
+              trigger: 'change',
+            },
+          ]"
+        >
+          <el-tree-select
+            v-model="form.deptIds"
+            :data="deptTree"
+            :props="{ label: 'name', children: 'children' }"
+            node-key="id"
+            multiple
+            show-checkbox
+            check-strictly
+            collapse-tags
+            collapse-tags-tooltip
+            :render-after-expand="false"
+            :disabled="superadminLock"
+            placeholder="请选择可见部门（可多选）"
+            style="width: 100%"
+          />
+          <div class="form-tip">
+            只选叶子部门也要勾——这里不做"父选子联"，选了哪个就是哪个。
           </div>
         </el-form-item>
         <el-form-item label="权限" prop="permissions">

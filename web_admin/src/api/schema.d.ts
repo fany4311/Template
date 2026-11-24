@@ -191,6 +191,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/user/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 导出用户（CSV，最多 5000 条，按数据范围） */
+    get: operations['UserController_exportCsv_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/user/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导入用户（CSV，逐行返回失败原因） */
+    post: operations['UserController_importCsv_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/user/{id}': {
     parameters: {
       query?: never;
@@ -310,6 +344,43 @@ export interface paths {
     post?: never;
     /** 删除部门（软删除，有下级则拒绝） */
     delete: operations['DeptController_remove_v1'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/role': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 分页查询角色 */
+    get: operations['RoleController_page_v1'];
+    put?: never;
+    /** 创建角色 */
+    post: operations['RoleController_create_v1'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/role/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 角色详情 */
+    get: operations['RoleController_detail_v1'];
+    /** 更新角色 */
+    put: operations['RoleController_update_v1'];
+    post?: never;
+    /** 删除角色（软删除） */
+    delete: operations['RoleController_remove_v1'];
     options?: never;
     head?: never;
     patch?: never;
@@ -838,43 +909,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/role': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** 分页查询角色 */
-    get: operations['RoleController_page_v1'];
-    put?: never;
-    /** 创建角色 */
-    post: operations['RoleController_create_v1'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/role/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** 角色详情 */
-    get: operations['RoleController_detail_v1'];
-    /** 更新角色 */
-    put: operations['RoleController_update_v1'];
-    post?: never;
-    /** 删除角色（软删除） */
-    delete: operations['RoleController_remove_v1'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/permission': {
     parameters: {
       query?: never;
@@ -1003,6 +1037,83 @@ export interface components {
       msg: string;
       data?: boolean;
     };
+    SysRolePage: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        list: {
+          id: number;
+          /** Format: date-time */
+          createTime: string;
+          /** Format: date-time */
+          updateTime: string;
+          roleName: string;
+          level: number;
+          isBuiltin: number;
+          permissions: string[];
+          rules?:
+            | {
+                action: string;
+                subject: string;
+                conditions?: {
+                  [key: string]: unknown;
+                };
+                fields?: string[];
+                inverted?: boolean;
+              }[]
+            | null;
+          dataScope: string;
+          deptIds?: number[];
+          status: number;
+        }[];
+        total: number;
+      };
+    };
+    SysRole: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        id: number;
+        /** Format: date-time */
+        createTime: string;
+        /** Format: date-time */
+        updateTime: string;
+        roleName: string;
+        level: number;
+        isBuiltin: number;
+        permissions: string[];
+        rules?:
+          | {
+              action: string;
+              subject: string;
+              conditions?: {
+                [key: string]: unknown;
+              };
+              fields?: string[];
+              inverted?: boolean;
+            }[]
+          | null;
+        dataScope: string;
+        deptIds?: number[];
+        status: number;
+      };
+    };
     SysDeptTree: {
       /**
        * @description 业务码，200 表示成功
@@ -1112,6 +1223,27 @@ export interface components {
           post: string;
         }[];
         total: number;
+      };
+    };
+    UserImportResult: {
+      /**
+       * @description 业务码，200 表示成功
+       * @example 200
+       */
+      code: number;
+      /**
+       * @description 提示信息
+       * @example 操作成功
+       */
+      msg: string;
+      data?: {
+        total: number;
+        ok: number;
+        failed: {
+          row: number;
+          message: string;
+        }[];
+        failedTruncated: boolean;
       };
     };
     SysUser: {
@@ -2170,81 +2302,6 @@ export interface components {
         }[];
       }[];
     };
-    SysRolePage: {
-      /**
-       * @description 业务码，200 表示成功
-       * @example 200
-       */
-      code: number;
-      /**
-       * @description 提示信息
-       * @example 操作成功
-       */
-      msg: string;
-      data?: {
-        list: {
-          id: number;
-          /** Format: date-time */
-          createTime: string;
-          /** Format: date-time */
-          updateTime: string;
-          roleName: string;
-          level: number;
-          isBuiltin: number;
-          permissions: string[];
-          rules?:
-            | {
-                action: string;
-                subject: string;
-                conditions?: {
-                  [key: string]: unknown;
-                };
-                fields?: string[];
-                inverted?: boolean;
-              }[]
-            | null;
-          dataScope: string;
-          status: number;
-        }[];
-        total: number;
-      };
-    };
-    SysRole: {
-      /**
-       * @description 业务码，200 表示成功
-       * @example 200
-       */
-      code: number;
-      /**
-       * @description 提示信息
-       * @example 操作成功
-       */
-      msg: string;
-      data?: {
-        id: number;
-        /** Format: date-time */
-        createTime: string;
-        /** Format: date-time */
-        updateTime: string;
-        roleName: string;
-        level: number;
-        isBuiltin: number;
-        permissions: string[];
-        rules?:
-          | {
-              action: string;
-              subject: string;
-              conditions?: {
-                [key: string]: unknown;
-              };
-              fields?: string[];
-              inverted?: boolean;
-            }[]
-          | null;
-        dataScope: string;
-        status: number;
-      };
-    };
   };
   responses: never;
   parameters: never;
@@ -2663,6 +2720,47 @@ export interface operations {
       };
     };
   };
+  UserController_exportCsv_v1: {
+    parameters: {
+      query?: {
+        keyword?: string;
+        deptId?: number;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  UserController_importCsv_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 导入结果 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserImportResult'];
+        };
+      };
+    };
+  };
   UserController_update_v1: {
     parameters: {
       query?: never;
@@ -2957,6 +3055,162 @@ export interface operations {
     };
   };
   DeptController_remove_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回 true 表示删除成功 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BoolResult'];
+        };
+      };
+    };
+  };
+  RoleController_page_v1: {
+    parameters: {
+      query?: {
+        pageNum?: number;
+        pageSize?: number;
+        keyword?: string;
+        status?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 分页结果 { list, total } */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRolePage'];
+        };
+      };
+    };
+  };
+  RoleController_create_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          roleName: string;
+          /** @default [] */
+          permissions?: string[];
+          rules?: {
+            action: string;
+            subject: string;
+            conditions?: {
+              [key: string]: unknown;
+            };
+            fields?: string[];
+            inverted?: boolean;
+          }[];
+          /**
+           * @default SELF
+           * @enum {string}
+           */
+          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
+          deptIds?: number[];
+          /** @default 1 */
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回创建后的角色 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_detail_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 返回角色详情 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_update_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          roleName?: string;
+          permissions?: string[];
+          rules?: {
+            action: string;
+            subject: string;
+            conditions?: {
+              [key: string]: unknown;
+            };
+            fields?: string[];
+            inverted?: boolean;
+          }[];
+          /** @enum {string} */
+          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
+          deptIds?: number[];
+          status?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description 返回更新后的角色 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SysRole'];
+        };
+      };
+    };
+  };
+  RoleController_remove_v1: {
     parameters: {
       query?: never;
       header?: never;
@@ -4135,160 +4389,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['Hazard'];
-        };
-      };
-    };
-  };
-  RoleController_page_v1: {
-    parameters: {
-      query?: {
-        pageNum?: number;
-        pageSize?: number;
-        keyword?: string;
-        status?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description 分页结果 { list, total } */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SysRolePage'];
-        };
-      };
-    };
-  };
-  RoleController_create_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          roleName: string;
-          /** @default [] */
-          permissions?: string[];
-          rules?: {
-            action: string;
-            subject: string;
-            conditions?: {
-              [key: string]: unknown;
-            };
-            fields?: string[];
-            inverted?: boolean;
-          }[];
-          /**
-           * @default SELF
-           * @enum {string}
-           */
-          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
-          /** @default 1 */
-          status?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description 返回创建后的角色 */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SysRole'];
-        };
-      };
-    };
-  };
-  RoleController_detail_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description 返回角色详情 */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SysRole'];
-        };
-      };
-    };
-  };
-  RoleController_update_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': {
-          roleName?: string;
-          permissions?: string[];
-          rules?: {
-            action: string;
-            subject: string;
-            conditions?: {
-              [key: string]: unknown;
-            };
-            fields?: string[];
-            inverted?: boolean;
-          }[];
-          /** @enum {string} */
-          dataScope?: 'ALL' | 'DEPT_AND_CHILD' | 'DEPT' | 'SELF' | 'CUSTOM';
-          status?: number;
-        };
-      };
-    };
-    responses: {
-      /** @description 返回更新后的角色 */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SysRole'];
-        };
-      };
-    };
-  };
-  RoleController_remove_v1: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description 返回 true 表示删除成功 */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['BoolResult'];
         };
       };
     };

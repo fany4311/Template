@@ -763,6 +763,84 @@
         ]
       }
     },
+    "/api/v1/user/export": {
+      "get": {
+        "operationId": "UserController_exportCsv_v1",
+        "parameters": [
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          },
+          {
+            "name": "deptId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "导出用户（CSV，最多 5000 条，按数据范围）",
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
+    "/api/v1/user/import": {
+      "post": {
+        "operationId": "UserController_importCsv_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "导入结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserImportResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "导入用户（CSV，逐行返回失败原因）",
+        "tags": [
+          "用户管理"
+        ]
+      }
+    },
     "/api/v1/user/{id}": {
       "put": {
         "operationId": "UserController_update_v1",
@@ -1449,6 +1527,389 @@
         "summary": "删除部门（软删除，有下级则拒绝）",
         "tags": [
           "部门管理"
+        ]
+      }
+    },
+    "/api/v1/role": {
+      "get": {
+        "operationId": "RoleController_page_v1",
+        "parameters": [
+          {
+            "name": "pageNum",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页结果 { list, total }",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SysRolePage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "分页查询角色",
+        "tags": [
+          "角色管理"
+        ]
+      },
+      "post": {
+        "operationId": "RoleController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roleName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "permissions": {
+                    "default": [],
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
+                        },
+                        "subject": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
+                        },
+                        "conditions": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        },
+                        "fields": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "inverted": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "action",
+                        "subject"
+                      ]
+                    }
+                  },
+                  "dataScope": {
+                    "default": "SELF",
+                    "type": "string",
+                    "enum": [
+                      "ALL",
+                      "DEPT_AND_CHILD",
+                      "DEPT",
+                      "SELF",
+                      "CUSTOM"
+                    ]
+                  },
+                  "deptIds": {
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "status": {
+                    "default": 1,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "roleName"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回创建后的角色",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SysRole"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "创建角色",
+        "tags": [
+          "角色管理"
+        ]
+      }
+    },
+    "/api/v1/role/{id}": {
+      "get": {
+        "operationId": "RoleController_detail_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "返回角色详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SysRole"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "角色详情",
+        "tags": [
+          "角色管理"
+        ]
+      },
+      "put": {
+        "operationId": "RoleController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roleName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "permissions": {
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64
+                    }
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
+                        },
+                        "subject": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 50
+                        },
+                        "conditions": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        },
+                        "fields": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "inverted": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "action",
+                        "subject"
+                      ]
+                    }
+                  },
+                  "dataScope": {
+                    "type": "string",
+                    "enum": [
+                      "ALL",
+                      "DEPT_AND_CHILD",
+                      "DEPT",
+                      "SELF",
+                      "CUSTOM"
+                    ]
+                  },
+                  "deptIds": {
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "status": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回更新后的角色",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SysRole"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "更新角色",
+        "tags": [
+          "角色管理"
+        ]
+      },
+      "delete": {
+        "operationId": "RoleController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "返回 true 表示删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoolResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "删除角色（软删除）",
+        "tags": [
+          "角色管理"
         ]
       }
     },
@@ -3953,369 +4414,6 @@
         ]
       }
     },
-    "/api/v1/role": {
-      "get": {
-        "operationId": "RoleController_page_v1",
-        "parameters": [
-          {
-            "name": "pageNum",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 9007199254740991
-            }
-          },
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 10,
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "keyword",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "maxLength": 50
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "分页结果 { list, total }",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SysRolePage"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "分页查询角色",
-        "tags": [
-          "角色管理"
-        ]
-      },
-      "post": {
-        "operationId": "RoleController_create_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "roleName": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 50
-                  },
-                  "permissions": {
-                    "default": [],
-                    "maxItems": 200,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "maxLength": 64
-                    }
-                  },
-                  "rules": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "action": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 50
-                        },
-                        "subject": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 50
-                        },
-                        "conditions": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        },
-                        "fields": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "inverted": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": [
-                        "action",
-                        "subject"
-                      ]
-                    }
-                  },
-                  "dataScope": {
-                    "default": "SELF",
-                    "type": "string",
-                    "enum": [
-                      "ALL",
-                      "DEPT_AND_CHILD",
-                      "DEPT",
-                      "SELF",
-                      "CUSTOM"
-                    ]
-                  },
-                  "status": {
-                    "default": 1,
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 1
-                  }
-                },
-                "required": [
-                  "roleName"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "返回创建后的角色",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SysRole"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "创建角色",
-        "tags": [
-          "角色管理"
-        ]
-      }
-    },
-    "/api/v1/role/{id}": {
-      "get": {
-        "operationId": "RoleController_detail_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "exclusiveMinimum": true,
-              "maximum": 9007199254740991
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "返回角色详情",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SysRole"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "角色详情",
-        "tags": [
-          "角色管理"
-        ]
-      },
-      "put": {
-        "operationId": "RoleController_update_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "exclusiveMinimum": true,
-              "maximum": 9007199254740991
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "roleName": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 50
-                  },
-                  "permissions": {
-                    "maxItems": 200,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "maxLength": 64
-                    }
-                  },
-                  "rules": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "action": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 50
-                        },
-                        "subject": {
-                          "type": "string",
-                          "minLength": 1,
-                          "maxLength": 50
-                        },
-                        "conditions": {
-                          "type": "object",
-                          "additionalProperties": {}
-                        },
-                        "fields": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "inverted": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": [
-                        "action",
-                        "subject"
-                      ]
-                    }
-                  },
-                  "dataScope": {
-                    "type": "string",
-                    "enum": [
-                      "ALL",
-                      "DEPT_AND_CHILD",
-                      "DEPT",
-                      "SELF",
-                      "CUSTOM"
-                    ]
-                  },
-                  "status": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 1
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "返回更新后的角色",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SysRole"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "更新角色",
-        "tags": [
-          "角色管理"
-        ]
-      },
-      "delete": {
-        "operationId": "RoleController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "exclusiveMinimum": true,
-              "maximum": 9007199254740991
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "返回 true 表示删除成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BoolResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "删除角色（软删除）",
-        "tags": [
-          "角色管理"
-        ]
-      }
-    },
     "/api/v1/permission": {
       "get": {
         "operationId": "PermissionController_list_v1",
@@ -4577,6 +4675,248 @@
           },
           "data": {
             "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "msg"
+        ]
+      },
+      "SysRolePage": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200,
+            "description": "业务码，200 表示成功"
+          },
+          "msg": {
+            "type": "string",
+            "example": "操作成功",
+            "description": "提示信息"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "list": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "createTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "roleName": {
+                      "type": "string"
+                    },
+                    "level": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "isBuiltin": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "rules": {
+                      "nullable": true,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "action": {
+                            "type": "string"
+                          },
+                          "subject": {
+                            "type": "string"
+                          },
+                          "conditions": {
+                            "type": "object",
+                            "additionalProperties": {}
+                          },
+                          "fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "inverted": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "action",
+                          "subject"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "dataScope": {
+                      "type": "string"
+                    },
+                    "deptIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "createTime",
+                    "updateTime",
+                    "roleName",
+                    "level",
+                    "isBuiltin",
+                    "permissions",
+                    "dataScope",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "total": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "list",
+              "total"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "msg"
+        ]
+      },
+      "SysRole": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200,
+            "description": "业务码，200 表示成功"
+          },
+          "msg": {
+            "type": "string",
+            "example": "操作成功",
+            "description": "提示信息"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "roleName": {
+                "type": "string"
+              },
+              "level": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "isBuiltin": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rules": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "conditions": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "fields": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "inverted": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "action",
+                    "subject"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "dataScope": {
+                "type": "string"
+              },
+              "deptIds": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "status": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "createTime",
+              "updateTime",
+              "roleName",
+              "level",
+              "isBuiltin",
+              "permissions",
+              "dataScope",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -4888,6 +5228,65 @@
             "required": [
               "list",
               "total"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "code",
+          "msg"
+        ]
+      },
+      "UserImportResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200,
+            "description": "业务码，200 表示成功"
+          },
+          "msg": {
+            "type": "string",
+            "example": "操作成功",
+            "description": "提示信息"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "ok": {
+                "type": "number"
+              },
+              "failed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "row": {
+                      "type": "number"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "row",
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "failedTruncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "total",
+              "ok",
+              "failed",
+              "failedTruncated"
             ],
             "additionalProperties": false
           }
@@ -7917,236 +8316,6 @@
               ],
               "additionalProperties": false
             }
-          }
-        },
-        "required": [
-          "code",
-          "msg"
-        ]
-      },
-      "SysRolePage": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "example": 200,
-            "description": "业务码，200 表示成功"
-          },
-          "msg": {
-            "type": "string",
-            "example": "操作成功",
-            "description": "提示信息"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "list": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "createTime": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "updateTime": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "roleName": {
-                      "type": "string"
-                    },
-                    "level": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "isBuiltin": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "permissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "rules": {
-                      "nullable": true,
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "action": {
-                            "type": "string"
-                          },
-                          "subject": {
-                            "type": "string"
-                          },
-                          "conditions": {
-                            "type": "object",
-                            "additionalProperties": {}
-                          },
-                          "fields": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          },
-                          "inverted": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "action",
-                          "subject"
-                        ],
-                        "additionalProperties": false
-                      }
-                    },
-                    "dataScope": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "createTime",
-                    "updateTime",
-                    "roleName",
-                    "level",
-                    "isBuiltin",
-                    "permissions",
-                    "dataScope",
-                    "status"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "total": {
-                "type": "number"
-              }
-            },
-            "required": [
-              "list",
-              "total"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "required": [
-          "code",
-          "msg"
-        ]
-      },
-      "SysRole": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "example": 200,
-            "description": "业务码，200 表示成功"
-          },
-          "msg": {
-            "type": "string",
-            "example": "操作成功",
-            "description": "提示信息"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "createTime": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              },
-              "updateTime": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-              },
-              "roleName": {
-                "type": "string"
-              },
-              "level": {
-                "type": "integer",
-                "minimum": -9007199254740991,
-                "maximum": 9007199254740991
-              },
-              "isBuiltin": {
-                "type": "integer",
-                "minimum": -9007199254740991,
-                "maximum": 9007199254740991
-              },
-              "permissions": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "rules": {
-                "nullable": true,
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "action": {
-                      "type": "string"
-                    },
-                    "subject": {
-                      "type": "string"
-                    },
-                    "conditions": {
-                      "type": "object",
-                      "additionalProperties": {}
-                    },
-                    "fields": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "inverted": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "action",
-                    "subject"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "dataScope": {
-                "type": "string"
-              },
-              "status": {
-                "type": "number"
-              }
-            },
-            "required": [
-              "id",
-              "createTime",
-              "updateTime",
-              "roleName",
-              "level",
-              "isBuiltin",
-              "permissions",
-              "dataScope",
-              "status"
-            ],
-            "additionalProperties": false
           }
         },
         "required": [

@@ -35,6 +35,8 @@
 
 - **ESM**：相对导入必须带 `.js`；禁 `src/...` 路径别名；用 `import.meta.dirname`；内置模块加 `node:` 前缀。
 - **数据库**：`DB_SYNCHRONIZE=false`（三份 `.env`）；已跑迁移不可改，只能追加；派生新系统**必须独立库**。
+- **库与账号**：三类角色 `<项目>`(dev) / `<项目>_prod` / `<项目>_tmp`；定义在 `server/sql/databases.sql`，
+  台账在 `docs/库台账.md`。**一库一账号，禁止跨库 GRANT** —— dev 凭据必须读写不了 prod 库。
 - **TypeORM**：联合类型字段必须显式 `type`。
 - **权限码**：接口（DTO）只收具体码（2–3 段小写，不含 `*` / `!`）；`*:*:*` 必须独占。
 - **同机共存**：绝不 `pm2 kill` / 停 nginx；端口 / PM2 名 / 站点名 / 目录 / token key 全局唯一；库 / Redis 索引 / bucket 独立。
@@ -57,6 +59,7 @@
 | 通用管理域 | `docs/通用管理域.md` |
 | 隐患闭环（示例业务） | `docs/隐患闭环.md` |
 | 部署端环境 | `docs/部署端环境.md` |
+| 库与账号台账 | `docs/库台账.md` |
 | 本地环境 | `docs/本地环境.md` |
 | 派生新项目清单 | `docs/init.md` |
 

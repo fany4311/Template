@@ -23,6 +23,16 @@ step "后端 lint"
 step "权限一致性（代码 ⇄ sys_permission ⇄ sys_menu）"
 (cd server && pnpm authz:check)
 
+# 迁移一致性：代码里有、库里没跑 → 派生/上线最经典的 500 制造机。
+# TypeORM 的 `migration:show` 用 `[X]` 标记已执行、`[ ]` 标记未执行。
+# 用 if 而不是 `cmd && die`：grep 没匹配到时是非零，直接跟 && 会被 set -e 判成失败。
+step "迁移一致性（代码 ⇄ 库）"
+if (cd server && NODE_ENV=dev pnpm migration:show 2>/dev/null) | grep -q '^\[ \]'; then
+  echo "✗ 有迁移未在 dev 库执行，先跑：cd server && NODE_ENV=dev pnpm migration:run" >&2
+  exit 1
+fi
+echo "    dev 库已与代码迁移对齐"
+
 step "前端 lint（web_admin / web）"
 (cd web_admin && pnpm lint)
 (cd web && pnpm lint)

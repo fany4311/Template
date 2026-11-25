@@ -89,12 +89,17 @@ if [ -n "$PORTS" ]; then
 fi
 
 # ── 预检 ─────────────────────────────────────────────────────────────
-command -v git >/dev/null 2>&1 || die "需要 git"
-git rev-parse --git-dir >/dev/null 2>&1 || die "当前目录不是 git 仓库：$ROOT"
-
-DIRTY="$(git status --porcelain --untracked-files=no)"
-[ -z "$DIRTY" ] || die "工作区有未提交改动，先提交或 stash：
+# 版本控制是个人习惯，不强制：有 git 就做「工作区干净」保护（防止改到一半误改），
+# 没有就只提醒一句然后继续。rename 本身不依赖 git。
+HAS_GIT=0
+if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  HAS_GIT=1
+  DIRTY="$(git status --porcelain --untracked-files=no)"
+  [ -z "$DIRTY" ] || die "工作区有未提交改动，先提交或 stash：
 $DIRTY"
+else
+  warn "未检测到版本控制仓库：跳过工作区检查（建议先自行备份一份基线）"
+fi
 
 CUR_SLUG="$(sed -n 's/.*"name": *"\([a-z0-9-]*\)-server".*/\1/p' server/package.json | head -1)"
 if [ "$CUR_SLUG" = "$SLUG" ]; then
@@ -200,7 +205,8 @@ build_new() {
 
 move_file() {
   local src="$1" dst="$2"
-  if git ls-files --error-unmatch "$src" >/dev/null 2>&1; then
+  # 有 git 且文件已跟踪 → 用 git mv 保留历史；其他情况一律普通 mv
+  if [ "$HAS_GIT" -eq 1 ] && git ls-files --error-unmatch "$src" >/dev/null 2>&1; then
     git mv "$src" "$dst"
   else
     mv "$src" "$dst"
@@ -294,7 +300,7 @@ fi
 
 if [ "$CONFIRM" -eq 0 ]; then
   echo
-  log "这只是预览。确认后重跑并加 --yes（建议先 git commit 一次基线）"
+  log "这只是预览。确认后重跑并加 --yes（建议先自行备份一份基线）"
   exit 0
 fi
 
@@ -339,7 +345,7 @@ cat <<EOF
    2. Redis 索引：确认 .env.* 的 REDIS_DB 是未被占用的编号
    3. 重新导出契约：cd server && pnpm openapi:dump
    4. 目录改名（脚本不动 cwd）：cd .. && mv $(basename "$ROOT") $SLUG
-   5. 复核：git status && git diff --stat，确认后再提交
+   5. 复核：确认文件已改名、无残留旧标识，再继续后续工作
 EOF
 
 [ -z "$LEFT" ] || exit 4

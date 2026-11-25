@@ -36,7 +36,7 @@ bash deploy/rename.sh <slug> \
   否则派生项目把旧 secret 抄回来就绕过了校验。
 - `--brand` 以「平台/系统」结尾时不再追加「管理平台」。
 - 默认要求工作区干净、只预览不落盘；`--yes` 才写文件。失败不自动回滚（怕误删未跟踪文件），
-  手工 `git checkout -- .` 即可回到基线。
+  手工还原改动即可回到基线。
 - `--env` 只改三份真实 `.env.*` 的身份键（`APP_NAME` / `DB_USERNAME` / `DB_DATABASE` / `STORAGE_S3_BUCKET`，
   含 `--ports` 时还有 dev 的 `PORT`），改前留 `.bak`；不碰 `JWT_SECRET` 与密码。
 - 收尾写 `docs/RENAMED.md`（原身份、新身份、时间、仍待人工项），便于日后追溯。
@@ -56,7 +56,7 @@ bash deploy/rename.sh <slug> \
 改名后复查（脚本收尾已按「旧标识」自检；手工复查把 `<旧标识>` 换成上一个项目名）：
 
 ```bash
-grep -rn "<旧标识>" --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.git .
+grep -rn "<旧标识>" --exclude-dir=node_modules --exclude-dir=dist .
 ```
 
 ## 2. 存储：二选一

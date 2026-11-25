@@ -6,9 +6,9 @@
 #   bash scripts/db-apply.sh [--dry-run]
 #
 # 为什么要这个脚本：
-#   真实密码**不能写进 databases.sql** —— 那个文件随 SVN 分发给派生项目，
-#   写进去等于把本机密码发给所有副本，而且 git 历史里擦不掉。
-#   所以：SQL 里只留 <改我-dev|prod|tmp> 占位符，真密码只存在（已 gitignore 的）
+#   真实密码**不能写进 databases.sql** —— 那个文件随底座副本分发给派生项目，
+#   写进去等于把本机密码发给所有副本，而且传播出去就收不回。
+#   所以：SQL 里只留 <改我-dev|prod|tmp> 占位符，真密码只存在（不入库的）
 #   .env.dev / .env.test / .env.prod 里，由本脚本在**临时文件**里渲染后执行。
 #
 # 管理员连接（与 db-reset.sh 同一套接口）：

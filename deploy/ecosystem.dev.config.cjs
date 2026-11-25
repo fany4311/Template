@@ -27,11 +27,11 @@
  */
 const path = require('node:path');
 
-const TRUNK = path.join(__dirname, '..');
-const SERVER_DIR = path.join(TRUNK, 'server');
-const ADMIN_DIR = path.join(TRUNK, 'web_admin');
-const WEB_DIR = path.join(TRUNK, 'web');
-const LOG_DIR = path.join(TRUNK, 'logs', 'dev');
+const ROOT = path.join(__dirname, '..');
+const SERVER_DIR = path.join(ROOT, 'server');
+const ADMIN_DIR = path.join(ROOT, 'web_admin');
+const WEB_DIR = path.join(ROOT, 'web');
+const LOG_DIR = path.join(ROOT, 'logs', 'dev');
 
 /** vite 的真实入口（见上面第 1 条坑） */
 const viteBin = (dir) => path.join(dir, 'node_modules', 'vite', 'bin', 'vite.js');
